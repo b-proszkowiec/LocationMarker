@@ -1,21 +1,14 @@
 package com.example.locationmarker;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 //* osmd
 import org.osmdroid.config.Configuration;
@@ -23,20 +16,16 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 public class MapActivity extends AppCompatActivity implements LocationListener {
     private static final String TAG = "MapActivity";
-
+    private static final double TEST_LOCATION_LAT = 50.06166667;      // rynek w Krakowie
+    private static final double TEST_LOCATION_LON = 19.93722222;
     private static final float DEFAULT_ZOOM = 15f;
 
     // vars
-    private static Boolean mLocationPermissionGranted = false;
     private MapView mMap = null;
-    private LocationManager mLocationManager = null;
     private Location mLocation = null;
-    private float mCurrentZoom = DEFAULT_ZOOM;
-    private MyLocationNewOverlay mMyLocationOverlay;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,33 +47,23 @@ public class MapActivity extends AppCompatActivity implements LocationListener {
     }
 
     private void goToTestLocation() {
-        GeoPoint startPoint = new GeoPoint(50.06166667, 19.93722222);   // rynek w Kraowie
-        moveCamera(startPoint, DEFAULT_ZOOM);
-        addMarker(startPoint);
+        moveCamera(new GeoPoint(TEST_LOCATION_LAT, TEST_LOCATION_LON), DEFAULT_ZOOM);
+        addMarker(new GeoPoint(TEST_LOCATION_LAT, TEST_LOCATION_LON));
     }
 
-    private void moveCamera(GeoPoint geoLocation, float zoom) {
+    private void moveCamera(GeoPoint position, float zoom) {
         mMap.getController().setZoom(zoom);
-        mMap.getController().animateTo(geoLocation);
+        mMap.getController().animateTo(position);
     }
 
-    private void getDeviceLocation() {
-        Log.d(TAG, "getDeviceLocation: getting the devices current location");
-
-        try {
-            mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            if (ActivityCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            //mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 100, this);
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        } catch (Exception ex) {
-            Log.d(TAG, "getDeviceLocation: exception occured " + ex.toString());
-            //do something useful here
+    private void moveCamera(Location mLocation, float zoom) {
+        GeoPoint position;
+        if (mLocation == null) {
+            position = new GeoPoint(TEST_LOCATION_LAT, TEST_LOCATION_LON);
+        } else {
+            position = new GeoPoint(mLocation.getLatitude(), mLocation.getLongitude());
         }
+        moveCamera(position, zoom);
     }
 
     private void markPosition(GeoPoint startPoint) {
@@ -96,6 +75,10 @@ public class MapActivity extends AppCompatActivity implements LocationListener {
         startMarker.setPosition(startPoint);
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         mMap.getOverlays().add(startMarker);
+    }
+
+    public void centerButtonOnClick(View view) {
+        moveCamera(mLocation, (float) mMap.getZoomLevelDouble());
     }
 
     @Override
@@ -125,11 +108,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, "onLocationChanged: provider location changed");
-        mLocation = location;
-
         Log.d(TAG, "onLocationChanged: " + location.toString());
-        moveCamera(new GeoPoint(location.getLatitude(), location.getLongitude()), (float) mMap.getZoomLevelDouble());
+        mLocation = location;
     }
 
     @Override

@@ -34,13 +34,16 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         getLocationPermission();
+    }
 
+    private void movetoMapActivity() {
         // move to another activity on start
         if (mLocationPermissionGranted) {
             Intent intent = new Intent(this, MapActivity.class);
             startActivity(intent);
         }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -61,6 +64,7 @@ public class MainActivity extends Activity {
                     Log.d(TAG, "onRequestPermissionsResult: permission granted");
 
                     // initialize a map
+                    movetoMapActivity();
                 }
             }
         }
@@ -86,5 +90,6 @@ public class MainActivity extends Activity {
         } else {
             ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
         }
+        movetoMapActivity();
     }
 }
