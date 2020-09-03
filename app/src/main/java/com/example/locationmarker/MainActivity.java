@@ -6,18 +6,27 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.LocationManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
+import android.widget.Toast;
 
-import org.osmdroid.views.MapView;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.gcm.Task;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 
-
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -25,25 +34,44 @@ public class MainActivity extends Activity {
     private static final String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
 
+    private static final int ERROR_DIALOG_REQUEST = 9001;
+
     // vars
     private static Boolean mLocationPermissionGranted = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        getLocationPermission();
-    }
-
-    private void movetoMapActivity() {
-        // move to another activity on start
-        if (mLocationPermissionGranted) {
-            Intent intent = new Intent(this, MapActivity.class);
-            startActivity(intent);
+        if (isServicesOK()) {
+            getLocationPermission();
         }
     }
 
+    private void mapInit() {
+        mLocationPermissionGranted = true;
+        Intent intent = new Intent(this, MapActivity.class);
+        startActivity(intent);
+    }
+
+    public boolean isServicesOK() {
+        Log.d(TAG, "isServicesOK: Checking google services version");
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
+
+        if (available == ConnectionResult.SUCCESS) {
+            // everything is fine and user can make map requests
+            Log.d(TAG, "isServicesOK: Google play services is working");
+            return true;
+        } else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
+            // an error occured but we can resolve it
+            Log.d(TAG, "isServicesOK: an error occured but we can fix it");
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
+        } else {
+            Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show();
+        }
+        return false;
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -56,15 +84,12 @@ public class MainActivity extends Activity {
                 if (grantResults.length > 0) {
                     for (int i = 0; i < grantResults.length; i++) {
                         if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                            Log.d(TAG, "onRequestPermissionsResult: permission falied");
+                            Log.d(TAG, "onRequestPermissionsResult: permission failed");
                             return;
                         }
                     }
-                    mLocationPermissionGranted = true;
+                    mapInit();
                     Log.d(TAG, "onRequestPermissionsResult: permission granted");
-
-                    // initialize a map
-                    movetoMapActivity();
                 }
             }
         }
@@ -80,7 +105,7 @@ public class MainActivity extends Activity {
                     COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                         WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    mLocationPermissionGranted = true;
+                    mapInit();
                 } else {
                     ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
                 }
@@ -90,6 +115,7 @@ public class MainActivity extends Activity {
         } else {
             ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
         }
-        movetoMapActivity();
     }
+
+
 }
