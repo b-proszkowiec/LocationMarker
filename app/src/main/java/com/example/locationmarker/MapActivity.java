@@ -23,9 +23,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.security.Provider;
-
-
 public class MapActivity extends AppCompatActivity implements LocationListener, OnMapReadyCallback {
     private static final String TAG = "MapActivity";
     private static final double TEST_LOCATION_LAT = 50.06166667;      // rynek w Krakowie
@@ -76,6 +73,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         LatLng krakow = new LatLng(TEST_LOCATION_LAT, TEST_LOCATION_LON);
 
         mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.addMarker(new MarkerOptions()
                 .position(krakow)
                 .title("Marker in Krakow"));
@@ -95,7 +93,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         String provider = locationManager.getBestProvider(criteria, true);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L,0.01f, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L,0.5f, this);
 
     }
 }
