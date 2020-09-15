@@ -13,18 +13,21 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-public class MarkersContainer {
+public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Comparator<LatLng> {
     private static final String TAG = MarkersContainer.class.getSimpleName();
     // vars
     private static Context context;
     private static MarkersContainer instance;
     private static GoogleMap map;
-    private ArrayList<Marker> mMarkersList;
+    private ArrayList<MyMarker> mMarkersList;
 
     public static void setMap(GoogleMap map) {
         MarkersContainer.map = map;
+        map.setOnMarkerClickListener(instance);
     }
 
     public static void setContext(Context context) {
@@ -40,22 +43,24 @@ public class MarkersContainer {
 
     public MarkersContainer() {
         this.instance = this;
-        this.mMarkersList = new ArrayList<Marker>();
+        this.mMarkersList = new ArrayList<MyMarker>();
     }
 
     public void addMarker(Location location) {
         if (isEnoughFarDistanceBetweenOtherMarkers(location)) {
-            mMarkersList.add(new Marker(location));
+            mMarkersList.add(new MyMarker(location));
         }
 
         map.addMarker(new MarkerOptions()
                 .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                .title("Test location " + mMarkersList.size()));
+                .title("Test location " + mMarkersList.size())
+
+        );
     }
 
     boolean isEnoughFarDistanceBetweenOtherMarkers(Location location){
-        for(Marker marker : mMarkersList) {
-            Location markerLocation = marker.getLocation();
+        for(MyMarker myMarker : mMarkersList) {
+            Location markerLocation = myMarker.getLocation();
             double distance = distance(markerLocation.getLatitude(), location.getLatitude(),
                     markerLocation.getLongitude(), location.getLongitude(),
                     0.0, 0.0);
@@ -88,20 +93,41 @@ public class MarkersContainer {
         return Math.sqrt(distance);
     }
 
+    public int compare(LatLng o1, LatLng o2) {
+        return (int) (o2.latitude - o1.latitude) * 10*1000;
+    }
+
     public double computeArea() {
         if (mMarkersList.size() <= 2) {
             return 0;
         }
-        List<LatLng> latLngs = new ArrayList<>();
-        for (Marker marker : mMarkersList) {
-            latLngs.add(new LatLng(marker.getLocation().getLatitude(), marker.getLocation().getLongitude()));
+        List<LatLng> points = new ArrayList<>();
+        for (MyMarker myMarker : mMarkersList) {
+            points.add(new LatLng(myMarker.getLocation().getLatitude(), myMarker.getLocation().getLongitude()));
         }
-        double surface = SphericalUtil.computeSignedArea(latLngs);
+        Collections.sort(points, this);
+
+        final double  R = 6371; // Radius of the earth
+        double surface = SphericalUtil.computeSignedArea(points);
         Log.d(TAG, "computeArea " + surface);
 
-        map.addPolygon(
-                new PolygonOptions().addAll(latLngs).strokeWidth(0).fillColor(Color.RED));
+        float alpha = 127; // 50% transparent
+
+
+        PolygonOptions polygonOptions = new PolygonOptions().addAll(points).strokeWidth(0).fillColor(Color.parseColor("#A3E17F"));
+
+        map.addPolygon(polygonOptions);
 
         return surface;
+    }
+
+    public void clear() {
+        mMarkersList.clear();
+    }
+
+    @Override
+    public boolean onMarkerClick(com.google.android.gms.maps.model.Marker marker) {
+        Toast.makeText(context, "Clicked " + marker.getId(), Toast.LENGTH_SHORT).show();
+        return false;
     }
 }

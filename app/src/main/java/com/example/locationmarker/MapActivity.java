@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.locationmarker.markers.MarkersContainer;
+import com.example.locationmarker.markers.ShowPopUp;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -122,19 +123,25 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L,0.5f, this);
     }
 
-    public void addPointButtonOnClickListener(View view) {
+    public void onClickAddPointButton(View view) {
         Log.d(TAG, "addPointButtonOnClickListener: button clicked");
+        ShowPopUp show = new ShowPopUp();
 
-        //markersContainer.getInstance().addMarker(mLastLocation);
+    }
+    
+    public void onClickTestButton(View view) {
+        Log.d(TAG, "onClickTestButton: button clicked");
         markerTest();
-
     }
 
     private void markerTest() {
+
+        markersContainer.getInstance().clear();
         markersContainer.getInstance().addMarker(getTestLocation(52.22526819, 20.95346435));
         markersContainer.getInstance().addMarker(getTestLocation(52.22526819, 20.95376435));
         markersContainer.getInstance().addMarker(getTestLocation(52.22566819, 20.95346435));
-        markersContainer.getInstance().addMarker(getTestLocation(52.22566819, 20.95376435));
+        //markersContainer.getInstance().addMarker(getTestLocation(52.22566819, 20.95376436));
+        //markersContainer.getInstance().addMarker(getTestLocation(52.22516819, 20.95371436));
 
         Toast.makeText(this, "Surface is equal to: " + markersContainer.getInstance().computeArea(), Toast.LENGTH_SHORT).show();
     }
