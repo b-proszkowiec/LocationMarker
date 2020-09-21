@@ -125,8 +125,9 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
     public void onClickAddPointButton(View view) {
         Log.d(TAG, "addPointButtonOnClickListener: button clicked");
-        ShowPopUp show = new ShowPopUp();
 
+        markersContainer.getInstance().addMarker(mLastLocation);
+        markersContainer.getInstance().drawPolyline();
     }
     
     public void onClickTestButton(View view) {

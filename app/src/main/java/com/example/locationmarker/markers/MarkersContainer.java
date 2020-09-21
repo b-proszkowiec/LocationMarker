@@ -1,5 +1,6 @@
 package com.example.locationmarker.markers;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
@@ -10,17 +11,23 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.google.maps.android.SphericalUtil.interpolate;
+
 public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Comparator<LatLng> {
     private static final String TAG = MarkersContainer.class.getSimpleName();
     // vars
+    @SuppressLint("StaticFieldLeak")
     private static Context context;
+    @SuppressLint("StaticFieldLeak")
     private static MarkersContainer instance;
     private static GoogleMap map;
     private ArrayList<MyMarker> mMarkersList;
@@ -42,8 +49,8 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
     }
 
     public MarkersContainer() {
-        this.instance = this;
-        this.mMarkersList = new ArrayList<MyMarker>();
+        instance = this;
+        this.mMarkersList = new ArrayList<>();
     }
 
     public void addMarker(Location location) {
@@ -64,8 +71,9 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
             double distance = distance(markerLocation.getLatitude(), location.getLatitude(),
                     markerLocation.getLongitude(), location.getLongitude(),
                     0.0, 0.0);
-            //Toast.makeText(context, "Distance is equal to: " + distance, Toast.LENGTH_SHORT).show();
-
+            if (distance < 0.5) {
+                return false;
+            }
         }
         return true;
     }
@@ -97,6 +105,53 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         return (int) (o2.latitude - o1.latitude) * 10*1000;
     }
 
+    public void drawPolyline() {
+
+        PolylineOptions polylineOptions = new PolylineOptions().color(Color.GREEN);
+
+        List<LatLng> points = getLatLngFromLocation();
+        map.addPolyline(polylineOptions.addAll(points));
+        if(points.size() > 2) {
+            map.addPolyline(polylineOptions.add(points.get(0)));
+        }
+        writeDistancesOnMap();
+    }
+
+    private List<LatLng> getLatLngFromLocation() {
+        List<LatLng> points = new ArrayList<>();
+        for (MyMarker myMarker : mMarkersList) {
+            points.add(new LatLng(myMarker.getLocation().getLatitude(), myMarker.getLocation().getLongitude()));
+        }
+        return points;
+    }
+
+    private void writeDistancesOnMap() {
+
+        List<LatLng> points = getLatLngFromLocation();
+
+        int len = points.size();
+        LatLng locStart, locEnd;
+        for (int i = 0; i < len; i++) {
+            locStart = points.get(i);
+            if (i == len-1) {
+                locEnd = points.get(0);
+            } else {
+                locEnd = points.get(i+1);
+            }
+            double distance = distance(locStart.latitude, locEnd.latitude,
+                    locStart.longitude, locEnd.longitude, 0, 0);
+
+
+            LatLng middle = interpolate(locStart, locEnd, 0.5);
+            map.addMarker(new MarkerOptions()
+                    .position(new LatLng(middle.latitude, middle.longitude))
+                    .title(new DecimalFormat("#.00").format(distance))
+                    //.visible(false)
+
+            ).showInfoWindow();
+        }
+    }
+
     public double computeArea() {
         if (mMarkersList.size() <= 2) {
             return 0;
@@ -107,17 +162,11 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         }
         Collections.sort(points, this);
 
-        final double  R = 6371; // Radius of the earth
         double surface = SphericalUtil.computeSignedArea(points);
         Log.d(TAG, "computeArea " + surface);
 
-        float alpha = 127; // 50% transparent
-
-
-        PolygonOptions polygonOptions = new PolygonOptions().addAll(points).strokeWidth(0).fillColor(Color.parseColor("#A3E17F"));
-
+        PolygonOptions polygonOptions = new PolygonOptions().addAll(points).strokeWidth(0);
         map.addPolygon(polygonOptions);
-
         return surface;
     }
 

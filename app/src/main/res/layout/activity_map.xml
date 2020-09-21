@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:ignore="ExtraText">
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/map"
         tools:context=".MapsActivity"
         android:name="com.google.android.gms.maps.SupportMapFragment"
-
+        android:layout_weight="1"
         />
 
     <RelativeLayout
         android:id="@+id/buttonsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/map"
-        android:layout_marginBottom="10dp"
-        android:layout_weight="0dp">
+        android:layout_alignParentBottom="true"
+        android:layout_weight="15"
+        >
 
         <Button
             android:id="@+id/addPointButton"
@@ -31,11 +32,8 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="30dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginBottom="10dp"
             android:background="@drawable/mybutton"
             android:onClick="onClickAddPointButton"
-            android:padding="10dp"
             android:text="Add point"
             android:textColor="#ffffff" />
 
@@ -45,13 +43,10 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="30dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginBottom="10dp"
             android:background="@drawable/mybutton"
             android:onClick="onClickTestButton"
-            android:padding="10dp"
             android:text="TEST"
             android:textColor="#ffffff" />
     </RelativeLayout>
 
-</RelativeLayout>
+</LinearLayout>
