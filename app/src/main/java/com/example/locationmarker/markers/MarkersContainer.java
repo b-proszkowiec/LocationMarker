@@ -2,12 +2,27 @@ package com.example.locationmarker.markers;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
+
+import com.example.locationmarker.R;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
@@ -58,11 +73,17 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
             mMarkersList.add(new MyMarker(location));
         }
 
+        Bitmap bmpIcon = drawableToBitmap(ContextCompat.getDrawable(context, R.drawable.testdrawable));
+
+        BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bmpIcon);
+
         map.addMarker(new MarkerOptions()
                 .position(new LatLng(location.getLatitude(), location.getLongitude()))
                 .title("Test location " + mMarkersList.size())
+                //.icon(BitmapDescriptorFactory.fromBitmap(bmp))
+                //.anchor(0.5f, 1)
 
-        );
+        ).setIcon(icon);
     }
 
     boolean isEnoughFarDistanceBetweenOtherMarkers(Location location){
@@ -77,6 +98,57 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         }
         return true;
     }
+
+
+
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        Bitmap bitmap = null;
+
+        if (drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+            if(bitmapDrawable.getBitmap() != null) {
+                return bitmapDrawable.getBitmap();
+            }
+        }
+
+        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
+            bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
+        } else {
+            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        }
+
+        Canvas canvas = new Canvas(bitmap);
+
+
+        Resources resources = context.getResources();
+        float scale = resources.getDisplayMetrics().density * 5;
+
+        // new antialised Paint
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        // text color - #3D3D3D
+        paint.setColor(Color.rgb(110,110, 110));
+        // text size in pixels
+        paint.setTextSize((int) (12)*scale);
+        // text shadow
+        paint.setShadowLayer(1f, 0f, 1f, Color.DKGRAY);
+        // draw text to the Canvas center
+
+        Rect bounds = new Rect();
+        String mText = "!!!";
+        paint.getTextBounds(mText, 0, mText.length(), bounds);
+        int x = (bitmap.getWidth() - bounds.width())/6;
+        int y = (bitmap.getHeight() + bounds.height())/5;
+
+        canvas.drawText(mText, x * scale, y * scale, paint);
+        canvas.drawRect(bounds, paint);
+
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
+    }
+
+
 
     /**
      * Calculate distance between two points in latitude and longitude taking
