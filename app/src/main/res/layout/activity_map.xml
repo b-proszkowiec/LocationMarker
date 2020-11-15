@@ -17,6 +17,7 @@
         android:layout_weight="1"
         />
 
+
     <RelativeLayout
         android:id="@+id/buttonsLayout"
         android:layout_width="match_parent"
