@@ -23,6 +23,7 @@ import com.google.android.gms.maps.GoogleMap;
 
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -115,6 +116,11 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         Criteria criteria = new Criteria();
         String provider = locationManager.getBestProvider(criteria, true);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L,0.5f, this);
+
+        UiSettings uiSettings = mMap.getUiSettings();
+        uiSettings.setAllGesturesEnabled(true);
+        uiSettings.setMapToolbarEnabled(true);
+        uiSettings.setZoomControlsEnabled(true);
     }
 
     public void onClickAddPointButton(View view) {
