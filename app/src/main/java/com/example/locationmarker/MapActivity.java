@@ -11,13 +11,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.locationmarker.markers.MarkersContainer;
-import com.example.locationmarker.markers.ShowPopUp;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -26,12 +24,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.maps.android.SphericalUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements LocationListener, OnMapReadyCallback {
     private static final String TAG = "MapActivity";
@@ -91,7 +84,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(krakow, DEFAULT_ZOOM));
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -143,7 +137,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         markersContainer.getInstance().addMarker(getTestLocation(52.22566819, 20.95346435));
         //markersContainer.getInstance().addMarker(getTestLocation(52.22566819, 20.95376436));
         //markersContainer.getInstance().addMarker(getTestLocation(52.22516819, 20.95371436));
-
         Toast.makeText(this, "Surface is equal to: " + markersContainer.getInstance().computeArea(), Toast.LENGTH_SHORT).show();
     }
 
