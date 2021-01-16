@@ -26,11 +26,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-
     private static final int ERROR_DIALOG_REQUEST = 9001;
 
     // vars
     private static Boolean mLocationPermissionGranted = false;
+    private Fragment mapFragment = null;
 
 
     @Override
@@ -51,7 +51,10 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (item.getItemId()) {
                     case R.id.mapsFragment:
-                        selectedFragment = new MapsFragment();
+                        if (mapFragment == null) {
+                            mapFragment = new MapsFragment();
+                        }
+                        selectedFragment = mapFragment;
                         break;
                     case R.id.itemFragment:
                         selectedFragment = new ItemFragment();

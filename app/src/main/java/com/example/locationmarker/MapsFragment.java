@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.locationmarker.markers.MarkersContainer;
@@ -88,6 +87,13 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng initLocation = new LatLng(INIT_LOCATION_LAT, INIT_LOCATION_LON);
+        if (mLastLocation != null) {
+            initLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        }
+
+        if (googleMap == mMap) {
+            return;
+        }
 
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
