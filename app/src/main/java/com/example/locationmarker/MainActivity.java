@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,19 +31,20 @@ public class MainActivity extends AppCompatActivity {
 
     // vars
     private static Boolean mLocationPermissionGranted = false;
-    private Fragment mapFragment = null;
+    private MapsFragment mapFragment;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mapFragment = new MapsFragment();
 
         if (isServicesOK()) {
             getLocationPermission();
         }
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        BottomNavigationView navigation = findViewById(R.id.bottom_navigation);
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -51,9 +53,6 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (item.getItemId()) {
                     case R.id.mapsFragment:
-                        if (mapFragment == null) {
-                            mapFragment = new MapsFragment();
-                        }
                         selectedFragment = mapFragment;
                         break;
                     case R.id.itemFragment:
@@ -140,5 +139,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    public void onClickAddPointButton(View view) {
+        Log.d(TAG, "addPointButtonOnClickListener: button clicked");
+        mapFragment.adPoint();
+    }
+
+    public void onClickTestButton(View view) {
+        Log.d(TAG, "onClickTestButton: button clicked");
+        mapFragment.markerTest();
+    }
 
 }

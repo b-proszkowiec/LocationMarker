@@ -21,7 +21,6 @@ import android.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
@@ -32,31 +31,32 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import static android.content.Context.LOCATION_SERVICE;
 
 public class MapsFragment extends Fragment implements LocationListener, OnMapReadyCallback {
-    private static final String TAG = "MapsFragment";
+    private static final String LOG_TAG = "MapsFragment";
     private static final float DEFAULT_ZOOM = 17f;
     private static final double INIT_LOCATION_LAT = 52.22514419;      // Ordona Warszawa
     private static final double INIT_LOCATION_LON = 20.95346435;
 
     // vars
-    private MapView mapView;
     private GoogleMap mMap;
-    private Location mLastLocation = null;
+    private static Location mLastLocation = null;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationManager locationManager;
     private MarkersContainer markersContainer;
+    private View view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         // initialize view
-        View view = inflater.inflate(R.layout.fragment_map, container, false);
-
+        if (view == null)
+        {
+            view = inflater.inflate(R.layout.fragment_map, container, false);
+        }
         // initialize map fragment
         SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
 
         supportMapFragment.getMapAsync(this);
-
         return view;
     }
 
@@ -65,7 +65,7 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
         String text = "Accurancy : " + location.getAccuracy() + "m";
 
         Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "onLocationChanged: location has changed");
+        Log.d(LOG_TAG, "onLocationChanged: location has changed");
         mLastLocation = location;
     }
 
@@ -87,9 +87,6 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng initLocation = new LatLng(INIT_LOCATION_LAT, INIT_LOCATION_LON);
-        if (mLastLocation != null) {
-            initLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        }
 
         if (googleMap == mMap) {
             return;
@@ -115,14 +112,14 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
             @Override
             public void onSuccess(Location location) {
                 if (location != null) {
-                    Log.d(TAG, "onSuccess: successfully got last location");
+                    Log.d(LOG_TAG, "onSuccess: successfully got last location");
                 }
                 mLastLocation = location;
             }
         });
         mMap.setMyLocationEnabled(true);
-        markersContainer.getInstance().setContext(getContext());
-        markersContainer.getInstance().setMap(mMap);
+        MarkersContainer.getInstance().setContext(getContext());
+        MarkersContainer.getInstance().setMap(mMap);
         locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         String provider = locationManager.getBestProvider(criteria, true);
@@ -151,5 +148,29 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
                 Toast.makeText(getContext(), latLng.latitude + " : " + latLng.longitude, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void adPoint() {
+        if (mLastLocation == null) {
+            return;
+        }
+        markersContainer.getInstance().addMarker(mLastLocation);
+        markersContainer.getInstance().drawPolyline();
+    }
+
+    public void markerTest() {
+        MarkersContainer.getInstance().clear();
+        MarkersContainer.getInstance().addMarker(getTestLocation(52.22526819, 20.95346435));
+        MarkersContainer.getInstance().addMarker(getTestLocation(52.22526819, 20.95376435));
+        MarkersContainer.getInstance().addMarker(getTestLocation(52.22566819, 20.95346435));
+        double area = MarkersContainer.getInstance().computeArea();
+        Log.d(LOG_TAG, "Surface is equal to: " + area);
+    }
+
+    private Location getTestLocation(double latitude, double longitude) {
+        Location loc = new Location(mLastLocation);
+        loc.setLatitude(latitude);
+        loc.setLongitude(longitude);
+        return loc;
     }
 }
