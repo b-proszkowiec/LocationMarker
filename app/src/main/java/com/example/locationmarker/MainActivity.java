@@ -1,20 +1,22 @@
 package com.example.locationmarker;
 
+import android.Manifest;
+import android.app.Dialog;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import android.Manifest;
-import android.app.Dialog;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-import android.util.Log;
-import android.widget.Toast;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -34,16 +36,43 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         if (isServicesOK()) {
             getLocationPermission();
         }
+
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                Fragment selectedFragment = null;
+
+                switch (item.getItemId()) {
+                    case R.id.mapsFragment:
+                        selectedFragment = new MapsFragment();
+                        break;
+                    case R.id.itemFragment:
+                        selectedFragment = new ItemFragment();
+                        break;
+                    case R.id.settingsFragment:
+                        selectedFragment = new SettingsFragment();
+                        break;
+                }
+
+                if (selectedFragment != null) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment, selectedFragment).commit();
+                }
+                return true;
+            }
+        });
     }
 
     private void mapInit() {
         mLocationPermissionGranted = true;
-        Intent intent = new Intent(this, MapActivity.class);
-        startActivity(intent);
+        //Intent intent = new Intent(this, MapActivity.class);
+        //startActivity(intent);
     }
 
     public boolean isServicesOK() {
