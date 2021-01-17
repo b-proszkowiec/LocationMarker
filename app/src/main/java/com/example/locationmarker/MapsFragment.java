@@ -16,6 +16,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.locationmarker.markers.MarkersContainer;
+import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import android.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
@@ -25,7 +26,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import static android.content.Context.LOCATION_SERVICE;
@@ -129,48 +129,12 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
         uiSettings.setAllGesturesEnabled(true);
         uiSettings.setMapToolbarEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
-
-        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                // When clicked on map
-                MarkerOptions markerOptions = new MarkerOptions();
-                // set position of marker
-                markerOptions.position(latLng);
-                markerOptions.title(latLng.latitude + " : " + latLng.longitude);
-                // remove all markers
-                mMap.clear();
-                // animate to zoom
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, mMap.getCameraPosition().zoom));
-                // Add marker on map
-                mMap.addMarker(markerOptions);
-
-                Toast.makeText(getContext(), latLng.latitude + " : " + latLng.longitude, Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     public void adPoint() {
         if (mLastLocation == null) {
             return;
         }
-        markersContainer.getInstance().addMarker(mLastLocation);
-        markersContainer.getInstance().drawPolyline();
-    }
-
-    public void markerTest() {
-        MarkersContainer.getInstance().clear();
-        MarkersContainer.getInstance().addMarker(getTestLocation(52.22526819, 20.95346435));
-        MarkersContainer.getInstance().addMarker(getTestLocation(52.22526819, 20.95376435));
-        MarkersContainer.getInstance().addMarker(getTestLocation(52.22566819, 20.95346435));
-        double area = MarkersContainer.getInstance().computeArea();
-        Log.d(LOG_TAG, "Surface is equal to: " + area);
-    }
-
-    private Location getTestLocation(double latitude, double longitude) {
-        Location loc = new Location(mLastLocation);
-        loc.setLatitude(latitude);
-        loc.setLongitude(longitude);
-        return loc;
+        SurfaceManager.getInstance().addPointToCurrentLocation(mLastLocation);
     }
 }

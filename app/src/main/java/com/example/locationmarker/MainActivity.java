@@ -145,9 +145,4 @@ public class MainActivity extends AppCompatActivity {
         mapFragment.adPoint();
     }
 
-    public void onClickTestButton(View view) {
-        Log.d(TAG, "onClickTestButton: button clicked");
-        mapFragment.markerTest();
-    }
-
 }
