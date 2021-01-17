@@ -70,15 +70,13 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         if (isEnoughFarDistanceBetweenOtherMarkers(location)) {
             mMarkersList.add(new MyMarker(location));
         }
-
-        Bitmap bmpIcon = drawableToBitmap(ContextCompat.getDrawable(context, R.drawable.testdrawable));
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bmpIcon);
+//        Bitmap bmpIcon = drawableToBitmap(ContextCompat.getDrawable(context, R.drawable.testdrawable));
+//        BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bmpIcon);
 
         map.addMarker(new MarkerOptions()
                 .position(new LatLng(location.getLatitude(), location.getLongitude()))
                 .title("Test location " + mMarkersList.size())
-
-        ).setIcon(icon);
+        )/*.setIcon(icon)*/;
     }
 
     boolean isEnoughFarDistanceBetweenOtherMarkers(Location location){
