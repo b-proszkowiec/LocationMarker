@@ -137,4 +137,11 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
         }
         SurfaceManager.getInstance().addPointToCurrentLocation(mLastLocation);
     }
+
+    public void finish() {
+        if (mLastLocation == null) {
+            return;
+        }
+        SurfaceManager.getInstance().finish();
+    }
 }

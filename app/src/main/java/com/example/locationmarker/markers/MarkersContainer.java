@@ -15,6 +15,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.locationmarker.R;
+import com.example.locationmarker.surface.LocationPoint;
+import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -164,7 +166,7 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         return (int) (o2.latitude - o1.latitude) * 10 * 1000;
     }
 
-    public void drawPolyline() {
+    public void drawPolyline(boolean isAddingProcessFinished) {
         if (polyline != null) {
             polyline.remove();
         }
@@ -172,27 +174,32 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         PolylineOptions polylineOptions = new PolylineOptions().color(Color.GREEN);
         List<LatLng> points = getLatLngFromLocation();
         polyline = map.addPolyline(polylineOptions.addAll(points));
-        if (points.size() > 2) {
-            map.addPolyline(polylineOptions.add(points.get(points.size() - 2)));
-        }
-        writeDistancesOnMap();
+        writeDistancesOnMap(isAddingProcessFinished);
     }
 
     private List<LatLng> getLatLngFromLocation() {
         List<LatLng> points = new ArrayList<>();
-        for (MyMarker myMarker : mMarkersList) {
-            points.add(new LatLng(myMarker.getLocation().getLatitude(), myMarker.getLocation().getLongitude()));
+        for (LocationPoint locationPoint : SurfaceManager.getInstance().getCurrentSurface().getLocationPoints()) {
+            Location location = locationPoint.getLocation();
+            points.add(new LatLng(location.getLatitude(), location.getLongitude()));
         }
         return points;
     }
 
-    private void writeDistancesOnMap() {
+    private void writeDistancesOnMap(boolean isAddingProcessFinished) {
         List<LatLng> points = getLatLngFromLocation();
         int len = points.size();
         LatLng locStart, locEnd;
-        for (int i = 0; i < len - 1; i++) {
+        for (int i = 0; i < len; i++) {
             locStart = points.get(i);
-            locEnd = points.get(i + 1);
+            if (isAddingProcessFinished && i == len - 1) {
+                // if process is finished and the point is the last one, connect first and last point with polyline
+                locEnd = points.get(0);
+            } else if (i == len - 1) {
+                continue;
+            } else {
+                locEnd = points.get(i + 1);
+            }
 
             double distance = distance(locStart.latitude, locEnd.latitude,
                     locStart.longitude, locEnd.longitude, 0, 0);
@@ -221,11 +228,8 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         for (MyMarker myMarker : mMarkersList) {
             points.add(new LatLng(myMarker.getLocation().getLatitude(), myMarker.getLocation().getLongitude()));
         }
-        Collections.sort(points, this);
-
-        double surface = SphericalUtil.computeSignedArea(points);
+        double surface = SphericalUtil.computeArea(points);
         Log.d(TAG, "computeArea " + surface);
-
         PolygonOptions polygonOptions = new PolygonOptions().addAll(points).strokeWidth(0);
         map.addPolygon(polygonOptions);
         return surface;

@@ -141,8 +141,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void onClickAddPointButton(View view) {
-        Log.d(TAG, "addPointButtonOnClickListener: button clicked");
+        Log.d(TAG, "onClickAddPointButton: button clicked");
         mapFragment.adPoint();
     }
 
+    public void onClickEndButton(View view) {
+        Log.d(TAG, "onClickEndButton: button clicked");
+        mapFragment.finish();
+    }
 }

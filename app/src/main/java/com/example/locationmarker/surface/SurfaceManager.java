@@ -31,19 +31,27 @@ public class SurfaceManager implements Serializable {
         return INSTANCE;
     }
 
-    public void addPointToCurrentLocation(Location location) {
-        currentSurface.addPointToSurface(location);
-        refreshView();
+    public void finish() {
+        refreshView(true);
     }
 
-    private void refreshView() {
+    public void addPointToCurrentLocation(Location location) {
+        currentSurface.addPointToSurface(location);
+        refreshView(false);
+    }
+
+    private void refreshView(boolean isAddingProcessFinished) {
         MarkersContainer.getInstance().clearMarkersList();
 
         for (LocationPoint locationPoint : currentSurface.getLocationPoints()) {
             Location location = locationPoint.getLocation();
             MarkersContainer.getInstance().addMarker(location);
         }
-        MarkersContainer.getInstance().drawPolyline();
+        MarkersContainer.getInstance().drawPolyline(isAddingProcessFinished);
+
+        if (isAddingProcessFinished) {
+            double surface =  MarkersContainer.getInstance().computeArea();
+        }
     }
 
     private void serializeData() throws IOException {
