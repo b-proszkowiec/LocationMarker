@@ -12,6 +12,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/AddPointEndLayer"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
@@ -27,7 +28,7 @@
             android:textColor="#ffffff" />
 
         <Button
-            android:id="@+id/endButton"
+            android:id="@+id/stopAddingButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -36,6 +37,40 @@
             android:background="@drawable/mybutton"
             android:onClick="onClickEndButton"
             android:text="@string/end_button_text"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:visibility="invisible" />
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/saveResetLayer"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/resetButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/mybutton"
+            android:onClick="onClickResetButton"
+            android:text="@string/reset_button_text"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/mybutton"
+            android:onClick="onClickSaveButton"
+            android:text="@string/save_button_text"
+            android:textColor="#ffffff" />
+
+    </LinearLayout>
+
 </RelativeLayout>

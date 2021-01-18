@@ -35,9 +35,14 @@ public class SurfaceManager implements Serializable {
         refreshView(true);
     }
 
-    public void addPointToCurrentLocation(Location location) {
+    public int addPointToCurrentLocation(Location location) {
         currentSurface.addPointToSurface(location);
         refreshView(false);
+        return getPointsAmount();
+    }
+
+    private int getPointsAmount() {
+        return currentSurface.getLocationPoints().size();
     }
 
     private void refreshView(boolean isAddingProcessFinished) {

@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
     // vars
     private static Boolean mLocationPermissionGranted = false;
     private MapsFragment mapFragment;
-
+    private LinearLayout buttonsLayer1, buttonsLayer2;
+    private Button addPointButton, stopAddingButton, resetButton, saveButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,10 +74,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // initialize custom buttons and layers
+        buttonsLayer1 = findViewById(R.id.AddPointEndLayer);
+        buttonsLayer2 = findViewById(R.id.saveResetLayer);
+        addPointButton = findViewById(R.id.addPointButton);
+        stopAddingButton = findViewById(R.id.stopAddingButton);
+        resetButton = findViewById(R.id.resetButton);
+        saveButton = findViewById(R.id.saveButton);
+
+        buttonsLayer2.setVisibility(View.INVISIBLE);
+    }
+
     private void mapInit() {
         mLocationPermissionGranted = true;
-        //Intent intent = new Intent(this, MapActivity.class);
-        //startActivity(intent);
     }
 
     public boolean isServicesOK() {
@@ -142,11 +158,27 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickAddPointButton(View view) {
         Log.d(TAG, "onClickAddPointButton: button clicked");
-        mapFragment.adPoint();
+        int points = mapFragment.adPoint();
+
+        Button endButton = findViewById(R.id.stopAddingButton);
+        if (points == 3) {
+            endButton.setVisibility(View.VISIBLE);
+        }
     }
 
     public void onClickEndButton(View view) {
         Log.d(TAG, "onClickEndButton: button clicked");
         mapFragment.finish();
+
+        buttonsLayer1.setVisibility(View.INVISIBLE);
+        buttonsLayer2.setVisibility(View.VISIBLE);
+    }
+
+    public void onClickResetButton(View view) {
+        Log.d(TAG, "onClickResetButton: button clicked");
+    }
+
+    public void onClickSaveButton(View view) {
+        Log.d(TAG, "onClickSaveButton: button clicked");
     }
 }

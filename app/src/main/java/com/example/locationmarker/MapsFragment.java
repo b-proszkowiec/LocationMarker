@@ -131,11 +131,11 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
         uiSettings.setZoomControlsEnabled(true);
     }
 
-    public void adPoint() {
+    public int adPoint() {
         if (mLastLocation == null) {
-            return;
+            return 0;
         }
-        SurfaceManager.getInstance().addPointToCurrentLocation(mLastLocation);
+        return SurfaceManager.getInstance().addPointToCurrentLocation(mLastLocation);
     }
 
     public void finish() {
