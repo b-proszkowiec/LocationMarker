@@ -24,4 +24,8 @@ public class Surface {
         return locationPoints;
     }
 
+    public void setName(String locationName) {
+        this.locationName = locationName;
+    }
+
 }

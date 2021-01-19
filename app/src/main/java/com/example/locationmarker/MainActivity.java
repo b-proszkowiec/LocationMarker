@@ -1,13 +1,17 @@
 package com.example.locationmarker;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -17,9 +21,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.w3c.dom.Text;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -35,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     private static Boolean mLocationPermissionGranted = false;
     private MapsFragment mapFragment;
     private LinearLayout buttonsLayer1, buttonsLayer2;
-    private Button addPointButton, stopAddingButton, resetButton, saveButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,11 +87,6 @@ public class MainActivity extends AppCompatActivity {
         // initialize custom buttons and layers
         buttonsLayer1 = findViewById(R.id.AddPointEndLayer);
         buttonsLayer2 = findViewById(R.id.saveResetLayer);
-        addPointButton = findViewById(R.id.addPointButton);
-        stopAddingButton = findViewById(R.id.stopAddingButton);
-        resetButton = findViewById(R.id.resetButton);
-        saveButton = findViewById(R.id.saveButton);
-
         buttonsLayer2.setVisibility(View.INVISIBLE);
     }
 
@@ -160,9 +161,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onClickAddPointButton: button clicked");
         int points = mapFragment.adPoint();
 
-        Button endButton = findViewById(R.id.stopAddingButton);
         if (points == 3) {
-            endButton.setVisibility(View.VISIBLE);
+            findViewById(R.id.stopAddingButton).setVisibility(View.VISIBLE);
         }
     }
 
@@ -176,9 +176,38 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickResetButton(View view) {
         Log.d(TAG, "onClickResetButton: button clicked");
+        SurfaceManager.getInstance().reset();
+
+        buttonsLayer1.setVisibility(View.VISIBLE);
+        buttonsLayer2.setVisibility(View.INVISIBLE);
+        findViewById(R.id.stopAddingButton).setVisibility(View.INVISIBLE);
     }
 
     public void onClickSaveButton(View view) {
         Log.d(TAG, "onClickSaveButton: button clicked");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Surface name");
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+        final String[] inputText = new String[1];
+
+// Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                inputText[0] = input.getText().toString();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+        SurfaceManager.getInstance().save(inputText[0]);
     }
 }

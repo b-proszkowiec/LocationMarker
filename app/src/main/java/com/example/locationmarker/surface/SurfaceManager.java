@@ -1,5 +1,6 @@
 package com.example.locationmarker.surface;
 
+import android.app.AlertDialog;
 import android.location.Location;
 import android.util.Log;
 
@@ -12,16 +13,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SurfaceManager implements Serializable {
     private static final String LOG_TAG = "SurfaceManager";
     private static final SurfaceManager INSTANCE = new SurfaceManager();
     private static final String FILE_NAME = "pecki.txt";
+    private static final String TEMP_NAME = "Name";
 
     // vars
-    Surface currentSurface = new Surface("temporary");
-    List<Surface> surfaces;
+    Surface currentSurface = new Surface(TEMP_NAME);
+    List<Surface> surfaces = new ArrayList<>();
 
     private SurfaceManager() {
         Log.d(LOG_TAG, "");
@@ -33,6 +36,19 @@ public class SurfaceManager implements Serializable {
 
     public void finish() {
         refreshView(true);
+    }
+
+    public void reset() {
+        currentSurface.getLocationPoints().clear();
+        refreshView(false);
+    }
+
+    public void save(String name) {
+        currentSurface.setName(name);
+        surfaces.add(currentSurface);
+        currentSurface = new Surface(TEMP_NAME);
+
+        refreshView(false);
     }
 
     public int addPointToCurrentLocation(Location location) {
