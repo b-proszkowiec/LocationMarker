@@ -1,10 +1,10 @@
 package com.example.locationmarker.surface;
 
-import android.app.AlertDialog;
 import android.location.Location;
 import android.util.Log;
 
 import com.example.locationmarker.markers.MarkersContainer;
+import com.google.android.gms.common.logging.Logger;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -27,7 +27,6 @@ public class SurfaceManager implements Serializable {
     List<Surface> surfaces = new ArrayList<>();
 
     private SurfaceManager() {
-        Log.d(LOG_TAG, "");
     }
 
     public static SurfaceManager getInstance() {
@@ -49,6 +48,20 @@ public class SurfaceManager implements Serializable {
         currentSurface = new Surface(TEMP_NAME);
 
         refreshView(false);
+
+        try {
+            serializeData();
+        } catch(IOException e) {
+            Log.e(LOG_TAG, "IOException exception occured: " + e.toString());
+        }
+    }
+
+    public void restoreSavedSurfaces() {
+        try {
+            deserializeData();
+        } catch(IOException e) {
+            Log.e(LOG_TAG, "IOException exception occured: " + e.toString());
+        }
     }
 
     public int addPointToCurrentLocation(Location location) {
@@ -71,7 +84,7 @@ public class SurfaceManager implements Serializable {
         MarkersContainer.getInstance().drawPolyline(isAddingProcessFinished);
 
         if (isAddingProcessFinished) {
-            double surface =  MarkersContainer.getInstance().computeArea();
+            currentSurface.computeArea();
         }
     }
 
@@ -93,5 +106,9 @@ public class SurfaceManager implements Serializable {
 
     public Surface getCurrentSurface() {
         return currentSurface;
+    }
+
+    public List<Surface> getSurfaces() {
+        return surfaces;
     }
 }

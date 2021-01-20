@@ -10,7 +10,6 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -26,8 +25,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import org.w3c.dom.Text;
-
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -42,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private static Boolean mLocationPermissionGranted = false;
     private MapsFragment mapFragment;
     private LinearLayout buttonsLayer1, buttonsLayer2;
+    private String alertDialogInputText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,11 +85,20 @@ public class MainActivity extends AppCompatActivity {
         // initialize custom buttons and layers
         buttonsLayer1 = findViewById(R.id.AddPointEndLayer);
         buttonsLayer2 = findViewById(R.id.saveResetLayer);
-        buttonsLayer2.setVisibility(View.INVISIBLE);
+        resetBottomLayer();
+        SurfaceManager.getInstance().restoreSavedSurfaces();
     }
 
     private void mapInit() {
         mLocationPermissionGranted = true;
+    }
+
+    private void resetBottomLayer() {
+        buttonsLayer1.setVisibility(View.VISIBLE);
+        buttonsLayer2.setVisibility(View.INVISIBLE);
+
+        findViewById(R.id.addPointButton).setVisibility(View.VISIBLE);
+        findViewById(R.id.stopAddingButton).setVisibility(View.INVISIBLE);
     }
 
     public boolean isServicesOK() {
@@ -156,7 +163,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     public void onClickAddPointButton(View view) {
         Log.d(TAG, "onClickAddPointButton: button clicked");
         int points = mapFragment.adPoint();
@@ -177,37 +183,44 @@ public class MainActivity extends AppCompatActivity {
     public void onClickResetButton(View view) {
         Log.d(TAG, "onClickResetButton: button clicked");
         SurfaceManager.getInstance().reset();
-
-        buttonsLayer1.setVisibility(View.VISIBLE);
-        buttonsLayer2.setVisibility(View.INVISIBLE);
-        findViewById(R.id.stopAddingButton).setVisibility(View.INVISIBLE);
+        resetBottomLayer();
     }
 
-    public void onClickSaveButton(View view) {
+    public void onClickSaveButton(View view) throws InterruptedException {
         Log.d(TAG, "onClickSaveButton: button clicked");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Surface name");
+        Runnable alertDialogRunnable = new Runnable() {
+            @Override
+            public void run() {
+                SurfaceManager.getInstance().save(alertDialogInputText);
+            }
+        };
+        userInput("Set new area name:", alertDialogRunnable);
+        resetBottomLayer();
+    }
+
+    private void userInput(String sTitle, final Runnable func) {
+        AlertDialog.Builder aBuilder = new AlertDialog.Builder(this);
+
+        aBuilder.setTitle(sTitle);
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-        final String[] inputText = new String[1];
+        aBuilder.setView(input);
 
-// Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        aBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                inputText[0] = input.getText().toString();
+                alertDialogInputText = input.getText().toString();
+                func.run();
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        aBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
+                alertDialogInputText = "";
             }
         });
-
-        builder.show();
-        SurfaceManager.getInstance().save(inputText[0]);
+        aBuilder.show();
     }
 }

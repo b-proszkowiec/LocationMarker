@@ -11,7 +11,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.example.locationmarker.R;
@@ -20,17 +19,13 @@ import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.ui.IconGenerator;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -218,21 +213,6 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
 
             map.addMarker(markerOptions);
         }
-    }
-
-    public double computeArea() {
-        if (mMarkersList.size() <= 2) {
-            return 0;
-        }
-        List<LatLng> points = new ArrayList<>();
-        for (MyMarker myMarker : mMarkersList) {
-            points.add(new LatLng(myMarker.getLocation().getLatitude(), myMarker.getLocation().getLongitude()));
-        }
-        double surface = SphericalUtil.computeArea(points);
-        Log.d(TAG, "computeArea " + surface);
-        PolygonOptions polygonOptions = new PolygonOptions().addAll(points).strokeWidth(0);
-        map.addPolygon(polygonOptions);
-        return surface;
     }
 
     public void clearMarkersList() {
