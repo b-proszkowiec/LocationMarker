@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.InputType;
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         buttonsLayer1 = findViewById(R.id.AddPointEndLayer);
         buttonsLayer2 = findViewById(R.id.saveResetLayer);
         resetBottomLayer();
-        SurfaceManager.getInstance().restoreSavedSurfaces();
+        SurfaceManager.getInstance().restoreSavedSurfaces(this.getApplicationContext());
     }
 
     private void mapInit() {
@@ -192,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         Runnable alertDialogRunnable = new Runnable() {
             @Override
             public void run() {
-                SurfaceManager.getInstance().save(alertDialogInputText);
+                SurfaceManager.getInstance().save(getApplicationContext(), alertDialogInputText);
             }
         };
         userInput("Set new area name:", alertDialogRunnable);

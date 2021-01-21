@@ -2,24 +2,27 @@ package com.example.locationmarker.surface;
 
 import android.location.Location;
 
-public class LocationPoint {
-    Location location;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.io.Serializable;
+
+public class LocationPoint implements Serializable {
     int number;
+    double latitude, longitude;
+    float accuracy;
 
     public LocationPoint(Location location, int number) {
-        this.location = location;
+        this.latitude = location.getLatitude();
+        this.longitude = location.getLongitude();
+        this.accuracy = location.getAccuracy();
         this.number = number;
     }
 
-    public Location getLocation() {
-        return location;
+    public LatLng getLatLng() {
+        return new LatLng(latitude, longitude);
     }
 
-    @Override
-    public String toString() {
-        return "LocationPoint{" +
-                "location=" + location +
-                ", number=" + number +
-                '}';
+    public float getAccuracy() {
+        return accuracy;
     }
 }

@@ -1,16 +1,17 @@
 package com.example.locationmarker.surface;
 
+import android.app.Activity;
+import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 
 import com.example.locationmarker.markers.MarkersContainer;
-import com.google.android.gms.common.logging.Logger;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class SurfaceManager implements Serializable {
         refreshView(false);
     }
 
-    public void save(String name) {
+    public void save(Context context, String name) {
         currentSurface.setName(name);
         surfaces.add(currentSurface);
         currentSurface = new Surface(TEMP_NAME);
@@ -50,16 +51,16 @@ public class SurfaceManager implements Serializable {
         refreshView(false);
 
         try {
-            serializeData();
-        } catch(IOException e) {
+            serializeData(context);
+        } catch (IOException e) {
             Log.e(LOG_TAG, "IOException exception occured: " + e.toString());
         }
     }
 
-    public void restoreSavedSurfaces() {
+    public void restoreSavedSurfaces(Context context) {
         try {
-            deserializeData();
-        } catch(IOException e) {
+            surfaces = (List<Surface>) deserializeData(context);
+        } catch (IOException e) {
             Log.e(LOG_TAG, "IOException exception occured: " + e.toString());
         }
     }
@@ -78,29 +79,12 @@ public class SurfaceManager implements Serializable {
         MarkersContainer.getInstance().clearMarkersList();
 
         for (LocationPoint locationPoint : currentSurface.getLocationPoints()) {
-            Location location = locationPoint.getLocation();
-            MarkersContainer.getInstance().addMarker(location);
+            MarkersContainer.getInstance().addMarker(locationPoint.getLatLng());
         }
         MarkersContainer.getInstance().drawPolyline(isAddingProcessFinished);
 
         if (isAddingProcessFinished) {
             currentSurface.computeArea();
-        }
-    }
-
-    private void serializeData() throws IOException {
-        try (FileOutputStream f = new FileOutputStream(FILE_NAME);
-             ObjectOutput s = new ObjectOutputStream(f)) {
-            s.writeObject(surfaces);
-        }
-    }
-
-    private void deserializeData() throws IOException {
-        try (FileInputStream in = new FileInputStream(FILE_NAME);
-             ObjectInputStream s = new ObjectInputStream(in)) {
-            surfaces = (List) s.readObject();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
     }
 
@@ -110,5 +94,55 @@ public class SurfaceManager implements Serializable {
 
     public List<Surface> getSurfaces() {
         return surfaces;
+    }
+
+    //
+    private void serializeData(Context context) throws IOException {
+        ObjectOutputStream objectOut = null;
+
+        try {
+            FileOutputStream fileOut = context.openFileOutput(FILE_NAME, Activity.MODE_PRIVATE);
+            objectOut = new ObjectOutputStream(fileOut);
+            objectOut.writeObject(surfaces);
+            fileOut.getFD().sync();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (objectOut != null) {
+                try {
+                    objectOut.close();
+                } catch (IOException e) {
+                    // do nowt
+                }
+            }
+        }
+    }
+
+    private Object deserializeData(Context context) throws IOException {
+        ObjectInputStream objectIn = null;
+        Object object = null;
+        try {
+
+            FileInputStream fileIn = context.openFileInput(FILE_NAME);
+            objectIn = new ObjectInputStream(fileIn);
+            object = objectIn.readObject();
+
+        } catch (FileNotFoundException e) {
+            // Do nothing
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            if (objectIn != null) {
+                try {
+                    objectIn.close();
+                } catch (IOException e) {
+                    // do nowt
+                }
+            }
+        }
+        return object;
     }
 }

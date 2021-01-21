@@ -63,22 +63,22 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         this.mMarkersList = new ArrayList<>();
     }
 
-    public void addMarker(Location location) {
-        if (isEnoughFarDistanceBetweenOtherMarkers(location)) {
-            mMarkersList.add(new MyMarker(location));
+    public void addMarker(LatLng latLng) {
+        if (isEnoughFarDistanceBetweenOtherMarkers(latLng)) {
+            mMarkersList.add(new MyMarker(latLng));
         }
 
         map.addMarker(new MarkerOptions()
-                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                .position(new LatLng(latLng.latitude, latLng.longitude))
                 .title("Test location " + mMarkersList.size())
         )/*.setIcon(icon)*/;
     }
 
-    boolean isEnoughFarDistanceBetweenOtherMarkers(Location location) {
+    boolean isEnoughFarDistanceBetweenOtherMarkers(LatLng newPositionLatLng) {
         for (MyMarker myMarker : mMarkersList) {
-            Location markerLocation = myMarker.getLocation();
-            double distance = distance(markerLocation.getLatitude(), location.getLatitude(),
-                    markerLocation.getLongitude(), location.getLongitude(),
+            LatLng markerLocation = myMarker.getLocation();
+            double distance = distance(markerLocation.latitude, newPositionLatLng.latitude,
+                    markerLocation.longitude, newPositionLatLng.longitude,
                     0.0, 0.0);
             if (distance < 0.5) {
                 return false;
@@ -175,8 +175,7 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
     private List<LatLng> getLatLngFromLocation() {
         List<LatLng> points = new ArrayList<>();
         for (LocationPoint locationPoint : SurfaceManager.getInstance().getCurrentSurface().getLocationPoints()) {
-            Location location = locationPoint.getLocation();
-            points.add(new LatLng(location.getLatitude(), location.getLongitude()));
+            points.add(locationPoint.getLatLng());
         }
         return points;
     }

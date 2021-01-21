@@ -5,21 +5,23 @@ import android.location.Location;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Surface {
+public class Surface implements Serializable {
     private static final String LOG_TAG = "Surface";
 
+    // vars
     List<LocationPoint> locationPoints;
     String locationName;
     int locationPointCounter;
     double areaValue;
 
     public Surface(String locationName) {
-        this.locationPointCounter = 0;
-        this.locationName = locationName;
         this.locationPoints = new ArrayList<>();
+        this.locationName = locationName;
+        this.locationPointCounter = 0;
         this.areaValue = -1;
     }
 
@@ -38,7 +40,7 @@ public class Surface {
     public List<LatLng> convertToLatLngList() {
         List<LatLng> points = new ArrayList<>();
         for (LocationPoint locationPoint : locationPoints) {
-            points.add(new LatLng(locationPoint.getLocation().getLatitude(), locationPoint.getLocation().getLongitude()));
+            points.add(locationPoint.getLatLng());
         }
         return points;
     }
