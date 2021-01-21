@@ -1,12 +1,18 @@
 package com.example.locationmarker;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,6 +21,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -32,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
     // vars
     private static Boolean mLocationPermissionGranted = false;
     private MapsFragment mapFragment;
-
+    private LinearLayout buttonsLayer1, buttonsLayer2;
+    private String alertDialogInputText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,10 +79,27 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // initialize custom buttons and layers
+        buttonsLayer1 = findViewById(R.id.AddPointEndLayer);
+        buttonsLayer2 = findViewById(R.id.saveResetLayer);
+        resetBottomLayer();
+        SurfaceManager.getInstance().restoreSavedSurfaces(this.getApplicationContext());
+    }
+
     private void mapInit() {
         mLocationPermissionGranted = true;
-        //Intent intent = new Intent(this, MapActivity.class);
-        //startActivity(intent);
+    }
+
+    private void resetBottomLayer() {
+        buttonsLayer1.setVisibility(View.VISIBLE);
+        buttonsLayer2.setVisibility(View.INVISIBLE);
+
+        findViewById(R.id.addPointButton).setVisibility(View.VISIBLE);
+        findViewById(R.id.stopAddingButton).setVisibility(View.INVISIBLE);
     }
 
     public boolean isServicesOK() {
@@ -139,15 +164,64 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     public void onClickAddPointButton(View view) {
-        Log.d(TAG, "addPointButtonOnClickListener: button clicked");
-        mapFragment.adPoint();
+        Log.d(TAG, "onClickAddPointButton: button clicked");
+        int points = mapFragment.adPoint();
+
+        if (points == 3) {
+            findViewById(R.id.stopAddingButton).setVisibility(View.VISIBLE);
+        }
     }
 
-    public void onClickTestButton(View view) {
-        Log.d(TAG, "onClickTestButton: button clicked");
-        mapFragment.markerTest();
+    public void onClickEndButton(View view) {
+        Log.d(TAG, "onClickEndButton: button clicked");
+        mapFragment.finish();
+
+        buttonsLayer1.setVisibility(View.INVISIBLE);
+        buttonsLayer2.setVisibility(View.VISIBLE);
     }
 
+    public void onClickResetButton(View view) {
+        Log.d(TAG, "onClickResetButton: button clicked");
+        SurfaceManager.getInstance().reset();
+        resetBottomLayer();
+    }
+
+    public void onClickSaveButton(View view) throws InterruptedException {
+        Log.d(TAG, "onClickSaveButton: button clicked");
+
+        Runnable alertDialogRunnable = new Runnable() {
+            @Override
+            public void run() {
+                SurfaceManager.getInstance().save(getApplicationContext(), alertDialogInputText);
+            }
+        };
+        userInput("Set new area name:", alertDialogRunnable);
+        resetBottomLayer();
+    }
+
+    private void userInput(String sTitle, final Runnable func) {
+        AlertDialog.Builder aBuilder = new AlertDialog.Builder(this);
+
+        aBuilder.setTitle(sTitle);
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        aBuilder.setView(input);
+
+        aBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                alertDialogInputText = input.getText().toString();
+                func.run();
+            }
+        });
+        aBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                alertDialogInputText = "";
+            }
+        });
+        aBuilder.show();
+    }
 }

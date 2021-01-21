@@ -9,29 +9,68 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/addPointButton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
+        android:id="@+id/AddPointEndLayer"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="25dp"
-        android:layout_marginEnd="50dp"
-        android:background="@drawable/mybutton"
-        android:onClick="onClickAddPointButton"
-        android:text="@string/add_point_button_text"
-        android:textColor="#ffffff" />
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/runTestButton"
-        android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/addPointButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/mybutton"
+            android:onClick="onClickAddPointButton"
+            android:text="@string/add_point_button_text"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:id="@+id/stopAddingButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/mybutton"
+            android:onClick="onClickEndButton"
+            android:text="@string/end_button_text"
+            android:textColor="#ffffff"
+            android:visibility="invisible" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
+        android:id="@+id/saveResetLayer"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="25dp"
-        android:layout_marginStart="50dp"
-        android:background="@drawable/mybutton"
-        android:onClick="onClickTestButton"
-        android:text="@string/test_button_text"
-        android:textColor="#ffffff" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/resetButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/mybutton"
+            android:onClick="onClickResetButton"
+            android:text="@string/reset_button_text"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/mybutton"
+            android:onClick="onClickSaveButton"
+            android:text="@string/save_button_text"
+            android:textColor="#ffffff" />
+
+    </LinearLayout>
+
 </RelativeLayout>

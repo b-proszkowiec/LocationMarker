@@ -11,25 +11,21 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.util.Log;
 import android.widget.Toast;
 
-import androidx.core.content.ContextCompat;
-
 import com.example.locationmarker.R;
+import com.example.locationmarker.surface.LocationPoint;
+import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.ui.IconGenerator;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -44,6 +40,7 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
     private static MarkersContainer instance;
     private static GoogleMap map;
     private ArrayList<MyMarker> mMarkersList;
+    private Polyline polyline;
 
     public static void setMap(GoogleMap map) {
         MarkersContainer.map = map;
@@ -66,24 +63,22 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         this.mMarkersList = new ArrayList<>();
     }
 
-    public void addMarker(Location location) {
-        if (isEnoughFarDistanceBetweenOtherMarkers(location)) {
-            mMarkersList.add(new MyMarker(location));
+    public void addMarker(LatLng latLng) {
+        if (isEnoughFarDistanceBetweenOtherMarkers(latLng)) {
+            mMarkersList.add(new MyMarker(latLng));
         }
-//        Bitmap bmpIcon = drawableToBitmap(ContextCompat.getDrawable(context, R.drawable.testdrawable));
-//        BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bmpIcon);
 
         map.addMarker(new MarkerOptions()
-                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                .position(new LatLng(latLng.latitude, latLng.longitude))
                 .title("Test location " + mMarkersList.size())
         )/*.setIcon(icon)*/;
     }
 
-    boolean isEnoughFarDistanceBetweenOtherMarkers(Location location){
-        for(MyMarker myMarker : mMarkersList) {
-            Location markerLocation = myMarker.getLocation();
-            double distance = distance(markerLocation.getLatitude(), location.getLatitude(),
-                    markerLocation.getLongitude(), location.getLongitude(),
+    boolean isEnoughFarDistanceBetweenOtherMarkers(LatLng newPositionLatLng) {
+        for (MyMarker myMarker : mMarkersList) {
+            LatLng markerLocation = myMarker.getLocation();
+            double distance = distance(markerLocation.latitude, newPositionLatLng.latitude,
+                    markerLocation.longitude, newPositionLatLng.longitude,
                     0.0, 0.0);
             if (distance < 0.5) {
                 return false;
@@ -92,17 +87,17 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         return true;
     }
 
-    public static Bitmap drawableToBitmap (Drawable drawable) {
+    public static Bitmap drawableToBitmap(Drawable drawable) {
         Bitmap bitmap = null;
 
         if (drawable instanceof BitmapDrawable) {
             BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
-            if(bitmapDrawable.getBitmap() != null) {
+            if (bitmapDrawable.getBitmap() != null) {
                 return bitmapDrawable.getBitmap();
             }
         }
 
-        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
+        if (drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
             bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
         } else {
             bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
@@ -117,9 +112,9 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         // new antialised Paint
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         // text color - #3D3D3D
-        paint.setColor(Color.rgb(110,110, 110));
+        paint.setColor(Color.rgb(110, 110, 110));
         // text size in pixels
-        paint.setTextSize((int) (12)*scale);
+        paint.setTextSize((int) (12) * scale);
         // text shadow
         paint.setShadowLayer(1f, 0f, 1f, Color.DKGRAY);
         // draw text to the Canvas center
@@ -127,8 +122,8 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         Rect bounds = new Rect();
         String mText = "!!!";
         paint.getTextBounds(mText, 0, mText.length(), bounds);
-        int x = (bitmap.getWidth() - bounds.width())/6;
-        int y = (bitmap.getHeight() + bounds.height())/5;
+        int x = (bitmap.getWidth() - bounds.width()) / 6;
+        int y = (bitmap.getHeight() + bounds.height()) / 5;
 
         canvas.drawText("!!!", x * scale, y * scale, paint);
 
@@ -142,9 +137,10 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
      * Calculate distance between two points in latitude and longitude taking
      * into account height difference. If you are not interested in height
      * difference pass 0.0. Uses Haversine method as its base.
-     *
+     * <p>
      * lat1, lon1 Start point lat2, lon2 End point el1 Start altitude in meters
      * el2 End altitude in meters
+     *
      * @returns Distance in Meters
      */
     public static double distance(double lat1, double lat2, double lon1,
@@ -162,40 +158,43 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
     }
 
     public int compare(LatLng o1, LatLng o2) {
-        return (int) (o2.latitude - o1.latitude) * 10*1000;
+        return (int) (o2.latitude - o1.latitude) * 10 * 1000;
     }
 
-    public void drawPolyline() {
+    public void drawPolyline(boolean isAddingProcessFinished) {
+        if (polyline != null) {
+            polyline.remove();
+        }
 
         PolylineOptions polylineOptions = new PolylineOptions().color(Color.GREEN);
-
         List<LatLng> points = getLatLngFromLocation();
-        map.addPolyline(polylineOptions.addAll(points));
-        if(points.size() > 2) {
-            map.addPolyline(polylineOptions.add(points.get(0)));
-        }
-        writeDistancesOnMap();
+        polyline = map.addPolyline(polylineOptions.addAll(points));
+        writeDistancesOnMap(isAddingProcessFinished);
     }
 
     private List<LatLng> getLatLngFromLocation() {
         List<LatLng> points = new ArrayList<>();
-        for (MyMarker myMarker : mMarkersList) {
-            points.add(new LatLng(myMarker.getLocation().getLatitude(), myMarker.getLocation().getLongitude()));
+        for (LocationPoint locationPoint : SurfaceManager.getInstance().getCurrentSurface().getLocationPoints()) {
+            points.add(locationPoint.getLatLng());
         }
         return points;
     }
 
-    private void writeDistancesOnMap() {
+    private void writeDistancesOnMap(boolean isAddingProcessFinished) {
         List<LatLng> points = getLatLngFromLocation();
         int len = points.size();
         LatLng locStart, locEnd;
         for (int i = 0; i < len; i++) {
             locStart = points.get(i);
-            if (i == len-1) {
+            if (isAddingProcessFinished && i == len - 1) {
+                // if process is finished and the point is the last one, connect first and last point with polyline
                 locEnd = points.get(0);
+            } else if (i == len - 1) {
+                continue;
             } else {
-                locEnd = points.get(i+1);
+                locEnd = points.get(i + 1);
             }
+
             double distance = distance(locStart.latitude, locEnd.latitude,
                     locStart.longitude, locEnd.longitude, 0, 0);
 
@@ -206,33 +205,17 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
             icg.setTextAppearance(R.style.BlackText); // black text
             Bitmap bm = icg.makeIcon(String.format("%.2f", distance) + "m");
 
-            map.addMarker(new MarkerOptions()
+            MarkerOptions markerOptions = new MarkerOptions()
                     .position(new LatLng(middle.latitude, middle.longitude))
                     .title(new DecimalFormat("#.00").format(distance))
-                    .icon(BitmapDescriptorFactory.fromBitmap(bm))
-            );
+                    .icon(BitmapDescriptorFactory.fromBitmap(bm));
+
+            map.addMarker(markerOptions);
         }
     }
 
-    public double computeArea() {
-        if (mMarkersList.size() <= 2) {
-            return 0;
-        }
-        List<LatLng> points = new ArrayList<>();
-        for (MyMarker myMarker : mMarkersList) {
-            points.add(new LatLng(myMarker.getLocation().getLatitude(), myMarker.getLocation().getLongitude()));
-        }
-        Collections.sort(points, this);
-
-        double surface = SphericalUtil.computeSignedArea(points);
-        Log.d(TAG, "computeArea " + surface);
-
-        PolygonOptions polygonOptions = new PolygonOptions().addAll(points).strokeWidth(0);
-        map.addPolygon(polygonOptions);
-        return surface;
-    }
-
-    public void clear() {
+    public void clearMarkersList() {
+        map.clear();
         mMarkersList.clear();
     }
 

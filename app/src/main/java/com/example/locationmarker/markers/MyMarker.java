@@ -2,10 +2,12 @@ package com.example.locationmarker.markers;
 
 import android.location.Location;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class MyMarker{
 
     // vars
-    private Location location;
+    private LatLng location;
     private String name;
     private static int COUNTER = 0;
 
@@ -13,12 +15,12 @@ public class MyMarker{
         return name;
     }
 
-    public MyMarker(Location location) {
-        this.location = location;
+    public MyMarker(LatLng locationLatlng) {
+        this.location = locationLatlng;
         this.name = "Marker " + COUNTER;
     }
 
-    public Location getLocation() {
+    public LatLng getLocation() {
         return this.location;
     }
 }

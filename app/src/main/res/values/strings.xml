@@ -19,5 +19,7 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="add_point_button_text">Add point</string>
-    <string name="test_button_text">Test</string>
+    <string name="end_button_text">End</string>
+    <string name="reset_button_text">Reset</string>
+    <string name="save_button_text">Save</string>
 </resources>
