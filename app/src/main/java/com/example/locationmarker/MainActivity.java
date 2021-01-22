@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.locationmarker.dialog.InputDialog;
 import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         SurfaceManager.getInstance().setContext(getApplicationContext());
         SurfaceManager.getInstance().restoreSavedSurfaces();
+        InputDialog.getInstance().setContext(this);
     }
 
     public boolean isServicesOK() {

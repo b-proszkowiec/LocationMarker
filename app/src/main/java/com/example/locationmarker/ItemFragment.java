@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.locationmarker.dialog.InputDialog;
 import com.example.locationmarker.surface.Surface;
 import com.example.locationmarker.surface.SurfaceManager;
 
@@ -19,6 +20,8 @@ import java.util.List;
 
 public class ItemFragment extends Fragment implements FragmentListSingleItemAdapter.OnItemClickListener {
     private static final String LOG_TAG = ItemFragment.class.getSimpleName();
+
+    private FragmentListSingleItemAdapter adapter;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,7 +47,7 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         RecyclerView recyclerView = getActivity().findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        FragmentListSingleItemAdapter adapter = new FragmentListSingleItemAdapter(itemList);
+        adapter = new FragmentListSingleItemAdapter(itemList);
         adapter.setOnItemClickListener(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
@@ -67,5 +70,16 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     @Override
     public void onEditClick(int position) {
         Log.d(LOG_TAG, "onEditClick occurred");
+        InputDialog.getInstance().setOnDialogTextInputListener(new InputDialog.OnDialogTextInputListener() {
+            @Override
+            public void onDialogTextInput(int itemPosition, String inputText) {
+                Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
+                surface.setName(inputText);
+                SurfaceManager.getInstance().storeCurrentSurfaces();
+                adapter.notifyItemChanged(itemPosition);
+                refreshItemsView();
+            }
+        });
+        InputDialog.startAlertDialog(position);
     }
 }
