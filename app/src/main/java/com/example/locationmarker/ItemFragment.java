@@ -1,6 +1,7 @@
 package com.example.locationmarker;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,7 @@ import com.example.locationmarker.surface.SurfaceManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemFragment extends Fragment {
+public class ItemFragment extends Fragment implements FragmentListSingleItemAdapter.OnItemClickListener {
     private static final String LOG_TAG = ItemFragment.class.getName();
 
     @Override
@@ -28,20 +29,42 @@ public class ItemFragment extends Fragment {
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-
         if (!hidden) {
-            ArrayList<FragmentListSingleItem> itemList = new ArrayList<>();
-            List<Surface> surfaces = SurfaceManager.getInstance().getSurfaces();
-
-            for (Surface surface : surfaces) {
-                itemList.add(new FragmentListSingleItem(R.drawable.ic_single_item_graphic, surface.getName(), surface.getArea()));
-            }
-            RecyclerView recyclerView = getActivity().findViewById(R.id.recyclerView);
-            recyclerView.setHasFixedSize(true);
-            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-            RecyclerView.Adapter adapter = new FragmentListSingleItemAdapter(itemList);
-            recyclerView.setLayoutManager(layoutManager);
-            recyclerView.setAdapter(adapter);
+            refreshView();
         }
+    }
+
+    private void refreshView() {
+        ArrayList<FragmentListSingleItem> itemList = new ArrayList<>();
+        List<Surface> surfaces = SurfaceManager.getInstance().getSurfaces();
+
+        for (Surface surface : surfaces) {
+            itemList.add(new FragmentListSingleItem(R.drawable.ic_single_item_graphic, surface.getName(), surface.getArea()));
+        }
+        RecyclerView recyclerView = getActivity().findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        FragmentListSingleItemAdapter adapter = new FragmentListSingleItemAdapter(itemList);
+        adapter.setOnItemClickListener(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        Log.d(LOG_TAG, "onItemClick occurred");
+    }
+
+    @Override
+    public void onDeleteClick(int position) {
+        Log.d(LOG_TAG, "onDeleteClick occurred");
+        List<Surface> surfaces = SurfaceManager.getInstance().getSurfaces();
+        surfaces.remove(position);
+        refreshView();
+    }
+
+    @Override
+    public void onEditClick(int position) {
+        Log.d(LOG_TAG, "onEditClick occurred");
     }
 }
