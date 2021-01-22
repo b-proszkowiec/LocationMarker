@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -34,11 +33,10 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-
 import static android.content.Context.LOCATION_SERVICE;
 
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
-    private static final String LOG_TAG = "MapsFragment";
+    private static final String LOG_TAG = MapFragment.class.getSimpleName();
     private static final float DEFAULT_ZOOM = 17f;
     private static final double INIT_LOCATION_LAT = 52.22514419;      // Ordona Warszawa
     private static final double INIT_LOCATION_LON = 20.95346435;
@@ -205,7 +203,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 Runnable alertDialogRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        SurfaceManager.getInstance().save(getContext(), alertDialogInputText);
+                        SurfaceManager.getInstance().storeNewSurface(alertDialogInputText);
                     }
                 };
                 userInput(alertDialogRunnable);

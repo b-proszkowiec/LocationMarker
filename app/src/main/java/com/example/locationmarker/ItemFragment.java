@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemFragment extends Fragment implements FragmentListSingleItemAdapter.OnItemClickListener {
-    private static final String LOG_TAG = ItemFragment.class.getName();
+    private static final String LOG_TAG = ItemFragment.class.getSimpleName();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -30,11 +30,11 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (!hidden) {
-            refreshView();
+            refreshItemsView();
         }
     }
 
-    private void refreshView() {
+    private void refreshItemsView() {
         ArrayList<FragmentListSingleItem> itemList = new ArrayList<>();
         List<Surface> surfaces = SurfaceManager.getInstance().getSurfaces();
 
@@ -60,7 +60,8 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         Log.d(LOG_TAG, "onDeleteClick occurred");
         List<Surface> surfaces = SurfaceManager.getInstance().getSurfaces();
         surfaces.remove(position);
-        refreshView();
+        refreshItemsView();
+        SurfaceManager.getInstance().storeCurrentSurfaces();
     }
 
     @Override

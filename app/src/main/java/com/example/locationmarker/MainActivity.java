@@ -21,7 +21,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
 public class MainActivity extends AppCompatActivity {
-    private static final String LOG_TAG = "MainActivity";
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -81,7 +81,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        SurfaceManager.getInstance().restoreSavedSurfaces(getApplicationContext());
+        SurfaceManager.getInstance().setContext(getApplicationContext());
+        SurfaceManager.getInstance().restoreSavedSurfaces();
     }
 
     public boolean isServicesOK() {
