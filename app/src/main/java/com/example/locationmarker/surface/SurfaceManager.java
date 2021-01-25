@@ -5,6 +5,8 @@ import android.location.Location;
 
 import com.example.locationmarker.markers.MarkersContainer;
 import com.example.locationmarker.storage.DataStorage;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -70,6 +72,19 @@ public class SurfaceManager implements Serializable {
         return currentSurface.getLocationPoints().size();
     }
 
+    public LatLng getSurfaceCenterPoint(List<LatLng> polygonPointsList){
+        LatLng centerLatLng;
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for(int i = 0 ; i < polygonPointsList.size() ; i++)
+        {
+            builder.include(polygonPointsList.get(i));
+        }
+        LatLngBounds bounds = builder.build();
+        centerLatLng =  bounds.getCenter();
+
+        return centerLatLng;
+    }
+
     public void refreshView(boolean isAddingProcessFinished, Surface surface) {
         MarkersContainer.getInstance().clearMarkersList();
 
@@ -81,7 +96,7 @@ public class SurfaceManager implements Serializable {
             double polygonArea = surface.computeArea();
             MarkersContainer.getInstance().drawPolygon(polygonArea, surface.convertToLatLngList());
         } else {
-            MarkersContainer.getInstance().drawPolyline(isAddingProcessFinished);
+            MarkersContainer.getInstance().drawPolyline(false);
         }
     }
 
