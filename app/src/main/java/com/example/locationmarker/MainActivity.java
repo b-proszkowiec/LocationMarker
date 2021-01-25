@@ -85,6 +85,15 @@ public class MainActivity extends AppCompatActivity {
         SurfaceManager.getInstance().setContext(getApplicationContext());
         SurfaceManager.getInstance().restoreSavedSurfaces();
         InputDialog.getInstance().setContext(this);
+
+        itemFragment.setOnLocationItemClickListener(new ItemFragment.OnLocationItemClickListener() {
+            @Override
+            public void onLocationItemClickListener(int itemPosition) {
+                fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
+                activeFragment = mapFragment;
+                SurfaceManager.getInstance().refreshView(true, SurfaceManager.getInstance().getSurfaces().get(itemPosition));
+            }
+        });
     }
 
     public boolean isServicesOK() {

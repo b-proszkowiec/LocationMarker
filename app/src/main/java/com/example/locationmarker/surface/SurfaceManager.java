@@ -32,12 +32,12 @@ public class SurfaceManager implements Serializable {
     }
 
     public void finish() {
-        refreshView(true);
+        refreshView(true, currentSurface);
     }
 
     public void reset() {
         currentSurface.getLocationPoints().clear();
-        refreshView(false);
+        refreshView(false, currentSurface);
     }
 
     public void storeNewSurface(String name) {
@@ -45,7 +45,7 @@ public class SurfaceManager implements Serializable {
         surfaces.add(currentSurface);
         currentSurface = new Surface(TEMP_NAME);
 
-        refreshView(false);
+        refreshView(false, currentSurface);
         storeCurrentSurfaces();
     }
 
@@ -62,7 +62,7 @@ public class SurfaceManager implements Serializable {
 
     public int addPointToCurrentLocation(Location location) {
         currentSurface.addPointToSurface(location);
-        refreshView(false);
+        refreshView(false, currentSurface);
         return getPointsAmount();
     }
 
@@ -70,16 +70,16 @@ public class SurfaceManager implements Serializable {
         return currentSurface.getLocationPoints().size();
     }
 
-    private void refreshView(boolean isAddingProcessFinished) {
+    public void refreshView(boolean isAddingProcessFinished, Surface surface) {
         MarkersContainer.getInstance().clearMarkersList();
 
-        for (LocationPoint locationPoint : currentSurface.getLocationPoints()) {
+        for (LocationPoint locationPoint : surface.getLocationPoints()) {
             MarkersContainer.getInstance().addMarker(locationPoint.getLatLng());
         }
 
         if (isAddingProcessFinished) {
-            double polygonArea = currentSurface.computeArea();
-            MarkersContainer.getInstance().drawPolygon(polygonArea);
+            double polygonArea = surface.computeArea();
+            MarkersContainer.getInstance().drawPolygon(polygonArea, surface.convertToLatLngList());
         } else {
             MarkersContainer.getInstance().drawPolyline(isAddingProcessFinished);
         }
@@ -88,7 +88,6 @@ public class SurfaceManager implements Serializable {
     public Surface getCurrentSurface() {
         return currentSurface;
     }
-
 
     public List<Surface> getSurfaces() {
         return surfaces;

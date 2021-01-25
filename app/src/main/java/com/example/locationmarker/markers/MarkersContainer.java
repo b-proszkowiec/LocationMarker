@@ -132,9 +132,7 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         writeDistancesOnMap(isAddingProcessFinished);
     }
 
-    public void drawPolygon(double polygonArea) {
-        List<LatLng> points = getLatLngFromLocation();
-
+    public void drawPolygon(double polygonArea, List<LatLng> points ) {
         PolygonOptions polygonOptions = new PolygonOptions()
                 .addAll(points)
                 .fillColor(R.color.black);
