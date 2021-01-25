@@ -11,7 +11,6 @@ import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -62,7 +61,7 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
 
         map.addMarker(new MarkerOptions()
                 .position(new LatLng(latLng.latitude, latLng.longitude))
-                .title("Test location " + mMarkersList.size())
+                .title("" + mMarkersList.size())
         )/*.setIcon(icon)*/;
     }
 
@@ -103,18 +102,6 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         return Math.sqrt(distance);
     }
 
-    private LatLng getPolygonCenterPoint(List<LatLng> polygonPointsList){
-        LatLng centerLatLng = null;
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for(int i = 0 ; i < polygonPointsList.size() ; i++)
-        {
-            builder.include(polygonPointsList.get(i));
-        }
-        LatLngBounds bounds = builder.build();
-        centerLatLng =  bounds.getCenter();
-
-        return centerLatLng;
-    }
 
     public int compare(LatLng o1, LatLng o2) {
         return (int) (o2.latitude - o1.latitude) * 10 * 1000;
@@ -132,15 +119,13 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         writeDistancesOnMap(isAddingProcessFinished);
     }
 
-    public void drawPolygon(double polygonArea) {
-        List<LatLng> points = getLatLngFromLocation();
-
+    public void drawPolygon(double polygonArea, List<LatLng> points) {
         PolygonOptions polygonOptions = new PolygonOptions()
                 .addAll(points)
                 .fillColor(R.color.black);
 
         map.addPolygon(polygonOptions);
-        LatLng polygonCenter = getPolygonCenterPoint(points);
+        LatLng polygonCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(points);
 
         IconGenerator icg = new IconGenerator(context);
         icg.setColor(Color.GREEN); // transparent background

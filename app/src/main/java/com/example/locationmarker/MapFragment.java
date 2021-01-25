@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.locationmarker.dialog.InputDialog;
 import com.example.locationmarker.markers.MarkersContainer;
+import com.example.locationmarker.surface.Surface;
 import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -39,8 +40,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private static final double INIT_LOCATION_LON = 20.95346435;
 
     private static Location mLastLocation = null;
+    private static GoogleMap map;
     private FusedLocationProviderClient fusedLocationClient;
-    private View view;
 
     private static LinearLayout addPointLayer, saveLayer;
     private static Button addPointButton, stopAddingButton, saveButton, resetButton;
@@ -49,14 +50,22 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         // initialize view
-        view = inflater.inflate(R.layout.fragment_map, container, false);
+        View view = inflater.inflate(R.layout.fragment_map, container, false);
 
         // initialize map fragment
         SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
-
         supportMapFragment.getMapAsync(this);
         return view;
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            resetBottomLayer();
+            SurfaceManager.getInstance().reset();
+        }
     }
 
     @Override
@@ -86,6 +95,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng initLocation = new LatLng(INIT_LOCATION_LAT, INIT_LOCATION_LON);
+        map = googleMap;
         initMapLayer();
 
         // vars
@@ -139,7 +149,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         SurfaceManager.getInstance().finish();
     }
 
-    public static void resetBottomLayer() {
+    public void resetBottomLayer() {
         addPointLayer.setVisibility(View.VISIBLE);
         saveLayer.setVisibility(View.INVISIBLE);
 
@@ -147,8 +157,13 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         stopAddingButton.setVisibility(View.INVISIBLE);
     }
 
-    private void initMapLayer() {
+    public void hideAddLayerAndMoveToSurface(Surface surface) {
+        addPointLayer.setVisibility(View.INVISIBLE);
+        LatLng surfaceCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(surface.convertToLatLngList());
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(surfaceCenter, DEFAULT_ZOOM));
+    }
 
+    private void initMapLayer() {
         // initialize custom buttons and layers
         addPointLayer = getActivity().findViewById(R.id.addPointEndLayer);
         saveLayer = getActivity().findViewById(R.id.saveResetLayer);

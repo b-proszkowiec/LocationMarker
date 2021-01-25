@@ -22,6 +22,15 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     private static final String LOG_TAG = ItemFragment.class.getSimpleName();
 
     private FragmentListSingleItemAdapter adapter;
+    private OnLocationItemClickListener onLocationItemClickListener;
+
+    public interface OnLocationItemClickListener {
+        void onLocationItemClickListener(int itemPosition);
+    }
+
+    public void setOnLocationItemClickListener(OnLocationItemClickListener listener) {
+        onLocationItemClickListener = listener;
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,6 +65,7 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     @Override
     public void onItemClick(int position) {
         Log.d(LOG_TAG, "onItemClick occurred");
+        onLocationItemClickListener.onLocationItemClickListener(position);
     }
 
     @Override

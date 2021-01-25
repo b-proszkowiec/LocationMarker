@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.locationmarker.dialog.InputDialog;
+import com.example.locationmarker.surface.Surface;
 import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.mapsFragment:
                     fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
+                    mapFragment.onHiddenChanged(false);
                     activeFragment = mapFragment;
                     return true;
 
@@ -85,6 +87,17 @@ public class MainActivity extends AppCompatActivity {
         SurfaceManager.getInstance().setContext(getApplicationContext());
         SurfaceManager.getInstance().restoreSavedSurfaces();
         InputDialog.getInstance().setContext(this);
+
+        itemFragment.setOnLocationItemClickListener(new ItemFragment.OnLocationItemClickListener() {
+            @Override
+            public void onLocationItemClickListener(int itemPosition) {
+                fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
+                activeFragment = mapFragment;
+                Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
+                SurfaceManager.getInstance().refreshView(true, surface);
+                mapFragment.hideAddLayerAndMoveToSurface(surface);
+            }
+        });
     }
 
     public boolean isServicesOK() {
