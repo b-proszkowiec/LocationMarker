@@ -73,16 +73,19 @@ public class SurfaceManager implements Serializable {
         for (LocationPoint locationPoint : currentSurface.getLocationPoints()) {
             MarkersContainer.getInstance().addMarker(locationPoint.getLatLng());
         }
-        MarkersContainer.getInstance().drawPolyline(isAddingProcessFinished);
 
         if (isAddingProcessFinished) {
             currentSurface.computeArea();
+            MarkersContainer.getInstance().drawPolygon();
+        } else {
+            MarkersContainer.getInstance().drawPolyline(isAddingProcessFinished);
         }
     }
 
     public Surface getCurrentSurface() {
         return currentSurface;
     }
+
 
     public List<Surface> getSurfaces() {
         return surfaces;
