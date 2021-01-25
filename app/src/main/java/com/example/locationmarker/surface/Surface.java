@@ -45,8 +45,9 @@ public class Surface implements Serializable {
         return points;
     }
 
-    public void computeArea() {
+    public double computeArea() {
         areaValue = SphericalUtil.computeArea(convertToLatLngList());
+        return areaValue;
     }
 
     public String getName() {

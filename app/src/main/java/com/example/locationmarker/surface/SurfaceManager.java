@@ -54,7 +54,10 @@ public class SurfaceManager implements Serializable {
     }
 
     public void restoreSavedSurfaces() {
-        surfaces = (List<Surface>) DataStorage.getInstance().loadData(context);
+        List<Surface> restoredSurfaces = (List<Surface>) DataStorage.getInstance().loadData(context);
+        if (restoredSurfaces != null) {
+            surfaces.addAll(restoredSurfaces);
+        }
     }
 
     public int addPointToCurrentLocation(Location location) {
@@ -73,16 +76,19 @@ public class SurfaceManager implements Serializable {
         for (LocationPoint locationPoint : currentSurface.getLocationPoints()) {
             MarkersContainer.getInstance().addMarker(locationPoint.getLatLng());
         }
-        MarkersContainer.getInstance().drawPolyline(isAddingProcessFinished);
 
         if (isAddingProcessFinished) {
-            currentSurface.computeArea();
+            double polygonArea = currentSurface.computeArea();
+            MarkersContainer.getInstance().drawPolygon(polygonArea);
+        } else {
+            MarkersContainer.getInstance().drawPolyline(isAddingProcessFinished);
         }
     }
 
     public Surface getCurrentSurface() {
         return currentSurface;
     }
+
 
     public List<Surface> getSurfaces() {
         return surfaces;

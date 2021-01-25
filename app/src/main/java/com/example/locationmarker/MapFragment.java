@@ -34,7 +34,7 @@ import static android.content.Context.LOCATION_SERVICE;
 
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
     private static final String LOG_TAG = MapFragment.class.getSimpleName();
-    private static final float DEFAULT_ZOOM = 17f;
+    private static final float DEFAULT_ZOOM = 19f;
     private static final double INIT_LOCATION_LAT = 52.22514419;      // Ordona Warszawa
     private static final double INIT_LOCATION_LON = 20.95346435;
 
