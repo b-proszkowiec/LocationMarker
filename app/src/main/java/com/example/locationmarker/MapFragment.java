@@ -1,27 +1,23 @@
 package com.example.locationmarker;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.locationmarker.dialog.InputDialog;
 import com.example.locationmarker.markers.MarkersContainer;
 import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -34,11 +30,10 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-
 import static android.content.Context.LOCATION_SERVICE;
 
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
-    private static final String LOG_TAG = "MapsFragment";
+    private static final String LOG_TAG = MapFragment.class.getSimpleName();
     private static final float DEFAULT_ZOOM = 17f;
     private static final double INIT_LOCATION_LAT = 52.22514419;      // Ordona Warszawa
     private static final double INIT_LOCATION_LON = 20.95346435;
@@ -47,7 +42,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private FusedLocationProviderClient fusedLocationClient;
     private View view;
 
-    private static String alertDialogInputText;
     private static LinearLayout addPointLayer, saveLayer;
     private static Button addPointButton, stopAddingButton, saveButton, resetButton;
 
@@ -123,7 +117,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         MarkersContainer.setContext(getContext());
         MarkersContainer.getInstance().setMap(googleMap);
         LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L,0.5f, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 0.5f, this);
 
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setAllGesturesEnabled(true);
@@ -201,41 +195,16 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             @Override
             public void onClick(View v) {
                 Log.d(LOG_TAG, "onClickSaveButton: button clicked");
-
-                Runnable alertDialogRunnable = new Runnable() {
+                InputDialog.getInstance().setOnDialogTextInputListener(new InputDialog.OnDialogTextInputListener() {
                     @Override
-                    public void run() {
-                        SurfaceManager.getInstance().save(getContext(), alertDialogInputText);
+                    public void onDialogTextInput(int pos, String text) {
+                        SurfaceManager.getInstance().storeNewSurface(text);
+                        resetBottomLayer();
                     }
-                };
-                userInput(alertDialogRunnable);
-                resetBottomLayer();
+                });
+                int itemPosition = SurfaceManager.getInstance().getSurfaces().size();
+                InputDialog.getInstance().startAlertDialog(itemPosition);
             }
         });
-    }
-
-    private void userInput(final Runnable func) {
-        AlertDialog.Builder aBuilder = new AlertDialog.Builder(getContext());
-
-        aBuilder.setTitle("Give a name for new area:");
-        final EditText input = new EditText(getContext());
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        aBuilder.setView(input);
-
-        aBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                alertDialogInputText = input.getText().toString();
-                func.run();
-            }
-        });
-        aBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-                alertDialogInputText = "";
-            }
-        });
-        aBuilder.show();
     }
 }

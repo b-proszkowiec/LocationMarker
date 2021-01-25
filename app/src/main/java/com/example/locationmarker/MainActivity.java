@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.locationmarker.dialog.InputDialog;
 import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -21,7 +22,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
 public class MainActivity extends AppCompatActivity {
-    private static final String LOG_TAG = "MainActivity";
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -81,7 +82,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        SurfaceManager.getInstance().restoreSavedSurfaces(getApplicationContext());
+        SurfaceManager.getInstance().setContext(getApplicationContext());
+        SurfaceManager.getInstance().restoreSavedSurfaces();
+        InputDialog.getInstance().setContext(this);
     }
 
     public boolean isServicesOK() {
