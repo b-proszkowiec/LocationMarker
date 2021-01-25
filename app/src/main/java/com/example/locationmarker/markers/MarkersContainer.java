@@ -1,14 +1,8 @@
 package com.example.locationmarker.markers;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.widget.Toast;
 
 import com.example.locationmarker.R;
@@ -17,6 +11,7 @@ import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -108,6 +103,19 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         return Math.sqrt(distance);
     }
 
+    private LatLng getPolygonCenterPoint(List<LatLng> polygonPointsList){
+        LatLng centerLatLng = null;
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for(int i = 0 ; i < polygonPointsList.size() ; i++)
+        {
+            builder.include(polygonPointsList.get(i));
+        }
+        LatLngBounds bounds = builder.build();
+        centerLatLng =  bounds.getCenter();
+
+        return centerLatLng;
+    }
+
     public int compare(LatLng o1, LatLng o2) {
         return (int) (o2.latitude - o1.latitude) * 10 * 1000;
     }
@@ -124,7 +132,7 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
         writeDistancesOnMap(isAddingProcessFinished);
     }
 
-    public void drawPolygon() {
+    public void drawPolygon(double polygonArea) {
         List<LatLng> points = getLatLngFromLocation();
 
         PolygonOptions polygonOptions = new PolygonOptions()
@@ -132,6 +140,20 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
                 .fillColor(R.color.black);
 
         map.addPolygon(polygonOptions);
+        LatLng polygonCenter = getPolygonCenterPoint(points);
+
+        IconGenerator icg = new IconGenerator(context);
+        icg.setColor(Color.GREEN); // transparent background
+        icg.setTextAppearance(R.style.BlackText); // black text
+        Bitmap bm = icg.makeIcon(String.format("%.2f", polygonArea) + " m2");
+
+        MarkerOptions markerOptions = new MarkerOptions()
+                .position(polygonCenter)
+                .title(new DecimalFormat("#.00").format(polygonArea))
+                .icon(BitmapDescriptorFactory.fromBitmap(bm));
+
+        map.addMarker(markerOptions);
+
     }
 
     private List<LatLng> getLatLngFromLocation() {
