@@ -5,19 +5,20 @@
     <string name="ic_location_text">Locations</string>
     <string name="ic_settings_text">Settings</string>
     <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
+    <string name="units_header">Units</string>
+    <string name="theme_header">Theme</string>
 
     <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
+    <string name="units_title">Units</string>
+    <string name="measurement_system_title">Measurement system</string>
+    <string name="area_unit_title">Area unit</string>
+    <string name="distance_unit_title">Distance unit</string>
 
     <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
+    <string name="theme_title">Use dark theme</string>
     <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="theme_summary_on">Application dark theme in use</string>
+    <string name="theme_summary_off">Application light theme in use</string>
     <string name="add_point_button_text">Add point</string>
     <string name="end_button_text">End</string>
     <string name="reset_button_text">Reset</string>

@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -23,6 +24,7 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
 
     private FragmentListSingleItemAdapter adapter;
     private OnLocationItemClickListener onLocationItemClickListener;
+    private TextView noItemsTextView;
 
     public interface OnLocationItemClickListener {
         void onLocationItemClickListener(int itemPosition);
@@ -35,7 +37,9 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        return inflater.inflate(R.layout.fragment_item_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_item_list, container, false);
+        noItemsTextView = view.findViewById(R.id.noItemsTextView);
+        return view;
     }
 
     @Override
@@ -60,6 +64,12 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         adapter.setOnItemClickListener(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+
+        if (itemList.size() == 0) {
+            noItemsTextView.setVisibility(View.VISIBLE);
+        } else {
+            noItemsTextView.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override

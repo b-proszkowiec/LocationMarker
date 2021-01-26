@@ -1,64 +1,39 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="@string/messages_header">
+    <PreferenceCategory app:title="@string/units_header">
 
-        <EditTextPreference
-            app:key="signature"
-            app:title="@string/signature_title"
+        <ListPreference
+            app:defaultValue="metric"
+            app:entries="@array/measurement_system_entries"
+            app:entryValues="@array/measurement_system_values"
+            app:key="measurement_system"
+            app:title="@string/measurement_system_title"
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/reply_title"
-            app:useSimpleSummaryProvider="true" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="@string/sync_header">
-
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
-
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
-
-    </PreferenceCategory>
-    <PreferenceCategory app:title="@string/messages_header">
-
-        <EditTextPreference
-            app:key="signature"
-            app:title="@string/signature_title"
+            app:defaultValue="m2"
+            app:entries="@array/area_unit_entries"
+            app:entryValues="@array/area_unit_entries"
+            app:key="area_unit_system"
+            app:title="@string/area_unit_title"
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/reply_title"
+            app:defaultValue="m"
+            app:entries="@array/distance_unit_entries"
+            app:entryValues="@array/distance_unit_values"
+            app:key="distance_unit_system"
+            app:title="@string/distance_unit_title"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
-    <PreferenceCategory app:title="@string/sync_header">
 
+    <PreferenceCategory app:title="@string/theme_header">
         <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
-
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
+            app:key="theme"
+            app:summaryOff="@string/theme_summary_off"
+            app:summaryOn="@string/theme_summary_on"
+            app:title="@string/theme_title" />
 
     </PreferenceCategory>
 
