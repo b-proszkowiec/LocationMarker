@@ -1,12 +1,36 @@
 <resources>
-    <!-- Reply Preference -->
-    <string-array name="reply_entries">
-        <item>Reply</item>
-        <item>Reply to all</item>
+    <!-- Measurement system -->
+    <string-array name="measurement_system_entries">
+        <item>Metric</item>
+        <item>Imperial</item>
     </string-array>
 
-    <string-array name="reply_values">
-        <item>reply</item>
-        <item>reply_all</item>
+    <string-array name="measurement_system_values">
+        <item>metric</item>
+        <item>imperial</item>
+    </string-array>
+
+    <!-- Area unit -->
+    <string-array name="area_unit_entries">
+        <item>m2</item>
+        <item>a</item>
+        <item>ha</item>
+        <item>km2</item>
+    </string-array>
+
+    <string-array name="area_unit_values">
+        <item>Metric</item>
+        <item>Imperial</item>
+    </string-array>
+
+    <!-- Reply Preference -->
+    <string-array name="distance_unit_entries">
+        <item>m</item>
+        <item>km</item>
+    </string-array>
+
+    <string-array name="distance_unit_values">
+        <item>m</item>
+        <item>km</item>
     </string-array>
 </resources>
