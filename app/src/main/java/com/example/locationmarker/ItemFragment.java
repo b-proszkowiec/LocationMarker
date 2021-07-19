@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,6 +26,8 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     private FragmentListSingleItemAdapter adapter;
     private OnLocationItemClickListener onLocationItemClickListener;
     private TextView noItemsTextView;
+    private Button importButton;
+    private Button exportButton;
 
     public interface OnLocationItemClickListener {
         void onLocationItemClickListener(int itemPosition);
@@ -40,6 +43,25 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         View view = inflater.inflate(R.layout.fragment_item_list, container, false);
         noItemsTextView = view.findViewById(R.id.noItemsTextView);
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        importButton = getActivity().findViewById(R.id.importButton);
+        importButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(LOG_TAG, "import button clicked");
+            }
+        });
+        exportButton = getActivity().findViewById(R.id.exportButton);
+        exportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(LOG_TAG, "export button clicked");
+            }
+        });
     }
 
     @Override

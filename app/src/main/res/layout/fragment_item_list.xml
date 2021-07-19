@@ -20,4 +20,36 @@
         android:layout_centerVertical="true"
         android:text="No items to show" />
 
+    <RelativeLayout
+        android:id="@+id/saveResetLayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/exportButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/mybutton"
+            android:onClick="onClickExportButton"
+            android:text="@string/export_button_text"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:id="@+id/importButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@id/exportButton"
+            android:background="@drawable/mybutton"
+            android:onClick="onClickImportButton"
+            android:text="@string/import_button_text"
+            android:textColor="#ffffff" />
+
+    </RelativeLayout>
+
 </RelativeLayout>
