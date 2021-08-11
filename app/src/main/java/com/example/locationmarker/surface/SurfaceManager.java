@@ -66,10 +66,11 @@ public class SurfaceManager implements Serializable {
                 .collect(Collectors.toList());
     }
 
-    public void importFromJson(Activity activity) {
-        List<Surface> importedSurfaces = JsonStorage.importFromFile(context, activity);
+    public void importFromJson(Uri uri) {
+        List<Surface> importedSurfaces = JsonStorage.importFromFile(context, uri);
         if (importedSurfaces != null) {
             surfaces = mergeSurfacesList(surfaces, importedSurfaces);
+            storeCurrentSurfaces();
         }
     }
 

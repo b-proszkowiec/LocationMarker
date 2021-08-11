@@ -26,6 +26,7 @@ import java.util.List;
 public class ItemFragment extends Fragment implements FragmentListSingleItemAdapter.OnItemClickListener {
     private static final String LOG_TAG = ItemFragment.class.getSimpleName();
     private static final int WRITE_FILE = 1855;
+    private static final int OPEN_FILE = 1856;
 
     private FragmentListSingleItemAdapter adapter;
     private OnLocationItemClickListener onLocationItemClickListener;
@@ -38,6 +39,9 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == WRITE_FILE && resultCode == Activity.RESULT_OK) {
             SurfaceManager.getInstance().exportToJson(getContext(), intent.getData());
+        } else if (requestCode == OPEN_FILE && resultCode == Activity.RESULT_OK) {
+            SurfaceManager.getInstance().importFromJson(intent.getData());
+            refreshItemsView();
         } else {
             Toast.makeText(getContext(), "Please install a File Manager.",
                     Toast.LENGTH_SHORT).show();
@@ -66,19 +70,30 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         importButton = getActivity().findViewById(R.id.importButton);
         importButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "Import button clicked");
-            SurfaceManager.getInstance().importFromJson(getActivity());
-            refreshItemsView();
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.setType("application/json");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            this.getActivity().setIntent(intent);
+            try {
+                this.startActivityForResult(intent, OPEN_FILE);
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(getContext(), "Please install a File Manager.",
+                        Toast.LENGTH_SHORT).show();
+            }
         });
         exportButton = getActivity().findViewById(R.id.exportButton);
         exportButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "Export button clicked");
-            // SurfaceManager.getInstance().exportToJson(this);
-
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("*/*");
+            intent.setType("application/json");
             this.getActivity().setIntent(intent);
-            this.startActivityForResult(intent, WRITE_FILE);
+            try {
+                this.startActivityForResult(intent, WRITE_FILE);
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(getContext(), "Please install a File Manager.",
+                        Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
