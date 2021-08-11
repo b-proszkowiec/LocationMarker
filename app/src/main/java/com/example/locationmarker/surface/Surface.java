@@ -1,6 +1,9 @@
 package com.example.locationmarker.surface;
 
 import android.location.Location;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
@@ -8,9 +11,14 @@ import com.google.maps.android.SphericalUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class Surface implements Serializable {
-    private static final String LOG_TAG = "Surface";
+    private static final String LOG_TAG = Surface.class.getSimpleName();
+    private static final long serialVersionUID = -5444204010422813540L;
 
     // vars
     List<LocationPoint> locationPoints;
@@ -56,5 +64,13 @@ public class Surface implements Serializable {
 
     public String getArea() {
         return String.format("%.2f square meters", areaValue);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static <T> Predicate<T> distinctByKey(
+            Function<? super T, ?> keyExtractor) {
+
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 }

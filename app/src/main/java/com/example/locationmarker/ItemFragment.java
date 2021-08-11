@@ -1,5 +1,7 @@
 package com.example.locationmarker;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -7,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -22,12 +25,24 @@ import java.util.List;
 
 public class ItemFragment extends Fragment implements FragmentListSingleItemAdapter.OnItemClickListener {
     private static final String LOG_TAG = ItemFragment.class.getSimpleName();
+    private static final int WRITE_FILE = 1855;
 
     private FragmentListSingleItemAdapter adapter;
     private OnLocationItemClickListener onLocationItemClickListener;
     private TextView noItemsTextView;
     private Button importButton;
     private Button exportButton;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == WRITE_FILE && resultCode == Activity.RESULT_OK) {
+            SurfaceManager.getInstance().exportToJson(getContext(), intent.getData());
+        } else {
+            Toast.makeText(getContext(), "Please install a File Manager.",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
 
     public interface OnLocationItemClickListener {
         void onLocationItemClickListener(int itemPosition);
@@ -49,18 +64,21 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     public void onStart() {
         super.onStart();
         importButton = getActivity().findViewById(R.id.importButton);
-        importButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(LOG_TAG, "import button clicked");
-            }
+        importButton.setOnClickListener(v -> {
+            Log.d(LOG_TAG, "Import button clicked");
+            SurfaceManager.getInstance().importFromJson(getActivity());
+            refreshItemsView();
         });
         exportButton = getActivity().findViewById(R.id.exportButton);
-        exportButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(LOG_TAG, "export button clicked");
-            }
+        exportButton.setOnClickListener(v -> {
+            Log.d(LOG_TAG, "Export button clicked");
+            // SurfaceManager.getInstance().exportToJson(this);
+
+            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*");
+            this.getActivity().setIntent(intent);
+            this.startActivityForResult(intent, WRITE_FILE);
         });
     }
 
