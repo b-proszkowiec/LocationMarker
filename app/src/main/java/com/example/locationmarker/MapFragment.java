@@ -6,10 +6,14 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -17,6 +21,7 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.locationmarker.controls.GpsPrecissionIconController;
 import com.example.locationmarker.dialog.InputDialog;
 import com.example.locationmarker.markers.MarkersContainer;
 import com.example.locationmarker.surface.Surface;
@@ -44,7 +49,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private FusedLocationProviderClient fusedLocationClient;
 
     private static LinearLayout addPointLayer, saveLayer;
-    private static Button addPointButton, stopAddingButton, saveButton, resetButton;
+    private static Button addPointButton, stopAddingButton, saveButton, resetButton, precissionButton;
+    private GpsPrecissionIconController gpsPrecissionIconController;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,9 +76,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     @Override
     public void onLocationChanged(Location location) {
-        String text = "Accurancy : " + location.getAccuracy() + "m";
-
-        Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
+        gpsPrecissionIconController.update(String.format("%.02f m", location.getAccuracy()));
         Log.d(LOG_TAG, "onLocationChanged: location has changed");
         mLastLocation = location;
     }
@@ -101,6 +105,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         // vars
         googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(initLocation, DEFAULT_ZOOM));
+        googleMap.setPadding(0, 300, 0, 0);
 
         Toast.makeText(getContext(), "Map is ready", Toast.LENGTH_SHORT).show();
 
@@ -114,14 +119,11 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        fusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if (location != null) {
-                    Log.d(LOG_TAG, "onSuccess: successfully got last location");
-                }
-                mLastLocation = location;
+        fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+            if (location != null) {
+                Log.d(LOG_TAG, "onSuccess: successfully got last location");
             }
+            mLastLocation = location;
         });
         googleMap.setMyLocationEnabled(true);
         MarkersContainer.setContext(getContext());
@@ -133,6 +135,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         uiSettings.setAllGesturesEnabled(true);
         uiSettings.setMapToolbarEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
+
+        gpsPrecissionIconController = new GpsPrecissionIconController(getContext(), precissionButton);
     }
 
     public int adPoint() {
@@ -172,54 +176,42 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         stopAddingButton = getActivity().findViewById(R.id.stopAddingButton);
         saveButton = getActivity().findViewById(R.id.saveButton);
         resetButton = getActivity().findViewById(R.id.resetButton);
+        precissionButton = getActivity().findViewById(R.id.precisionButton);
         resetBottomLayer();
 
-        addPointButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(LOG_TAG, "onClickAddPointButton: button clicked");
-                int points = adPoint();
+        addPointButton.setOnClickListener(v -> {
+            Log.d(LOG_TAG, "onClickAddPointButton: button clicked");
+            int points = adPoint();
 
-                if (points == 3) {
-                    stopAddingButton.setVisibility(View.VISIBLE);
-                }
+            if (points == 3) {
+                stopAddingButton.setVisibility(View.VISIBLE);
             }
         });
 
-        stopAddingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(LOG_TAG, "onClickEndButton: button clicked");
-                finish();
+        stopAddingButton.setOnClickListener(v -> {
+            Log.d(LOG_TAG, "onClickEndButton: button clicked");
+            finish();
 
-                addPointLayer.setVisibility(View.INVISIBLE);
-                saveLayer.setVisibility(View.VISIBLE);
-            }
+            addPointLayer.setVisibility(View.INVISIBLE);
+            saveLayer.setVisibility(View.VISIBLE);
         });
 
-        resetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(LOG_TAG, "onClickResetButton: button clicked");
-                SurfaceManager.getInstance().reset();
+        resetButton.setOnClickListener(v -> {
+            Log.d(LOG_TAG, "onClickResetButton: button clicked");
+            SurfaceManager.getInstance().reset();
+            resetBottomLayer();
+        });
+
+        saveButton.setOnClickListener(v -> {
+            Log.d(LOG_TAG, "onClickSaveButton: button clicked");
+            InputDialog.getInstance().setOnDialogTextInputListener((pos, text) -> {
+                SurfaceManager.getInstance().storeNewSurface(text);
                 resetBottomLayer();
-            }
+            });
+            int itemPosition = SurfaceManager.getInstance().getSurfaces().size();
+            InputDialog.getInstance().startAlertDialog(itemPosition);
         });
 
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(LOG_TAG, "onClickSaveButton: button clicked");
-                InputDialog.getInstance().setOnDialogTextInputListener(new InputDialog.OnDialogTextInputListener() {
-                    @Override
-                    public void onDialogTextInput(int pos, String text) {
-                        SurfaceManager.getInstance().storeNewSurface(text);
-                        resetBottomLayer();
-                    }
-                });
-                int itemPosition = SurfaceManager.getInstance().getSurfaces().size();
-                InputDialog.getInstance().startAlertDialog(itemPosition);
-            }
-        });
+
     }
 }

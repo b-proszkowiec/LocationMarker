@@ -31,8 +31,6 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     private FragmentListSingleItemAdapter adapter;
     private OnLocationItemClickListener onLocationItemClickListener;
     private TextView noItemsTextView;
-    private Button importButton;
-    private Button exportButton;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -67,7 +65,7 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     @Override
     public void onStart() {
         super.onStart();
-        importButton = getActivity().findViewById(R.id.importButton);
+        Button importButton = getActivity().findViewById(R.id.importButton);
         importButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "Import button clicked");
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -81,7 +79,7 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
                         Toast.LENGTH_SHORT).show();
             }
         });
-        exportButton = getActivity().findViewById(R.id.exportButton);
+        Button exportButton = getActivity().findViewById(R.id.exportButton);
         exportButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "Export button clicked");
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -145,15 +143,12 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     @Override
     public void onEditClick(int position) {
         Log.d(LOG_TAG, "onEditClick occurred");
-        InputDialog.getInstance().setOnDialogTextInputListener(new InputDialog.OnDialogTextInputListener() {
-            @Override
-            public void onDialogTextInput(int itemPosition, String inputText) {
-                Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
-                surface.setName(inputText);
-                SurfaceManager.getInstance().storeCurrentSurfaces();
-                adapter.notifyItemChanged(itemPosition);
-                refreshItemsView();
-            }
+        InputDialog.getInstance().setOnDialogTextInputListener((itemPosition, inputText) -> {
+            Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
+            surface.setName(inputText);
+            SurfaceManager.getInstance().storeCurrentSurfaces();
+            adapter.notifyItemChanged(itemPosition);
+            refreshItemsView();
         });
         InputDialog.startAlertDialog(position);
     }
