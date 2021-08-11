@@ -1,19 +1,29 @@
 package com.example.locationmarker.surface;
 
+import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
+import android.net.Uri;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import com.example.locationmarker.markers.MarkersContainer;
 import com.example.locationmarker.storage.DataStorage;
+import com.example.locationmarker.storage.JsonStorage;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.example.locationmarker.surface.Surface.distinctByKey;
 
 public class SurfaceManager implements Serializable {
     private static final String LOG_TAG = SurfaceManager.class.getSimpleName();
+    private static final long serialVersionUID = -5444204010422813540L;
     private static final SurfaceManager INSTANCE = new SurfaceManager();
     private static final String TEMP_NAME = "Name";
     private Context context;
@@ -42,6 +52,28 @@ public class SurfaceManager implements Serializable {
         refreshView(false, currentSurface);
     }
 
+    public void exportToJson(Context context, Uri uri) {
+        JsonStorage instance = new JsonStorage();
+        instance.exportToFile(context, uri, surfaces);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    List<Surface> mergeSurfacesList(List<Surface> targetSurfaces, List<Surface> surfacesToMerge) {
+
+        targetSurfaces.addAll(surfacesToMerge);
+        return targetSurfaces.stream()
+                .filter(distinctByKey(p -> p.getName()))
+                .collect(Collectors.toList());
+    }
+
+    public void importFromJson(Uri uri) {
+        List<Surface> importedSurfaces = JsonStorage.importFromFile(context, uri);
+        if (importedSurfaces != null) {
+            surfaces = mergeSurfacesList(surfaces, importedSurfaces);
+            storeCurrentSurfaces();
+        }
+    }
+
     public void storeNewSurface(String name) {
         currentSurface.setName(name);
         surfaces.add(currentSurface);
@@ -58,7 +90,7 @@ public class SurfaceManager implements Serializable {
     public void restoreSavedSurfaces() {
         List<Surface> restoredSurfaces = (List<Surface>) DataStorage.getInstance().loadData(context);
         if (restoredSurfaces != null) {
-            surfaces.addAll(restoredSurfaces);
+            surfaces = mergeSurfacesList(surfaces, restoredSurfaces);
         }
     }
 
@@ -72,15 +104,14 @@ public class SurfaceManager implements Serializable {
         return currentSurface.getLocationPoints().size();
     }
 
-    public LatLng getSurfaceCenterPoint(List<LatLng> polygonPointsList){
+    public LatLng getSurfaceCenterPoint(List<LatLng> polygonPointsList) {
         LatLng centerLatLng;
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for(int i = 0 ; i < polygonPointsList.size() ; i++)
-        {
+        for (int i = 0; i < polygonPointsList.size(); i++) {
             builder.include(polygonPointsList.get(i));
         }
         LatLngBounds bounds = builder.build();
-        centerLatLng =  bounds.getCenter();
+        centerLatLng = bounds.getCenter();
 
         return centerLatLng;
     }

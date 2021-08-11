@@ -1,11 +1,15 @@
 package com.example.locationmarker;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -21,10 +25,28 @@ import java.util.List;
 
 public class ItemFragment extends Fragment implements FragmentListSingleItemAdapter.OnItemClickListener {
     private static final String LOG_TAG = ItemFragment.class.getSimpleName();
+    private static final int WRITE_FILE = 1855;
+    private static final int OPEN_FILE = 1856;
 
     private FragmentListSingleItemAdapter adapter;
     private OnLocationItemClickListener onLocationItemClickListener;
     private TextView noItemsTextView;
+    private Button importButton;
+    private Button exportButton;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == WRITE_FILE && resultCode == Activity.RESULT_OK) {
+            SurfaceManager.getInstance().exportToJson(getContext(), intent.getData());
+        } else if (requestCode == OPEN_FILE && resultCode == Activity.RESULT_OK) {
+            SurfaceManager.getInstance().importFromJson(intent.getData());
+            refreshItemsView();
+        } else {
+            Toast.makeText(getContext(), "Please install a File Manager.",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
 
     public interface OnLocationItemClickListener {
         void onLocationItemClickListener(int itemPosition);
@@ -40,6 +62,39 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         View view = inflater.inflate(R.layout.fragment_item_list, container, false);
         noItemsTextView = view.findViewById(R.id.noItemsTextView);
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        importButton = getActivity().findViewById(R.id.importButton);
+        importButton.setOnClickListener(v -> {
+            Log.d(LOG_TAG, "Import button clicked");
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.setType("application/json");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            this.getActivity().setIntent(intent);
+            try {
+                this.startActivityForResult(intent, OPEN_FILE);
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(getContext(), "Please install a File Manager.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+        exportButton = getActivity().findViewById(R.id.exportButton);
+        exportButton.setOnClickListener(v -> {
+            Log.d(LOG_TAG, "Export button clicked");
+            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("application/json");
+            this.getActivity().setIntent(intent);
+            try {
+                this.startActivityForResult(intent, WRITE_FILE);
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(getContext(), "Please install a File Manager.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

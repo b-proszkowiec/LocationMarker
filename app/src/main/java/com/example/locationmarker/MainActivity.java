@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+    private static final String READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
 
     // vars
@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
     private final SettingsFragment settingFragment = new SettingsFragment();
     private FragmentManager fragmentManager = getSupportFragmentManager();
     private Fragment activeFragment = mapFragment;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,29 +55,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+            = item -> {
+        switch (item.getItemId()) {
+            case R.id.mapsFragment:
+                fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
+                mapFragment.onHiddenChanged(false);
+                activeFragment = mapFragment;
+                return true;
 
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.mapsFragment:
-                    fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
-                    mapFragment.onHiddenChanged(false);
-                    activeFragment = mapFragment;
-                    return true;
+            case R.id.itemFragment:
+                fragmentManager.beginTransaction().hide(activeFragment).show(itemFragment).commit();
+                activeFragment = itemFragment;
+                return true;
 
-                case R.id.itemFragment:
-                    fragmentManager.beginTransaction().hide(activeFragment).show(itemFragment).commit();
-                    activeFragment = itemFragment;
-                    return true;
-
-                case R.id.settingsFragment:
-                    fragmentManager.beginTransaction().hide(activeFragment).show(settingFragment).commit();
-                    activeFragment = settingFragment;
-                    return true;
-            }
-            return false;
+            case R.id.settingsFragment:
+                fragmentManager.beginTransaction().hide(activeFragment).show(settingFragment).commit();
+                activeFragment = settingFragment;
+                return true;
         }
+        return false;
     };
 
     @Override
@@ -88,15 +83,12 @@ public class MainActivity extends AppCompatActivity {
         SurfaceManager.getInstance().restoreSavedSurfaces();
         InputDialog.getInstance().setContext(this);
 
-        itemFragment.setOnLocationItemClickListener(new ItemFragment.OnLocationItemClickListener() {
-            @Override
-            public void onLocationItemClickListener(int itemPosition) {
-                fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
-                activeFragment = mapFragment;
-                Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
-                SurfaceManager.getInstance().refreshView(true, surface);
-                mapFragment.hideAddLayerAndMoveToSurface(surface);
-            }
+        itemFragment.setOnLocationItemClickListener(itemPosition -> {
+            fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
+            activeFragment = mapFragment;
+            Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
+            SurfaceManager.getInstance().refreshView(true, surface);
+            mapFragment.hideAddLayerAndMoveToSurface(surface);
         });
     }
 
@@ -137,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void getLocationPermission() {
         Log.d(LOG_TAG, "getLocationPermission: getting location permissions");
-        String[] permissions = {FINE_LOCATION, COURSE_LOCATION, WRITE_EXTERNAL_STORAGE};
+        String[] permissions = {FINE_LOCATION, COURSE_LOCATION, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE};
 
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -145,14 +137,17 @@ public class MainActivity extends AppCompatActivity {
                     COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                         WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                            READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    } else {
+                        ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
+                    }
                 } else {
                     ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
                 }
             } else {
                 ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
             }
-        } else {
-            ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
 }

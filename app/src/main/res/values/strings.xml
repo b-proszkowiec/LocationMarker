@@ -23,4 +23,6 @@
     <string name="end_button_text">End</string>
     <string name="reset_button_text">Reset</string>
     <string name="save_button_text">Save</string>
+    <string name="import_button_text">Import</string>
+    <string name="export_button_text">Export</string>
 </resources>
