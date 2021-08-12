@@ -39,6 +39,7 @@
         android:layout_alignParentBottom="true"
         android:paddingBottom="10dp"
         android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:orientation="horizontal">
 
         <Button
@@ -46,7 +47,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/mybutton"
-            android:onClick="onClickAddPointButton"
             android:text="@string/add_point_button_text"
             android:textColor="#ffffff"
             tools:ignore="ButtonStyle" />
@@ -57,7 +57,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:background="@drawable/mybutton"
-            android:onClick="onClickEndButton"
             android:text="@string/end_button_text"
             android:textColor="#ffffff"
             android:visibility="invisible" />
@@ -77,7 +76,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/mybutton"
-            android:onClick="onClickResetButton"
             android:text="@string/reset_button_text"
             android:textColor="#ffffff" />
 
@@ -87,7 +85,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:background="@drawable/mybutton"
-            android:onClick="onClickSaveButton"
             android:text="@string/save_button_text"
             android:textColor="#ffffff" />
 

@@ -1,10 +1,10 @@
 package com.example.locationmarker.surface;
 
-import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
@@ -94,7 +94,16 @@ public class SurfaceManager implements Serializable {
         }
     }
 
+
     public int addPointToCurrentLocation(Location location) {
+        if (currentSurface.getLocationPoints().size() > 0) {
+            LocationPoint lastLocation = currentSurface.getLocationPoints().get(currentSurface.getLocationPoints().size() - 1);
+            double distance = MarkersContainer.calculateDistanceBetweenLocations(lastLocation.getLocation(), location);
+            if (distance < 1) {
+                Toast.makeText(context, String.format("Minimal distance should be at least %.1f m", 1.0), Toast.LENGTH_SHORT).show();
+                return getPointsAmount();
+            }
+        }
         currentSurface.addPointToSurface(location);
         refreshView(false, currentSurface);
         return getPointsAmount();
