@@ -1,6 +1,7 @@
 package com.example.locationmarker.surface;
 
 import android.location.Location;
+import android.location.LocationManager;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -22,7 +23,10 @@ public class LocationPoint implements Serializable {
         return new LatLng(latitude, longitude);
     }
 
-    public float getAccuracy() {
-        return accuracy;
+    public Location getLocation() {
+        Location location = new Location(LocationManager.GPS_PROVIDER);
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
+        return location;
     }
 }

@@ -3,6 +3,7 @@ package com.example.locationmarker.markers;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.location.Location;
 import android.widget.Toast;
 
 import com.example.locationmarker.R;
@@ -76,6 +77,13 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
             }
         }
         return true;
+    }
+
+    public static double calculateDistanceBetweenLocations(Location locStart, Location locEnd) {
+        double distance = distance(locStart.getLatitude(), locEnd.getLatitude(),
+                locStart.getLongitude(), locEnd.getLongitude(), 0, 0);
+
+        return distance;
     }
 
     /**
