@@ -20,7 +20,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.locationmarker.controls.GpsPrecissionIconController;
+import com.example.locationmarker.controls.GpsPrecisionIconController;
 import com.example.locationmarker.dialog.InputDialog;
 import com.example.locationmarker.markers.MarkersManager;
 import com.example.locationmarker.surface.Surface;
@@ -37,13 +37,12 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 
 import static android.content.Context.LOCATION_SERVICE;
+import static com.example.locationmarker.constants.LocationMarkerConstants.DEFAULT_ZOOM;
+import static com.example.locationmarker.constants.LocationMarkerConstants.INIT_LOCATION_LAT;
+import static com.example.locationmarker.constants.LocationMarkerConstants.INIT_LOCATION_LON;
 
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
     private static final String LOG_TAG = MapFragment.class.getSimpleName();
-    private static final float DEFAULT_ZOOM = 19f;
-    private static final double INIT_LOCATION_LAT = 50.06167366350375;      // rynek w Krakowie
-    private static final double INIT_LOCATION_LON = 19.93725953201794;
-
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -58,7 +57,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private static Button addPointButton;
     private static Button stopAddingButton;
     private static Button precisionButton;
-    private GpsPrecissionIconController gpsPrecissionIconController;
+    private GpsPrecisionIconController gpsPrecisionIconController;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -82,7 +81,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     @SuppressLint("DefaultLocale")
     @Override
     public void onLocationChanged(Location location) {
-        gpsPrecissionIconController.update(String.format("%.02f m", location.getAccuracy()));
+        gpsPrecisionIconController.update(String.format("%.02f m", location.getAccuracy()));
         Log.d(LOG_TAG, "onLocationChanged: location has changed");
         mLastLocation = location;
     }
@@ -142,7 +141,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         uiSettings.setMapToolbarEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
 
-        gpsPrecissionIconController = new GpsPrecissionIconController(getContext(), precisionButton);
+        gpsPrecisionIconController = new GpsPrecisionIconController(getContext(), precisionButton);
     }
 
     private boolean areGrantedPermission() {

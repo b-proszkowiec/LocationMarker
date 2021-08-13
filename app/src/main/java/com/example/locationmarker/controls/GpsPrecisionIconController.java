@@ -10,17 +10,18 @@ import android.widget.Button;
 
 import com.example.locationmarker.R;
 
-public class GpsPrecissionIconController {
+import static com.example.locationmarker.constants.LocationMarkerConstants.GpsPrecisionIconControllerConstants.NO_LOCATION_UPDATE_TIMEOUT;
 
-    private static final String LOG_TAG = GpsPrecissionIconController.class.getSimpleName();
+public class GpsPrecisionIconController {
 
-    private final int interval = 10000;
+    private static final String LOG_TAG = GpsPrecisionIconController.class.getSimpleName();
+
     private final int EVENT = 104;
     private boolean isTimesUp;
     private static Button precisionButton;
     private Context context;
 
-    public GpsPrecissionIconController(Context context, Button button) {
+    public GpsPrecisionIconController(Context context, Button button) {
         this.context = context;
         this.precisionButton = button;
         isTimesUp = true;
@@ -31,7 +32,7 @@ public class GpsPrecissionIconController {
         Animation animation = AnimationUtils.loadAnimation(context, R.anim.anim_scale);
         precisionButton.startAnimation(animation);
         Message msg = handler.obtainMessage(EVENT);
-        handler.sendMessageDelayed(msg, interval);
+        handler.sendMessageDelayed(msg, NO_LOCATION_UPDATE_TIMEOUT);
         isTimesUp = false;
     }
 
@@ -45,7 +46,7 @@ public class GpsPrecissionIconController {
                     }
 
                     if (!handler.hasMessages(EVENT)) {
-                        handler.sendMessageDelayed(handler.obtainMessage(EVENT), interval);
+                        handler.sendMessageDelayed(handler.obtainMessage(EVENT), NO_LOCATION_UPDATE_TIMEOUT);
                         isTimesUp = true;
                     }
                     break;
