@@ -41,8 +41,8 @@ import static android.content.Context.LOCATION_SERVICE;
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
     private static final String LOG_TAG = MapFragment.class.getSimpleName();
     private static final float DEFAULT_ZOOM = 19f;
-    private static final double INIT_LOCATION_LAT = 52.22514419;      // Ordona Warszawa
-    private static final double INIT_LOCATION_LON = 20.95346435;
+    private static final double INIT_LOCATION_LAT = 50.06167366350375;      // rynek w Krakowie
+    private static final double INIT_LOCATION_LON = 19.93725953201794;
 
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -230,6 +230,15 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         // initialize map fragment
         SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(loc -> {
+                    mLastLocation = loc;
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(loc.getLatitude(), loc.getLongitude()), DEFAULT_ZOOM));
+                });
         supportMapFragment.getMapAsync(this);
     }
 
