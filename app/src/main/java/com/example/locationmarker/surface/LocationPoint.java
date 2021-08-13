@@ -29,4 +29,8 @@ public class LocationPoint implements Serializable {
         location.setLongitude(longitude);
         return location;
     }
+
+    public int getOrderNumber() {
+        return number;
+    }
 }

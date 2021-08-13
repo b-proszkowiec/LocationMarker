@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.example.locationmarker.R;
 import com.example.locationmarker.surface.LocationPoint;
+import com.example.locationmarker.surface.Surface;
 import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -25,58 +26,42 @@ import java.util.List;
 
 import static com.google.maps.android.SphericalUtil.interpolate;
 
-public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Comparator<LatLng> {
-    private static final String TAG = MarkersContainer.class.getSimpleName();
+public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparator<LatLng> {
+    private static final String TAG = MarkersManager.class.getSimpleName();
     // vars
     private static Context context;
-    private static MarkersContainer instance;
-    private static GoogleMap map;
-    private ArrayList<MyMarker> mMarkersList;
+    private static MarkersManager instance;
+    private static GoogleMap googleMap;
     private Polyline polyline;
 
-    public static void setMap(GoogleMap map) {
-        MarkersContainer.map = map;
-        map.setOnMarkerClickListener(instance);
+    public static void setGoogleMap(GoogleMap gMap) {
+        MarkersManager.googleMap = gMap;
+        googleMap.setOnMarkerClickListener(instance);
     }
 
     public static void setContext(Context context) {
-        MarkersContainer.context = context;
+        MarkersManager.context = context;
     }
 
-    public static MarkersContainer getInstance() {
+    public static MarkersManager getInstance() {
         if (instance == null) {
-            return new MarkersContainer();
+            return new MarkersManager();
         }
         return instance;
     }
 
-    public MarkersContainer() {
+    public MarkersManager() {
         instance = this;
-        this.mMarkersList = new ArrayList<>();
     }
 
-    public void addMarker(LatLng latLng) {
-        if (isEnoughFarDistanceBetweenOtherMarkers(latLng)) {
-            mMarkersList.add(new MyMarker(latLng));
-        }
+    public void showSurfaceOnMap(Surface surface) {
+        googleMap.clear();
 
-        map.addMarker(new MarkerOptions()
-                .position(new LatLng(latLng.latitude, latLng.longitude))
-                .title("" + mMarkersList.size())
-        )/*.setIcon(icon)*/;
-    }
-
-    boolean isEnoughFarDistanceBetweenOtherMarkers(LatLng newPositionLatLng) {
-        for (MyMarker myMarker : mMarkersList) {
-            LatLng markerLocation = myMarker.getLocation();
-            double distance = distance(markerLocation.latitude, newPositionLatLng.latitude,
-                    markerLocation.longitude, newPositionLatLng.longitude,
-                    0.0, 0.0);
-            if (distance < 0.5) {
-                return false;
-            }
+        for (LocationPoint locationPoint : surface.getLocationPoints()) {
+            googleMap.addMarker(new MarkerOptions()
+                    .position(locationPoint.getLatLng())
+                    .title("" + locationPoint.getOrderNumber()));
         }
-        return true;
     }
 
     public static double calculateDistanceBetweenLocations(Location locStart, Location locEnd) {
@@ -122,7 +107,7 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
 
         PolylineOptions polylineOptions = new PolylineOptions().color(Color.GREEN);
         List<LatLng> points = getLatLngFromLocation();
-        polyline = map.addPolyline(polylineOptions.addAll(points));
+        polyline = googleMap.addPolyline(polylineOptions.addAll(points));
 
         writeDistancesOnMap(isAddingProcessFinished);
     }
@@ -132,7 +117,7 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
                 .addAll(points)
                 .fillColor(R.color.black);
 
-        map.addPolygon(polygonOptions);
+        googleMap.addPolygon(polygonOptions);
         LatLng polygonCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(points);
 
         IconGenerator icg = new IconGenerator(context);
@@ -145,7 +130,7 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
                 .title(new DecimalFormat("#.00").format(polygonArea))
                 .icon(BitmapDescriptorFactory.fromBitmap(bm));
 
-        map.addMarker(markerOptions);
+        googleMap.addMarker(markerOptions);
 
     }
 
@@ -187,13 +172,8 @@ public class MarkersContainer implements GoogleMap.OnMarkerClickListener, Compar
                     .title(new DecimalFormat("#.00").format(distance))
                     .icon(BitmapDescriptorFactory.fromBitmap(bm));
 
-            map.addMarker(markerOptions);
+            googleMap.addMarker(markerOptions);
         }
-    }
-
-    public void clearMarkersList() {
-        map.clear();
-        mMarkersList.clear();
     }
 
     @Override

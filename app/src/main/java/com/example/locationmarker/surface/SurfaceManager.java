@@ -8,7 +8,7 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.locationmarker.markers.MarkersContainer;
+import com.example.locationmarker.markers.MarkersManager;
 import com.example.locationmarker.storage.DataStorage;
 import com.example.locationmarker.storage.JsonStorage;
 import com.google.android.gms.maps.model.LatLng;
@@ -94,11 +94,10 @@ public class SurfaceManager implements Serializable {
         }
     }
 
-
     public int addPointToCurrentLocation(Location location) {
         if (currentSurface.getLocationPoints().size() > 0) {
             LocationPoint lastLocation = currentSurface.getLocationPoints().get(currentSurface.getLocationPoints().size() - 1);
-            double distance = MarkersContainer.calculateDistanceBetweenLocations(lastLocation.getLocation(), location);
+            double distance = MarkersManager.calculateDistanceBetweenLocations(lastLocation.getLocation(), location);
             if (distance < 1) {
                 Toast.makeText(context, String.format("Minimal distance should be at least %.1f m", 1.0), Toast.LENGTH_SHORT).show();
                 return getPointsAmount();
@@ -126,17 +125,14 @@ public class SurfaceManager implements Serializable {
     }
 
     public void refreshView(boolean isAddingProcessFinished, Surface surface) {
-        MarkersContainer.getInstance().clearMarkersList();
 
-        for (LocationPoint locationPoint : surface.getLocationPoints()) {
-            MarkersContainer.getInstance().addMarker(locationPoint.getLatLng());
-        }
+        MarkersManager.getInstance().showSurfaceOnMap(surface);
 
         if (isAddingProcessFinished) {
             double polygonArea = surface.computeArea();
-            MarkersContainer.getInstance().drawPolygon(polygonArea, surface.convertToLatLngList());
+            MarkersManager.getInstance().drawPolygon(polygonArea, surface.convertToLatLngList());
         } else {
-            MarkersContainer.getInstance().drawPolyline(false);
+            MarkersManager.getInstance().drawPolyline(false);
         }
     }
 

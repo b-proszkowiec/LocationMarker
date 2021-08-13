@@ -6,14 +6,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -23,7 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.locationmarker.controls.GpsPrecissionIconController;
 import com.example.locationmarker.dialog.InputDialog;
-import com.example.locationmarker.markers.MarkersContainer;
+import com.example.locationmarker.markers.MarkersManager;
 import com.example.locationmarker.surface.Surface;
 import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -34,7 +30,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import static android.content.Context.LOCATION_SERVICE;
 
@@ -49,7 +44,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private FusedLocationProviderClient fusedLocationClient;
 
     private static LinearLayout addPointLayer, saveLayer;
-    private static Button addPointButton, stopAddingButton, saveButton, resetButton, precissionButton;
+    private static Button addPointButton, stopAddingButton, saveButton, resetButton, precisionButton;
     private GpsPrecissionIconController gpsPrecissionIconController;
 
     @Override
@@ -126,8 +121,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             mLastLocation = location;
         });
         googleMap.setMyLocationEnabled(true);
-        MarkersContainer.setContext(getContext());
-        MarkersContainer.getInstance().setMap(googleMap);
+        MarkersManager.setContext(getContext());
+        MarkersManager.getInstance().setGoogleMap(googleMap);
         LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 0.5f, this);
 
@@ -136,7 +131,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         uiSettings.setMapToolbarEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
 
-        gpsPrecissionIconController = new GpsPrecissionIconController(getContext(), precissionButton);
+        gpsPrecissionIconController = new GpsPrecissionIconController(getContext(), precisionButton);
     }
 
     public int adPoint() {
@@ -176,7 +171,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         stopAddingButton = getActivity().findViewById(R.id.stopAddingButton);
         saveButton = getActivity().findViewById(R.id.saveButton);
         resetButton = getActivity().findViewById(R.id.resetButton);
-        precissionButton = getActivity().findViewById(R.id.precisionButton);
+        precisionButton = getActivity().findViewById(R.id.precisionButton);
         resetBottomLayer();
 
         addPointButton.setOnClickListener(v -> {
