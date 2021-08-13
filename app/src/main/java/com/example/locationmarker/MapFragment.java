@@ -1,31 +1,32 @@
 package com.example.locationmarker;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.locationmarker.controls.GpsPrecissionIconController;
+import com.example.locationmarker.controls.GpsPrecisionIconController;
 import com.example.locationmarker.dialog.InputDialog;
-import com.example.locationmarker.markers.MarkersContainer;
+import com.example.locationmarker.markers.MarkersManager;
 import com.example.locationmarker.surface.Surface;
 import com.example.locationmarker.surface.SurfaceManager;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -34,49 +35,53 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import static android.content.Context.LOCATION_SERVICE;
+import static com.example.locationmarker.constants.LocationMarkerConstants.DEFAULT_ZOOM;
+import static com.example.locationmarker.constants.LocationMarkerConstants.INIT_LOCATION_LAT;
+import static com.example.locationmarker.constants.LocationMarkerConstants.INIT_LOCATION_LON;
 
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
     private static final String LOG_TAG = MapFragment.class.getSimpleName();
-    private static final float DEFAULT_ZOOM = 19f;
-    private static final double INIT_LOCATION_LAT = 52.22514419;      // Ordona Warszawa
-    private static final double INIT_LOCATION_LON = 20.95346435;
+    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
+    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
+    private static final String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+    private static final String READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
+    private static final int PERMISSION_REQUEST_CODE = 1234;
 
     private static Location mLastLocation = null;
-    private static GoogleMap map;
+    private static GoogleMap googleMap;
     private FusedLocationProviderClient fusedLocationClient;
 
     private static LinearLayout addPointLayer, saveLayer;
-    private static Button addPointButton, stopAddingButton, saveButton, resetButton, precissionButton;
-    private GpsPrecissionIconController gpsPrecissionIconController;
+    private static Button addPointButton;
+    private static Button stopAddingButton;
+    private static Button precisionButton;
+    private GpsPrecisionIconController gpsPrecisionIconController;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         // initialize view
         View view = inflater.inflate(R.layout.fragment_map, container, false);
-
-        // initialize map fragment
-        SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map);
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
-        supportMapFragment.getMapAsync(this);
+        if (isServicesOK() && areGrantedPermission()) {
+            initMap();
+        }
         return view;
     }
 
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if (!hidden) {
+        if (!hidden && googleMap != null) {
             resetBottomLayer();
             SurfaceManager.getInstance().reset();
         }
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     public void onLocationChanged(Location location) {
-        gpsPrecissionIconController.update(String.format("%.02f m", location.getAccuracy()));
+        gpsPrecisionIconController.update(String.format("%.02f m", location.getAccuracy()));
         Log.d(LOG_TAG, "onLocationChanged: location has changed");
         mLastLocation = location;
     }
@@ -99,7 +104,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng initLocation = new LatLng(INIT_LOCATION_LAT, INIT_LOCATION_LON);
-        map = googleMap;
+        MapFragment.googleMap = googleMap;
         initMapLayer();
 
         // vars
@@ -126,8 +131,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             mLastLocation = location;
         });
         googleMap.setMyLocationEnabled(true);
-        MarkersContainer.setContext(getContext());
-        MarkersContainer.getInstance().setMap(googleMap);
+        MarkersManager.setContext(getContext());
+        MarkersManager.getInstance().setGoogleMap(googleMap);
         LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 0.5f, this);
 
@@ -136,7 +141,43 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         uiSettings.setMapToolbarEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
 
-        gpsPrecissionIconController = new GpsPrecissionIconController(getContext(), precissionButton);
+        gpsPrecisionIconController = new GpsPrecisionIconController(getContext(), precisionButton);
+    }
+
+    private boolean areGrantedPermission() {
+        String[] permissions = {FINE_LOCATION, COURSE_LOCATION, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE};
+
+        if (ContextCompat.checkSelfPermission(this.getContext(),
+                FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(getContext(),
+                    COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(this.getContext(),
+                        WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(this.getContext(),
+                            READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                        return true;
+                    }
+                }
+            }
+        }
+        requestPermissions(permissions, PERMISSION_REQUEST_CODE);
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0) {
+                for (int grantResult : grantResults) {
+                    if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(permissions, PERMISSION_REQUEST_CODE);
+                        return;
+                    }
+                    initMap();
+                }
+            }
+        }
     }
 
     public int adPoint() {
@@ -164,7 +205,40 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     public void hideAddLayerAndMoveToSurface(Surface surface) {
         addPointLayer.setVisibility(View.INVISIBLE);
         LatLng surfaceCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(surface.convertToLatLngList());
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(surfaceCenter, DEFAULT_ZOOM));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(surfaceCenter, DEFAULT_ZOOM));
+    }
+
+    private boolean isServicesOK() {
+        Log.d(LOG_TAG, "isServicesOK: Checking google services version");
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getContext());
+
+        if (available == ConnectionResult.SUCCESS) {
+            // everything is fine and user can make map requests
+            Log.d(LOG_TAG, "isServicesOK: Google play services is working");
+            return true;
+        } else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
+            // an error occured but we can resolve it
+            Log.d(LOG_TAG, "isServicesOK: an error occured but we can fix it");
+        } else {
+            Toast.makeText(getContext(), "You can't make map requests", Toast.LENGTH_SHORT).show();
+        }
+        return false;
+    }
+
+    public void initMap() {
+        // initialize map fragment
+        SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(loc -> {
+                    mLastLocation = loc;
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(loc.getLatitude(), loc.getLongitude()), DEFAULT_ZOOM));
+                });
+        supportMapFragment.getMapAsync(this);
     }
 
     private void initMapLayer() {
@@ -174,9 +248,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         addPointButton = getActivity().findViewById(R.id.addPointButton);
         stopAddingButton = getActivity().findViewById(R.id.stopAddingButton);
-        saveButton = getActivity().findViewById(R.id.saveButton);
-        resetButton = getActivity().findViewById(R.id.resetButton);
-        precissionButton = getActivity().findViewById(R.id.precisionButton);
+        Button saveButton = getActivity().findViewById(R.id.saveButton);
+        Button resetButton = getActivity().findViewById(R.id.resetButton);
+        precisionButton = getActivity().findViewById(R.id.precisionButton);
         resetBottomLayer();
 
         addPointButton.setOnClickListener(v -> {
@@ -211,7 +285,5 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             int itemPosition = SurfaceManager.getInstance().getSurfaces().size();
             InputDialog.getInstance().startAlertDialog(itemPosition);
         });
-
-
     }
 }

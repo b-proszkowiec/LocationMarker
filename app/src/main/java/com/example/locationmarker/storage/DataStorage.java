@@ -13,9 +13,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
+import static com.example.locationmarker.constants.LocationMarkerConstants.DataStorageConstants.STORAGE_FILE_NAME;
+
 public class DataStorage {
     private static final String LOG_TAG = DataStorage.class.getSimpleName();
-    private static final String FILE_NAME = "pecki.txt";
     private static final DataStorage INSTANCE = new DataStorage();
 
     public static DataStorage getInstance() {
@@ -29,7 +30,7 @@ public class DataStorage {
         ObjectOutputStream objectOut = null;
 
         try {
-            FileOutputStream fileOut = context.openFileOutput(FILE_NAME, Activity.MODE_PRIVATE);
+            FileOutputStream fileOut = context.openFileOutput(STORAGE_FILE_NAME, Activity.MODE_PRIVATE);
             objectOut = new ObjectOutputStream(fileOut);
             objectOut.writeObject(surfaces);
             fileOut.getFD().sync();
@@ -52,7 +53,7 @@ public class DataStorage {
         Object object = null;
         try {
 
-            FileInputStream fileIn = context.openFileInput(FILE_NAME);
+            FileInputStream fileIn = context.openFileInput(STORAGE_FILE_NAME);
             objectIn = new ObjectInputStream(fileIn);
             object = objectIn.readObject();
 
