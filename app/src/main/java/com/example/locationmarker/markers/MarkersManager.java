@@ -166,7 +166,6 @@ public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparat
             IconGenerator icg = new IconGenerator(context);
             icg.setColor(Color.GREEN); // transparent background
             icg.setTextAppearance(R.style.BlackText); // black text
-            //Bitmap bm = icg.makeIcon(String.format("%.2f", distance) + "m");
             Bitmap bm = icg.makeIcon(OptionSettings.getInstance().calculateDistanceAccordingToSettingUnit(distance));
 
             MarkerOptions markerOptions = new MarkerOptions()

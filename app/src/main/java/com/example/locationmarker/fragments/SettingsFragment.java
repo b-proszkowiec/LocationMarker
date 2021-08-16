@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.preference.ListPreference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -72,6 +73,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             String areaUnit = getAreaUnit();
             Log.d(LOG_TAG, "Area unit changed to: " + areaUnit);
             OptionSettings.getInstance().setAreaUnit(areaUnit);
+
+        } else if (key.equals(getString(R.string.theme_title))) {
+            Toast.makeText(getContext(), "Not implemented yet", Toast.LENGTH_SHORT).show();
+
+        } else if (key.equals(getString(R.string.measurement_system_title))) {
+            Toast.makeText(getContext(), "Not implemented yet", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -53,13 +53,13 @@ public class OptionSettings {
                 formattedArea = String.format("%.2f m\u00B2", areaInSquareMeters);
                 break;
             case "ar":
-                formattedArea = String.format("%.2f ares", areaInSquareMeters / 100);
+                formattedArea = String.format("%.2f ar", areaInSquareMeters / 100);
                 break;
             case "ha":
-                formattedArea = String.format("%.2f hectares", areaInSquareMeters / 10*1000);
+                formattedArea = String.format("%.2f ha", areaInSquareMeters / (10*1000));
                 break;
             case "km\u00B2":
-                formattedArea = String.format("%.2f km\u00B2", areaInSquareMeters / 1000*1000);
+                formattedArea = String.format("%.2f km\u00B2", areaInSquareMeters / (1000*1000));
                 break;
             default:
                 formattedArea = "n/a";
