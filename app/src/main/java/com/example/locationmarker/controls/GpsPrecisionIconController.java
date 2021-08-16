@@ -9,22 +9,24 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
 import com.example.locationmarker.R;
+import com.example.locationmarker.fragments.SettingsFragment;
 
 import static com.example.locationmarker.constants.LocationMarkerConstants.GpsPrecisionIconControllerConstants.NO_LOCATION_UPDATE_TIMEOUT;
 
-public class GpsPrecisionIconController {
+public class GpsPrecisionIconController implements IPrecisionIconVisible {
 
     private static final String LOG_TAG = GpsPrecisionIconController.class.getSimpleName();
 
     private final int EVENT = 104;
     private boolean isTimesUp;
-    private static Button precisionButton;
+    private Button precisionButton;
     private Context context;
 
     public GpsPrecisionIconController(Context context, Button button) {
         this.context = context;
         this.precisionButton = button;
-        isTimesUp = true;
+        this.isTimesUp = true;
+        SettingsFragment.registerListener(this);
     }
 
     public void update(String text) {
@@ -41,7 +43,7 @@ public class GpsPrecisionIconController {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case EVENT:
-                    if (isTimesUp == true) {
+                    if (isTimesUp) {
                         precisionButton.setText("N/A");
                     }
 
@@ -57,4 +59,9 @@ public class GpsPrecisionIconController {
             }
         }
     };
+
+    @Override
+    public void onPrecisionIconVisibleChange(int visibility) {
+        precisionButton.setVisibility(visibility);
+    }
 }

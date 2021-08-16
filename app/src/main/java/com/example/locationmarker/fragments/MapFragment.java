@@ -1,4 +1,4 @@
-package com.example.locationmarker;
+package com.example.locationmarker.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -20,6 +20,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.locationmarker.R;
 import com.example.locationmarker.controls.GpsPrecisionIconController;
 import com.example.locationmarker.dialog.InputDialog;
 import com.example.locationmarker.markers.MarkersManager;
@@ -252,6 +253,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         Button resetButton = getActivity().findViewById(R.id.resetButton);
         precisionButton = getActivity().findViewById(R.id.precisionButton);
         resetBottomLayer();
+
 
         addPointButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "onClickAddPointButton: button clicked");

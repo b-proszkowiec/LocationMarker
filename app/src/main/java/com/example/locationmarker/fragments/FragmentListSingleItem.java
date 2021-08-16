@@ -1,4 +1,4 @@
-package com.example.locationmarker;
+package com.example.locationmarker.fragments;
 
 public class FragmentListSingleItem {
     private int imageResource;

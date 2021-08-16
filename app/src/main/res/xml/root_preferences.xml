@@ -1,5 +1,14 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <PreferenceCategory app:title="@string/theme_header">
+        <SwitchPreferenceCompat
+            app:key="theme"
+            app:summaryOff="@string/theme_summary_off"
+            app:summaryOn="@string/theme_summary_on"
+            app:title="@string/theme_title" />
+
+    </PreferenceCategory>
     <PreferenceCategory app:title="@string/units_header">
 
         <ListPreference
@@ -28,12 +37,13 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/theme_header">
+    <PreferenceCategory app:title="@string/options_header">
         <SwitchPreferenceCompat
-            app:key="theme"
-            app:summaryOff="@string/theme_summary_off"
-            app:summaryOn="@string/theme_summary_on"
-            app:title="@string/theme_title" />
+            app:key="@string/precision_icon_title"
+            android:defaultValue="true"
+            app:summaryOff="@string/precision_icon_summary_off"
+            app:summaryOn="@string/precision_icon_summary_on"
+            app:title="@string/precision_icon_title" />
 
     </PreferenceCategory>
 
