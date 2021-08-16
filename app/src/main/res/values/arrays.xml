@@ -12,18 +12,20 @@
 
     <!-- Area unit -->
     <string-array name="area_unit_entries">
-        <item>m2</item>
-        <item>a</item>
+        <item>m\u00B2</item>
+        <item>ar</item>
         <item>ha</item>
-        <item>km2</item>
+        <item>km\u00B2</item>
     </string-array>
 
     <string-array name="area_unit_values">
-        <item>Metric</item>
-        <item>Imperial</item>
+        <item>m\u00B2</item>
+        <item>a</item>
+        <item>ha</item>
+        <item>km\u00B2</item>
     </string-array>
 
-    <!-- Reply Preference -->
+    <!-- Distance unit -->
     <string-array name="distance_unit_entries">
         <item>m</item>
         <item>km</item>

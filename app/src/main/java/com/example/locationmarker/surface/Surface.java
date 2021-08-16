@@ -5,6 +5,7 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.locationmarker.settings.OptionSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 
@@ -24,13 +25,13 @@ public class Surface implements Serializable {
     List<LocationPoint> locationPoints;
     String locationName;
     int locationPointCounter;
-    double areaValue;
+    double areaInSquareMeters;
 
     public Surface(String locationName) {
         this.locationPoints = new ArrayList<>();
         this.locationName = locationName;
         this.locationPointCounter = 0;
-        this.areaValue = -1;
+        this.areaInSquareMeters = -1;
     }
 
     void addPointToSurface(Location location) {
@@ -54,8 +55,8 @@ public class Surface implements Serializable {
     }
 
     public double computeArea() {
-        areaValue = SphericalUtil.computeArea(convertToLatLngList());
-        return areaValue;
+        areaInSquareMeters = SphericalUtil.computeArea(convertToLatLngList());
+        return areaInSquareMeters;
     }
 
     public String getName() {
@@ -63,7 +64,7 @@ public class Surface implements Serializable {
     }
 
     public String getArea() {
-        return String.format("%.2f square meters", areaValue);
+        return OptionSettings.getInstance().calculateAreaAccordingToSettingUnit(areaInSquareMeters);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

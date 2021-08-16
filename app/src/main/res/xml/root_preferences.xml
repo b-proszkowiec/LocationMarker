@@ -12,18 +12,18 @@
     <PreferenceCategory app:title="@string/units_header">
 
         <ListPreference
+            app:key="@string/measurement_system_title"
+            app:title="@string/measurement_system_title"
             app:defaultValue="metric"
             app:entries="@array/measurement_system_entries"
             app:entryValues="@array/measurement_system_values"
-            app:key="measurement_system"
-            app:title="@string/measurement_system_title"
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            app:defaultValue="m2"
+            app:key="@string/area_unit_title"
+            app:defaultValue="m\u00B2"
             app:entries="@array/area_unit_entries"
             app:entryValues="@array/area_unit_entries"
-            app:key="area_unit_system"
             app:title="@string/area_unit_title"
             app:useSimpleSummaryProvider="true" />
 

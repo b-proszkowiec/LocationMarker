@@ -7,6 +7,7 @@ public class OptionSettings {
     // vars
     private static boolean showPrecisionIconStatus;
     private static String distanceUnit;
+    private static String areaUnit;
 
     public static OptionSettings getInstance() {
         return INSTANCE;
@@ -25,16 +26,49 @@ public class OptionSettings {
     }
 
     public String calculateDistanceAccordingToSettingUnit(double distance) {
-        if (distanceUnit.equals("m")) {
-            return String.format("%.2f ", distance) + "m";
-        } else if (distanceUnit.equals("km")) {
-            return String.format("%.3f ", distance / 1000) + "km";
-        } else {
-            return "";
+        String formattedDistance;
+
+        switch (distanceUnit) {
+            case "m":
+                formattedDistance = String.format("%.2f ", distance) + "m";
+                break;
+            case "km":
+                formattedDistance = String.format("%.3f ", distance / 1000) + "km";
+                break;
+            default:
+                formattedDistance = "";
         }
+        return formattedDistance;
     }
 
     public void setDistanceUnit(String distanceUnit) {
         OptionSettings.distanceUnit = distanceUnit;
+    }
+
+    public String calculateAreaAccordingToSettingUnit(double areaInSquareMeters) {
+        String formattedArea;
+
+        switch (areaUnit) {
+            case "m\u00B2":        // square meters
+                formattedArea = String.format("%.2f m\u00B2", areaInSquareMeters);
+                break;
+            case "ar":
+                formattedArea = String.format("%.2f ares", areaInSquareMeters / 100);
+                break;
+            case "ha":
+                formattedArea = String.format("%.2f hectares", areaInSquareMeters / 10*1000);
+                break;
+            case "km\u00B2":
+                formattedArea = String.format("%.2f km\u00B2", areaInSquareMeters / 1000*1000);
+                break;
+            default:
+                formattedArea = "n/a";
+                break;
+        }
+        return formattedArea;
+    }
+
+    public static void setAreaUnit(String areaUnit) {
+        OptionSettings.areaUnit = areaUnit;
     }
 }

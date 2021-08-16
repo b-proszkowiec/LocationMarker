@@ -30,6 +30,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
         OptionSettings.getInstance().setShowPrecisionIconStatus(getPrecisionIconVisibleStatus());
         OptionSettings.getInstance().setDistanceUnit(getDistanceUnit());
+        OptionSettings.getInstance().setAreaUnit(getAreaUnit());
     }
 
     @Override
@@ -66,12 +67,21 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             String distanceUnit = getDistanceUnit();
             Log.d(LOG_TAG, "Distance unit changed to: " + distanceUnit);
             OptionSettings.getInstance().setDistanceUnit(distanceUnit);
+
+        } else if (key.equals(getString(R.string.area_unit_title))) {
+            String areaUnit = getAreaUnit();
+            Log.d(LOG_TAG, "Area unit changed to: " + areaUnit);
+            OptionSettings.getInstance().setAreaUnit(areaUnit);
         }
     }
 
     private String getDistanceUnit() {
         ListPreference distanceUnitPreference = (ListPreference)findPreference(getString(R.string.distance_unit_title));
         return distanceUnitPreference.getValue();
+    }
+    private String getAreaUnit() {
+        ListPreference areaUnitPreference = (ListPreference)findPreference(getString(R.string.area_unit_title));
+        return areaUnitPreference.getValue();
     }
 
     private boolean getPrecisionIconVisibleStatus() {
