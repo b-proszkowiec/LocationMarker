@@ -57,7 +57,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private static LinearLayout addPointLayer, saveLayer;
     private static Button addPointButton;
     private static Button stopAddingButton;
-    private static Button precisionButton;
     private GpsPrecisionIconController gpsPrecisionIconController;
 
     @Override
@@ -141,8 +140,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         uiSettings.setAllGesturesEnabled(true);
         uiSettings.setMapToolbarEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
-
-        gpsPrecisionIconController = new GpsPrecisionIconController(getContext(), precisionButton);
     }
 
     private boolean areGrantedPermission() {
@@ -251,7 +248,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         stopAddingButton = getActivity().findViewById(R.id.stopAddingButton);
         Button saveButton = getActivity().findViewById(R.id.saveButton);
         Button resetButton = getActivity().findViewById(R.id.resetButton);
-        precisionButton = getActivity().findViewById(R.id.precisionButton);
+        gpsPrecisionIconController = new GpsPrecisionIconController(getContext(), getActivity());
         resetBottomLayer();
 
 

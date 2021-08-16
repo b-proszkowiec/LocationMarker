@@ -28,11 +28,11 @@
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
+            app:key="@string/distance_unit_title"
+            app:title="@string/distance_unit_title"
             app:defaultValue="m"
             app:entries="@array/distance_unit_entries"
             app:entryValues="@array/distance_unit_values"
-            app:key="distance_unit_system"
-            app:title="@string/distance_unit_title"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>

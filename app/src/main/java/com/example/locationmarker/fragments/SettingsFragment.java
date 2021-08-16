@@ -2,20 +2,22 @@ package com.example.locationmarker.fragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.preference.ListPreference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
 
 import com.example.locationmarker.R;
 import com.example.locationmarker.controls.IPrecisionIconVisible;
+import com.example.locationmarker.settings.OptionSettings;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public static final int VISIBLE = 0x00000000;
-    public static final int INVISIBLE = 0x00000004;
+    private static final String LOG_TAG = SettingsFragment.class.getSimpleName();
 
     private static IPrecisionIconVisible iPrecisionIconVisible;
 
@@ -26,7 +28,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
-
+        OptionSettings.getInstance().setShowPrecisionIconStatus(getPrecisionIconVisibleStatus());
+        OptionSettings.getInstance().setDistanceUnit(getDistanceUnit());
     }
 
     @Override
@@ -55,14 +58,25 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.precision_icon_title))) {
-            String keyEnableStart = getString(R.string.precision_icon_title);
-            SwitchPreferenceCompat enableStart = (SwitchPreferenceCompat)findPreference(keyEnableStart);
-            if (enableStart.isChecked()) {
-                iPrecisionIconVisible.onPrecisionIconVisibleChange(VISIBLE);
-            } else {
-                iPrecisionIconVisible.onPrecisionIconVisibleChange(INVISIBLE);
-            }
-        }
+            boolean precisionIconVisibleStatus = getPrecisionIconVisibleStatus();
+            Log.d(LOG_TAG, "Precision icon visible changed to: " + precisionIconVisibleStatus);
+            iPrecisionIconVisible.onPrecisionIconVisibleChange(precisionIconVisibleStatus);
 
+        } else if (key.equals(getString(R.string.distance_unit_title))) {
+            String distanceUnit = getDistanceUnit();
+            Log.d(LOG_TAG, "Distance unit changed to: " + distanceUnit);
+            OptionSettings.getInstance().setDistanceUnit(distanceUnit);
+        }
+    }
+
+    private String getDistanceUnit() {
+        ListPreference distanceUnitPreference = (ListPreference)findPreference(getString(R.string.distance_unit_title));
+        return distanceUnitPreference.getValue();
+    }
+
+    private boolean getPrecisionIconVisibleStatus() {
+        String keyEnableStart = getString(R.string.precision_icon_title);
+        SwitchPreferenceCompat enableStart = (SwitchPreferenceCompat)findPreference(keyEnableStart);
+        return enableStart.isChecked();
     }
 }

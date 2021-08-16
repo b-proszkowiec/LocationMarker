@@ -1,15 +1,20 @@
 package com.example.locationmarker.controls;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
+import androidx.preference.SwitchPreferenceCompat;
+
 import com.example.locationmarker.R;
 import com.example.locationmarker.fragments.SettingsFragment;
+import com.example.locationmarker.settings.OptionSettings;
 
 import static com.example.locationmarker.constants.LocationMarkerConstants.GpsPrecisionIconControllerConstants.NO_LOCATION_UPDATE_TIMEOUT;
 
@@ -20,13 +25,20 @@ public class GpsPrecisionIconController implements IPrecisionIconVisible {
     private final int EVENT = 104;
     private boolean isTimesUp;
     private Button precisionButton;
+    private View precisionLayout;
+    private Activity activity;
     private Context context;
 
-    public GpsPrecisionIconController(Context context, Button button) {
+    public GpsPrecisionIconController(Context context, Activity activity) {
         this.context = context;
-        this.precisionButton = button;
+        this.activity = activity;
+        this.precisionButton = activity.findViewById(R.id.precisionButton);
+        this.precisionLayout = activity.findViewById(R.id.precisionLayout);
         this.isTimesUp = true;
         SettingsFragment.registerListener(this);
+
+
+        setPrecisionLayoutVisible(OptionSettings.getInstance().getShowPrecisionIconStatus());
     }
 
     public void update(String text) {
@@ -60,8 +72,16 @@ public class GpsPrecisionIconController implements IPrecisionIconVisible {
         }
     };
 
+    private void setPrecisionLayoutVisible(boolean visibility) {
+        if (visibility) {
+            precisionLayout.setVisibility(View.VISIBLE);
+        } else {
+            precisionLayout.setVisibility(View.INVISIBLE);
+        }
+    }
+
     @Override
-    public void onPrecisionIconVisibleChange(int visibility) {
-        precisionButton.setVisibility(visibility);
+    public void onPrecisionIconVisibleChange(boolean visibility) {
+        setPrecisionLayoutVisible(visibility);
     }
 }
