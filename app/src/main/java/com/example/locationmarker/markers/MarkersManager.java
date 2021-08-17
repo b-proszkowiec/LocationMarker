@@ -1,11 +1,16 @@
 package com.example.locationmarker.markers;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.widget.Toast;
 
+import com.example.locationmarker.DetailsActivity;
+import com.example.locationmarker.MainActivity;
+import com.example.locationmarker.MapFragment;
 import com.example.locationmarker.R;
 import com.example.locationmarker.settings.OptionSettings;
 import com.example.locationmarker.surface.LocationPoint;
@@ -14,6 +19,7 @@ import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -133,6 +139,14 @@ public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparat
 
         googleMap.addMarker(markerOptions);
 
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                showPopup();
+                return true;
+            }
+        });
+
     }
 
     private List<LatLng> getLatLngFromLocation() {
@@ -141,6 +155,12 @@ public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparat
             points.add(locationPoint.getLatLng());
         }
         return points;
+    }
+
+    private void showPopup() {
+        Intent intent = new Intent(context, DetailsActivity.class);
+        intent.putExtra("title", "");
+        context.startActivity(intent);
     }
 
     private void writeDistancesOnMap(boolean isAddingProcessFinished) {
