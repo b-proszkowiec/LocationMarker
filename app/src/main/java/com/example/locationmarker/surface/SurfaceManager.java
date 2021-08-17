@@ -29,8 +29,9 @@ public class SurfaceManager implements Serializable {
     private Context context;
 
     // vars
-    Surface currentSurface = new Surface(TEMP_NAME);
-    List<Surface> surfaces = new ArrayList<>();
+    private Surface lastViewedSurface;
+    private Surface currentSurface = new Surface(TEMP_NAME);
+    private List<Surface> surfaces = new ArrayList<>();
 
     private SurfaceManager() {
     }
@@ -95,6 +96,7 @@ public class SurfaceManager implements Serializable {
     }
 
     public int addPointToCurrentLocation(Location location) {
+        setLastViewedSurface(null);
         if (currentSurface.getLocationPoints().size() > 0) {
             LocationPoint lastLocation = currentSurface.getLocationPoints().get(currentSurface.getLocationPoints().size() - 1);
             double distance = MarkersManager.calculateDistanceBetweenLocations(lastLocation.getLocation(), location);
@@ -142,5 +144,13 @@ public class SurfaceManager implements Serializable {
 
     public List<Surface> getSurfaces() {
         return surfaces;
+    }
+
+    public Surface getLastViewedSurface() {
+        return lastViewedSurface;
+    }
+
+    public void setLastViewedSurface(Surface lastViewedSurface) {
+        this.lastViewedSurface = lastViewedSurface;
     }
 }

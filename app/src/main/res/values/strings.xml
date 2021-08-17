@@ -4,13 +4,14 @@
     <string name="ic_map_text">Map</string>
     <string name="ic_location_text">Locations</string>
     <string name="ic_settings_text">Settings</string>
+    <string name="ic_details_text">Details</string>
 
     <!-- Preference Titles -->
     <string name="units_header">Units</string>
     <string name="theme_header">Theme</string>
     <string name="options_header">Options</string>
 
-    <!-- Messages Preferences -->
+    <!-- Settings Preferences -->
     <string name="units_title">Units</string>
     <string name="measurement_system_title">Measurement system</string>
     <string name="area_unit_title">Area unit</string>
@@ -32,4 +33,12 @@
     <string name="save_button_text">Save</string>
     <string name="import_button_text">Import</string>
     <string name="export_button_text">Export</string>
+
+    <!-- Location Details -->
+    <string name="details_id">Id</string>
+    <string name="details_latitude">Latitude</string>
+    <string name="details_longitude">Longitude</string>
+    <string name="details_accuracy">Accuracy</string>
+    <string name="details_default">n/a</string>
+
 </resources>

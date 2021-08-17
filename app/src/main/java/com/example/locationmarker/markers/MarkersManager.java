@@ -1,16 +1,14 @@
 package com.example.locationmarker.markers;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.locationmarker.DetailsActivity;
-import com.example.locationmarker.MainActivity;
-import com.example.locationmarker.MapFragment;
 import com.example.locationmarker.R;
 import com.example.locationmarker.settings.OptionSettings;
 import com.example.locationmarker.surface.LocationPoint;
@@ -19,7 +17,6 @@ import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -30,11 +27,13 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.maps.android.SphericalUtil.interpolate;
+import static java.lang.Integer.parseInt;
 
 public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparator<LatLng> {
-    private static final String TAG = MarkersManager.class.getSimpleName();
+    private static final String LOG_TAG = MarkersManager.class.getSimpleName();
     // vars
     private static Context context;
     private static MarkersManager instance;
@@ -127,6 +126,7 @@ public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparat
         googleMap.addPolygon(polygonOptions);
         LatLng polygonCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(points);
 
+
         IconGenerator icg = new IconGenerator(context);
         icg.setColor(Color.GREEN); // transparent background
         icg.setTextAppearance(R.style.BlackText); // black text
@@ -138,14 +138,27 @@ public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparat
                 .icon(BitmapDescriptorFactory.fromBitmap(bm));
 
         googleMap.addMarker(markerOptions);
+        googleMap.setOnMarkerClickListener(marker -> {
+                    Surface lastViewedSurface = SurfaceManager.getInstance().getLastViewedSurface();
+                    if (lastViewedSurface != null) {
+                        try {
+                            int id = parseInt(marker.getTitle());
+                            Optional<LocationPoint> locationPoint = lastViewedSurface.getLocationPoints().stream()
+                                    .filter(p -> p.getOrderNumber() == id)
+                                    .findFirst();
 
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                showPopup();
-                return true;
-            }
-        });
+                            if (locationPoint.isPresent()) {
+                                showDetailsLayout(locationPoint.get());
+                                return true;
+                            }
+                            Log.e(LOG_TAG, "Unable to recognized LocationPoint object of selected marker!");
+                        } catch (NumberFormatException e) {
+                            Log.e(LOG_TAG, "NumberFormatException occurred while parsing: " + marker.getTitle());
+                        }
+                    }
+                    return false;
+                }
+        );
 
     }
 
@@ -157,9 +170,9 @@ public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparat
         return points;
     }
 
-    private void showPopup() {
+    private void showDetailsLayout(LocationPoint locationPoint) {
         Intent intent = new Intent(context, DetailsActivity.class);
-        intent.putExtra("title", "");
+        intent.putExtra("LocationPoint", locationPoint);
         context.startActivity(intent);
     }
 
