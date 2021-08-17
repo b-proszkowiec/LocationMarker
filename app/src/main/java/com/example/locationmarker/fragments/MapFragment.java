@@ -1,4 +1,4 @@
-package com.example.locationmarker;
+package com.example.locationmarker.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -20,6 +20,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.locationmarker.R;
 import com.example.locationmarker.controls.GpsPrecisionIconController;
 import com.example.locationmarker.dialog.InputDialog;
 import com.example.locationmarker.markers.MarkersManager;
@@ -56,7 +57,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private static LinearLayout addPointLayer, saveLayer;
     private static Button addPointButton;
     private static Button stopAddingButton;
-    private static Button precisionButton;
     private GpsPrecisionIconController gpsPrecisionIconController;
 
     @Override
@@ -140,8 +140,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         uiSettings.setAllGesturesEnabled(true);
         uiSettings.setMapToolbarEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
-
-        gpsPrecisionIconController = new GpsPrecisionIconController(getContext(), precisionButton);
     }
 
     private boolean areGrantedPermission() {
@@ -250,8 +248,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         stopAddingButton = getActivity().findViewById(R.id.stopAddingButton);
         Button saveButton = getActivity().findViewById(R.id.saveButton);
         Button resetButton = getActivity().findViewById(R.id.resetButton);
-        precisionButton = getActivity().findViewById(R.id.precisionButton);
+        gpsPrecisionIconController = new GpsPrecisionIconController(getContext(), getActivity());
         resetBottomLayer();
+
 
         addPointButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "onClickAddPointButton: button clicked");

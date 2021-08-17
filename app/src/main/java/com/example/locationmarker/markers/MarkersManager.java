@@ -7,6 +7,7 @@ import android.location.Location;
 import android.widget.Toast;
 
 import com.example.locationmarker.R;
+import com.example.locationmarker.settings.OptionSettings;
 import com.example.locationmarker.surface.LocationPoint;
 import com.example.locationmarker.surface.Surface;
 import com.example.locationmarker.surface.SurfaceManager;
@@ -123,7 +124,7 @@ public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparat
         IconGenerator icg = new IconGenerator(context);
         icg.setColor(Color.GREEN); // transparent background
         icg.setTextAppearance(R.style.BlackText); // black text
-        Bitmap bm = icg.makeIcon(String.format("%.2f", polygonArea) + " m2");
+        Bitmap bm = icg.makeIcon(OptionSettings.getInstance().calculateAreaAccordingToSettingUnit(polygonArea));
 
         MarkerOptions markerOptions = new MarkerOptions()
                 .position(polygonCenter)
@@ -165,7 +166,7 @@ public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparat
             IconGenerator icg = new IconGenerator(context);
             icg.setColor(Color.GREEN); // transparent background
             icg.setTextAppearance(R.style.BlackText); // black text
-            Bitmap bm = icg.makeIcon(String.format("%.2f", distance) + "m");
+            Bitmap bm = icg.makeIcon(OptionSettings.getInstance().calculateDistanceAccordingToSettingUnit(distance));
 
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(new LatLng(middle.latitude, middle.longitude))

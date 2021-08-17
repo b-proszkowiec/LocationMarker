@@ -1,4 +1,4 @@
-package com.example.locationmarker;
+package com.example.locationmarker.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.locationmarker.R;
 import com.example.locationmarker.dialog.InputDialog;
 import com.example.locationmarker.surface.Surface;
 import com.example.locationmarker.surface.SurfaceManager;

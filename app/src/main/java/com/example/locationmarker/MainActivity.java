@@ -7,6 +7,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.locationmarker.dialog.InputDialog;
+import com.example.locationmarker.fragments.ItemFragment;
+import com.example.locationmarker.fragments.MapFragment;
+import com.example.locationmarker.fragments.SettingsFragment;
 import com.example.locationmarker.surface.Surface;
 import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -29,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView navigation = findViewById(R.id.bottom_navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
         fragmentManager.beginTransaction().add(R.id.fragment_container, settingFragment, "3").hide(settingFragment).commit();
         fragmentManager.beginTransaction().add(R.id.fragment_container, itemFragment, "2").hide(itemFragment).commit();
         //fragmentManager.beginTransaction().add(R.id.fragment_container, mapFragment, "1").commit();

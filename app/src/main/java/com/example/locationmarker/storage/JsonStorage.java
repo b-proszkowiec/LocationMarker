@@ -5,7 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
-import com.example.locationmarker.ItemFragment;
+import com.example.locationmarker.fragments.ItemFragment;
 import com.example.locationmarker.surface.Surface;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

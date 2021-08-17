@@ -4,9 +4,11 @@
     <string name="ic_map_text">Map</string>
     <string name="ic_location_text">Locations</string>
     <string name="ic_settings_text">Settings</string>
+
     <!-- Preference Titles -->
     <string name="units_header">Units</string>
     <string name="theme_header">Theme</string>
+    <string name="options_header">Options</string>
 
     <!-- Messages Preferences -->
     <string name="units_title">Units</string>
@@ -16,9 +18,14 @@
 
     <!-- Sync Preferences -->
     <string name="theme_title">Use dark theme</string>
-    <string name="attachment_title">Download incoming attachments</string>
     <string name="theme_summary_on">Application dark theme in use</string>
     <string name="theme_summary_off">Application light theme in use</string>
+
+    <string name="precision_icon_title">Show precision icon</string>
+    <string name="precision_icon_summary_on">Precision icon on map turned on</string>
+    <string name="precision_icon_summary_off">Precision icon on map turned off</string>
+
+    <!--  -->
     <string name="add_point_button_text">Add point</string>
     <string name="end_button_text">End</string>
     <string name="reset_button_text">Reset</string>
