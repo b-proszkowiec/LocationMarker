@@ -41,4 +41,7 @@
     <string name="details_accuracy">Accuracy</string>
     <string name="details_default">n/a</string>
 
+    <!-- Marker Popups -->
+    <string name="marker_delete_popup">Delete</string>
+
 </resources>

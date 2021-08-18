@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -13,13 +14,17 @@ import com.example.locationmarker.storage.DataStorage;
 import com.example.locationmarker.storage.JsonStorage;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.example.locationmarker.fragments.MapFragment.updateBottomLayer;
 import static com.example.locationmarker.surface.Surface.distinctByKey;
+import static java.lang.Integer.parseInt;
 
 public class SurfaceManager implements Serializable {
     private static final String LOG_TAG = SurfaceManager.class.getSimpleName();
@@ -110,6 +115,23 @@ public class SurfaceManager implements Serializable {
         return getPointsAmount();
     }
 
+    public void removeMarker(Marker marker) {
+        try {
+            final int id = parseInt(marker.getTitle());
+            Optional<LocationPoint> markerLocationPoint = workingSurface.getLocationPoints().stream()
+                    .filter(p -> p.getOrderNumber() == id)
+                    .findFirst();
+            if(markerLocationPoint.isPresent()) {
+                workingSurface.getLocationPoints().remove(markerLocationPoint.get());
+                refreshView(false, workingSurface);
+            }
+        } catch (NumberFormatException e) {
+            Log.e(LOG_TAG, "NumberFormatException occurred while parsing: " + marker.getTitle());
+        }
+        // add control over button visibility
+        updateBottomLayer(workingSurface.getLocationPoints().size());
+    }
+
     private int getPointsAmount() {
         return workingSurface.getLocationPoints().size();
     }
@@ -127,13 +149,11 @@ public class SurfaceManager implements Serializable {
     }
 
     public void refreshView(boolean isAddingProcessFinished, Surface surface) {
-
         MarkersManager.getInstance().showSurfaceOnMap(surface);
-
         if (isAddingProcessFinished) {
             double polygonArea = surface.computeArea();
             MarkersManager.getInstance().drawPolygon(polygonArea, surface.convertToLatLngList());
-        } else {
+        } else if (surface.getLocationPoints().size() > 1) {
             MarkersManager.getInstance().drawPolyline(false);
         }
     }

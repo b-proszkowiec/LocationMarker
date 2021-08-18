@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Location;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
@@ -43,7 +44,6 @@ public class MarkersManager implements Comparator<LatLng> {
     private static Context context;
     private static MarkersManager instance;
     private static GoogleMap googleMap;
-    private static RelativeLayout mMapViewRoot;
     private static View transparentView;
 
     // vars
@@ -61,7 +61,7 @@ public class MarkersManager implements Comparator<LatLng> {
     }
 
     private MarkersManager() {
-        mMapViewRoot = ((Activity) context).findViewById(R.id.marker_layout);
+        RelativeLayout mMapViewRoot = ((Activity) context).findViewById(R.id.marker_layout);
         transparentView = View.inflate(context, R.layout.transparent_layout, mMapViewRoot);
         instance = this;
     }
@@ -94,6 +94,16 @@ public class MarkersManager implements Comparator<LatLng> {
                         transparentView.setTranslationY(screenPosition.y);
 
                         PopupMenu popupMenu = new PopupMenu(context, transparentView);
+                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                if(item.getTitle().equals(context.getString(R.string.marker_delete_popup))) {
+                                    SurfaceManager.getInstance().removeMarker(marker);
+                                }
+                                return false;
+                            }
+                        });
+
                         popupMenu.inflate(R.menu.marker_popup_menu);
                         popupMenu.show();
                         return true;

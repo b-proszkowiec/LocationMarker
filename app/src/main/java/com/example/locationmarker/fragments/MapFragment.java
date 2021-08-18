@@ -200,6 +200,17 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         stopAddingButton.setVisibility(View.INVISIBLE);
     }
 
+    public static void updateBottomLayer(int markerAmount) {
+        addPointLayer.setVisibility(View.VISIBLE);
+        saveLayer.setVisibility(View.INVISIBLE);
+        addPointButton.setVisibility(View.VISIBLE);
+        stopAddingButton.setVisibility(View.VISIBLE);
+
+        if(markerAmount < 3) {
+            stopAddingButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
     public void hideAddLayerAndMoveToSurface(Surface surface) {
         addPointLayer.setVisibility(View.INVISIBLE);
         LatLng surfaceCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(surface.convertToLatLngList());
@@ -254,11 +265,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         addPointButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "onClickAddPointButton: button clicked");
-            int points = adPoint();
-
-            if (points == 3) {
-                stopAddingButton.setVisibility(View.VISIBLE);
-            }
+            updateBottomLayer(adPoint());
         });
 
         stopAddingButton.setOnClickListener(v -> {

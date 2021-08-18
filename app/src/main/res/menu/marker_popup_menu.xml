@@ -4,5 +4,5 @@
         android:id="@+id/delete"
         android:enabled="true"
         android:icon="@drawable/ic_map"
-        android:title="Delete"/>
+        android:title="@string/marker_delete_popup"/>
 </menu>
