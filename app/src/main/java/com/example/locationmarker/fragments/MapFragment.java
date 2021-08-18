@@ -2,11 +2,14 @@ package com.example.locationmarker.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -244,10 +247,26 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         }
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(loc -> {
-                    mLastLocation = loc;
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(loc.getLatitude(), loc.getLongitude()), DEFAULT_ZOOM));
+                    if (loc != null) {
+                        mLastLocation = loc;
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(loc.getLatitude(), loc.getLongitude()), DEFAULT_ZOOM));
+                    } else {
+                        turnOnLocationAlert();
+                    }
                 });
         supportMapFragment.getMapAsync(this);
+    }
+
+    private void turnOnLocationAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+        alertDialog.setTitle("Localization turned off");
+        alertDialog.setMessage("Localization is not enabled. Do you want to go to settings menu?");
+        alertDialog.setPositiveButton("Settings", (dialog, which) -> {
+            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            getContext().startActivity(intent);
+        });
+        alertDialog.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        alertDialog.show();
     }
 
     private void initMapLayer() {
