@@ -30,7 +30,7 @@ public class SurfaceManager implements Serializable {
 
     // vars
     private Surface lastViewedSurface;
-    private Surface currentSurface = new Surface(TEMP_NAME);
+    private Surface workingSurface = new Surface(TEMP_NAME);
     private List<Surface> surfaces = new ArrayList<>();
 
     private SurfaceManager() {
@@ -45,12 +45,12 @@ public class SurfaceManager implements Serializable {
     }
 
     public void finish() {
-        refreshView(true, currentSurface);
+        refreshView(true, workingSurface);
     }
 
     public void reset() {
-        currentSurface.getLocationPoints().clear();
-        refreshView(false, currentSurface);
+        workingSurface.getLocationPoints().clear();
+        refreshView(false, workingSurface);
     }
 
     public void exportToJson(Context context, Uri uri) {
@@ -76,11 +76,11 @@ public class SurfaceManager implements Serializable {
     }
 
     public void storeNewSurface(String name) {
-        currentSurface.setName(name);
-        surfaces.add(currentSurface);
-        currentSurface = new Surface(TEMP_NAME);
+        workingSurface.setName(name);
+        surfaces.add(workingSurface);
+        workingSurface = new Surface(TEMP_NAME);
 
-        refreshView(false, currentSurface);
+        refreshView(false, workingSurface);
         storeCurrentSurfaces();
     }
 
@@ -95,23 +95,23 @@ public class SurfaceManager implements Serializable {
         }
     }
 
-    public int addPointToCurrentLocation(Location location) {
+    public int addPointToWorkingSurface(Location location) {
         setLastViewedSurface(null);
-        if (currentSurface.getLocationPoints().size() > 0) {
-            LocationPoint lastLocation = currentSurface.getLocationPoints().get(currentSurface.getLocationPoints().size() - 1);
+        if (workingSurface.getLocationPoints().size() > 0) {
+            LocationPoint lastLocation = workingSurface.getLocationPoints().get(workingSurface.getLocationPoints().size() - 1);
             double distance = MarkersManager.calculateDistanceBetweenLocations(lastLocation.getLocation(), location);
             if (distance < 1) {
                 Toast.makeText(context, String.format("Minimal distance should be at least %.1f m", 1.0), Toast.LENGTH_SHORT).show();
                 return getPointsAmount();
             }
         }
-        currentSurface.addPointToSurface(location);
-        refreshView(false, currentSurface);
+        workingSurface.addPointToSurface(location);
+        refreshView(false, workingSurface);
         return getPointsAmount();
     }
 
     private int getPointsAmount() {
-        return currentSurface.getLocationPoints().size();
+        return workingSurface.getLocationPoints().size();
     }
 
     public LatLng getSurfaceCenterPoint(List<LatLng> polygonPointsList) {
@@ -138,8 +138,8 @@ public class SurfaceManager implements Serializable {
         }
     }
 
-    public Surface getCurrentSurface() {
-        return currentSurface;
+    public Surface getWorkingSurface() {
+        return workingSurface;
     }
 
     public List<Surface> getSurfaces() {

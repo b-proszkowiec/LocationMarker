@@ -182,7 +182,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         if (mLastLocation == null) {
             return 0;
         }
-        return SurfaceManager.getInstance().addPointToCurrentLocation(mLastLocation);
+        return SurfaceManager.getInstance().addPointToWorkingSurface(mLastLocation);
     }
 
     public void finish() {
@@ -225,7 +225,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     public void initMap() {
         // initialize map fragment
-        SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map);
+        SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map_fragment);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
