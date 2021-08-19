@@ -1,17 +1,26 @@
 package com.example.locationmarker.markers;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.location.Location;
-import android.widget.Toast;
+import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 
+import com.example.locationmarker.DetailsActivity;
 import com.example.locationmarker.R;
 import com.example.locationmarker.settings.OptionSettings;
 import com.example.locationmarker.surface.LocationPoint;
 import com.example.locationmarker.surface.Surface;
 import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -24,21 +33,21 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.maps.android.SphericalUtil.interpolate;
+import static java.lang.Integer.parseInt;
 
-public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparator<LatLng> {
-    private static final String TAG = MarkersManager.class.getSimpleName();
+public class MarkersManager implements Comparator<LatLng> {
+    private static final String LOG_TAG = MarkersManager.class.getSimpleName();
     // vars
     private static Context context;
     private static MarkersManager instance;
     private static GoogleMap googleMap;
-    private Polyline polyline;
+    private static View transparentView;
 
-    public static void setGoogleMap(GoogleMap gMap) {
-        MarkersManager.googleMap = gMap;
-        googleMap.setOnMarkerClickListener(instance);
-    }
+    // vars
+    private Polyline polyline;
 
     public static void setContext(Context context) {
         MarkersManager.context = context;
@@ -51,8 +60,56 @@ public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparat
         return instance;
     }
 
-    public MarkersManager() {
+    private MarkersManager() {
+        RelativeLayout mMapViewRoot = ((Activity) context).findViewById(R.id.marker_layout);
+        transparentView = View.inflate(context, R.layout.transparent_layout, mMapViewRoot);
         instance = this;
+    }
+
+    public static void setGoogleMap(GoogleMap gMap) {
+        googleMap = gMap;
+        googleMap.setOnMarkerClickListener(marker -> {
+                    Surface lastViewedSurface = SurfaceManager.getInstance().getLastViewedSurface();
+                    if (lastViewedSurface != null) {
+                        try {
+                            int id = parseInt(marker.getTitle());
+                            Optional<LocationPoint> locationPoint = lastViewedSurface.getLocationPoints().stream()
+                                    .filter(p -> p.getOrderNumber() == id)
+                                    .findFirst();
+
+                            if (locationPoint.isPresent()) {
+                                showDetailsLayout(locationPoint.get());
+                                return true;
+                            }
+                            Log.e(LOG_TAG, "Unable to recognized LocationPoint object of selected marker!");
+                        } catch (NumberFormatException e) {
+                            Log.e(LOG_TAG, "NumberFormatException occurred while parsing: " + marker.getTitle());
+                        }
+                        return false;
+                    } else {
+                        Projection projection = googleMap.getProjection();
+                        LatLng markerLocation = marker.getPosition();
+                        Point screenPosition = projection.toScreenLocation(markerLocation);
+                        transparentView.setTranslationX(screenPosition.x);
+                        transparentView.setTranslationY(screenPosition.y);
+
+                        PopupMenu popupMenu = new PopupMenu(context, transparentView);
+                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                if(item.getTitle().equals(context.getString(R.string.marker_delete_popup))) {
+                                    SurfaceManager.getInstance().removeMarker(marker);
+                                }
+                                return false;
+                            }
+                        });
+
+                        popupMenu.inflate(R.menu.marker_popup_menu);
+                        popupMenu.show();
+                        return true;
+                    }
+                }
+        );
     }
 
     public void showSurfaceOnMap(Surface surface) {
@@ -121,6 +178,7 @@ public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparat
         googleMap.addPolygon(polygonOptions);
         LatLng polygonCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(points);
 
+
         IconGenerator icg = new IconGenerator(context);
         icg.setColor(Color.GREEN); // transparent background
         icg.setTextAppearance(R.style.BlackText); // black text
@@ -132,15 +190,20 @@ public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparat
                 .icon(BitmapDescriptorFactory.fromBitmap(bm));
 
         googleMap.addMarker(markerOptions);
-
     }
 
     private List<LatLng> getLatLngFromLocation() {
         List<LatLng> points = new ArrayList<>();
-        for (LocationPoint locationPoint : SurfaceManager.getInstance().getCurrentSurface().getLocationPoints()) {
+        for (LocationPoint locationPoint : SurfaceManager.getInstance().getWorkingSurface().getLocationPoints()) {
             points.add(locationPoint.getLatLng());
         }
         return points;
+    }
+
+    private static void showDetailsLayout(LocationPoint locationPoint) {
+        Intent intent = new Intent(context, DetailsActivity.class);
+        intent.putExtra("LocationPoint", locationPoint);
+        context.startActivity(intent);
     }
 
     private void writeDistancesOnMap(boolean isAddingProcessFinished) {
@@ -175,11 +238,5 @@ public class MarkersManager implements GoogleMap.OnMarkerClickListener, Comparat
 
             googleMap.addMarker(markerOptions);
         }
-    }
-
-    @Override
-    public boolean onMarkerClick(com.google.android.gms.maps.model.Marker marker) {
-        Toast.makeText(context, "Clicked " + marker.getId(), Toast.LENGTH_SHORT).show();
-        return false;
     }
 }

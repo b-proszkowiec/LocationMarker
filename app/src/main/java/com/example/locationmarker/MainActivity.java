@@ -1,6 +1,7 @@
 package com.example.locationmarker;
 
 import android.os.Bundle;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -24,12 +25,14 @@ public class MainActivity extends AppCompatActivity {
     private final SettingsFragment settingFragment = new SettingsFragment();
     private FragmentManager fragmentManager = getSupportFragmentManager();
     private Fragment activeFragment = mapFragment;
+    private TextView toolbarTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        toolbarTextView = this.findViewById(R.id.toolbar_textView);
         BottomNavigationView navigation = findViewById(R.id.bottom_navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         fragmentManager.beginTransaction().add(R.id.fragment_container, settingFragment, "3").hide(settingFragment).commit();
@@ -43,16 +46,19 @@ public class MainActivity extends AppCompatActivity {
             case R.id.mapsFragment:
                 fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
                 mapFragment.onHiddenChanged(false);
+                toolbarTextView.setText(R.string.app_name);
                 activeFragment = mapFragment;
                 return true;
 
             case R.id.itemFragment:
                 fragmentManager.beginTransaction().hide(activeFragment).show(itemFragment).commit();
+                toolbarTextView.setText(R.string.ic_location_text);
                 activeFragment = itemFragment;
                 return true;
 
             case R.id.settingsFragment:
                 fragmentManager.beginTransaction().hide(activeFragment).show(settingFragment).commit();
+                toolbarTextView.setText(R.string.ic_settings_text);
                 activeFragment = settingFragment;
                 return true;
         }
@@ -70,9 +76,10 @@ public class MainActivity extends AppCompatActivity {
             fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
             activeFragment = mapFragment;
             Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
+            // set last active surface
+            SurfaceManager.getInstance().setLastViewedSurface(surface);
             SurfaceManager.getInstance().refreshView(true, surface);
             mapFragment.hideAddLayerAndMoveToSurface(surface);
         });
     }
-
 }

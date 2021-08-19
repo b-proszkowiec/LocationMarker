@@ -9,7 +9,8 @@ import java.io.Serializable;
 
 public class LocationPoint implements Serializable {
     int number;
-    double latitude, longitude;
+    double latitude;
+    double longitude;
     float accuracy;
 
     public LocationPoint(Location location, int number) {
@@ -32,5 +33,9 @@ public class LocationPoint implements Serializable {
 
     public int getOrderNumber() {
         return number;
+    }
+
+    public float getAccuracy() {
+        return accuracy;
     }
 }

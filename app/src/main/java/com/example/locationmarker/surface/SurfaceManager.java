@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -13,13 +14,17 @@ import com.example.locationmarker.storage.DataStorage;
 import com.example.locationmarker.storage.JsonStorage;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.example.locationmarker.fragments.MapFragment.updateBottomLayer;
 import static com.example.locationmarker.surface.Surface.distinctByKey;
+import static java.lang.Integer.parseInt;
 
 public class SurfaceManager implements Serializable {
     private static final String LOG_TAG = SurfaceManager.class.getSimpleName();
@@ -29,8 +34,9 @@ public class SurfaceManager implements Serializable {
     private Context context;
 
     // vars
-    Surface currentSurface = new Surface(TEMP_NAME);
-    List<Surface> surfaces = new ArrayList<>();
+    private Surface lastViewedSurface;
+    private Surface workingSurface = new Surface(TEMP_NAME);
+    private List<Surface> surfaces = new ArrayList<>();
 
     private SurfaceManager() {
     }
@@ -44,12 +50,12 @@ public class SurfaceManager implements Serializable {
     }
 
     public void finish() {
-        refreshView(true, currentSurface);
+        refreshView(true, workingSurface);
     }
 
     public void reset() {
-        currentSurface.getLocationPoints().clear();
-        refreshView(false, currentSurface);
+        workingSurface.getLocationPoints().clear();
+        refreshView(false, workingSurface);
     }
 
     public void exportToJson(Context context, Uri uri) {
@@ -75,11 +81,11 @@ public class SurfaceManager implements Serializable {
     }
 
     public void storeNewSurface(String name) {
-        currentSurface.setName(name);
-        surfaces.add(currentSurface);
-        currentSurface = new Surface(TEMP_NAME);
+        workingSurface.setName(name);
+        surfaces.add(workingSurface);
+        workingSurface = new Surface(TEMP_NAME);
 
-        refreshView(false, currentSurface);
+        refreshView(false, workingSurface);
         storeCurrentSurfaces();
     }
 
@@ -94,22 +100,40 @@ public class SurfaceManager implements Serializable {
         }
     }
 
-    public int addPointToCurrentLocation(Location location) {
-        if (currentSurface.getLocationPoints().size() > 0) {
-            LocationPoint lastLocation = currentSurface.getLocationPoints().get(currentSurface.getLocationPoints().size() - 1);
+    public int addPointToWorkingSurface(Location location) {
+        setLastViewedSurface(null);
+        if (workingSurface.getLocationPoints().size() > 0) {
+            LocationPoint lastLocation = workingSurface.getLocationPoints().get(workingSurface.getLocationPoints().size() - 1);
             double distance = MarkersManager.calculateDistanceBetweenLocations(lastLocation.getLocation(), location);
             if (distance < 1) {
                 Toast.makeText(context, String.format("Minimal distance should be at least %.1f m", 1.0), Toast.LENGTH_SHORT).show();
                 return getPointsAmount();
             }
         }
-        currentSurface.addPointToSurface(location);
-        refreshView(false, currentSurface);
+        workingSurface.addPointToSurface(location);
+        refreshView(false, workingSurface);
         return getPointsAmount();
     }
 
+    public void removeMarker(Marker marker) {
+        try {
+            final int id = parseInt(marker.getTitle());
+            Optional<LocationPoint> markerLocationPoint = workingSurface.getLocationPoints().stream()
+                    .filter(p -> p.getOrderNumber() == id)
+                    .findFirst();
+            if(markerLocationPoint.isPresent()) {
+                workingSurface.getLocationPoints().remove(markerLocationPoint.get());
+                refreshView(false, workingSurface);
+            }
+        } catch (NumberFormatException e) {
+            Log.e(LOG_TAG, "NumberFormatException occurred while parsing: " + marker.getTitle());
+        }
+        // add control over button visibility
+        updateBottomLayer(workingSurface.getLocationPoints().size());
+    }
+
     private int getPointsAmount() {
-        return currentSurface.getLocationPoints().size();
+        return workingSurface.getLocationPoints().size();
     }
 
     public LatLng getSurfaceCenterPoint(List<LatLng> polygonPointsList) {
@@ -125,22 +149,28 @@ public class SurfaceManager implements Serializable {
     }
 
     public void refreshView(boolean isAddingProcessFinished, Surface surface) {
-
         MarkersManager.getInstance().showSurfaceOnMap(surface);
-
         if (isAddingProcessFinished) {
             double polygonArea = surface.computeArea();
             MarkersManager.getInstance().drawPolygon(polygonArea, surface.convertToLatLngList());
-        } else {
+        } else if (surface.getLocationPoints().size() > 1) {
             MarkersManager.getInstance().drawPolyline(false);
         }
     }
 
-    public Surface getCurrentSurface() {
-        return currentSurface;
+    public Surface getWorkingSurface() {
+        return workingSurface;
     }
 
     public List<Surface> getSurfaces() {
         return surfaces;
+    }
+
+    public Surface getLastViewedSurface() {
+        return lastViewedSurface;
+    }
+
+    public void setLastViewedSurface(Surface lastViewedSurface) {
+        this.lastViewedSurface = lastViewedSurface;
     }
 }
