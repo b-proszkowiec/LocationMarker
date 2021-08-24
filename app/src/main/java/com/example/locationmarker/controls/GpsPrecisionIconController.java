@@ -10,8 +10,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
-import androidx.preference.SwitchPreferenceCompat;
-
 import com.example.locationmarker.R;
 import com.example.locationmarker.fragments.SettingsFragment;
 import com.example.locationmarker.settings.OptionSettings;
@@ -26,21 +24,28 @@ public class GpsPrecisionIconController implements IPrecisionIconVisible {
     private boolean isTimesUp;
     private Button precisionButton;
     private View precisionLayout;
-    private Activity activity;
     private Context context;
 
+    /**
+     * Constructor of GpsPrecisionIconController.
+     *
+     * @param context Context to working on.
+     * @param activity Activity to working on.
+     */
     public GpsPrecisionIconController(Context context, Activity activity) {
         this.context = context;
-        this.activity = activity;
         this.precisionButton = activity.findViewById(R.id.precisionButton);
         this.precisionLayout = activity.findViewById(R.id.precisionLayout);
         this.isTimesUp = true;
         SettingsFragment.registerListener(this);
-
-
         setPrecisionLayoutVisible(OptionSettings.getInstance().getShowPrecisionIconStatus());
     }
 
+    /**
+     * Update value in precision button to the specified.
+     *
+     * @param text value to show inside precision button.
+     */
     public void update(String text) {
         precisionButton.setText(text);
         Animation animation = AnimationUtils.loadAnimation(context, R.anim.anim_scale);

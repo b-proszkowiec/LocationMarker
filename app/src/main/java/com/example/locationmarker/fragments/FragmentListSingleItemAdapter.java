@@ -46,37 +46,28 @@ public class FragmentListSingleItemAdapter extends RecyclerView.Adapter<Fragment
             deleteImage = itemView.findViewById(R.id.delete_item);
             editImage = itemView.findViewById(R.id.edit_item);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
                     }
                 }
             });
 
-            deleteImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onDeleteClick(position);
-                        }
+            deleteImage.setOnClickListener(v -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onDeleteClick(position);
                     }
                 }
             });
-            editImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onEditClick(position);
-                        }
+            editImage.setOnClickListener(v -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onEditClick(position);
                     }
                 }
             });

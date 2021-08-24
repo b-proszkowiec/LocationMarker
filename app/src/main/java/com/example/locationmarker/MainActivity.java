@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         fragmentManager.beginTransaction().add(R.id.fragment_container, settingFragment, "3").hide(settingFragment).commit();
         fragmentManager.beginTransaction().add(R.id.fragment_container, itemFragment, "2").hide(itemFragment).commit();
-        //fragmentManager.beginTransaction().add(R.id.fragment_container, mapFragment, "1").commit();
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener

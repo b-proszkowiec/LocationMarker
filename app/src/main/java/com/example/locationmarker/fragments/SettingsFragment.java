@@ -22,6 +22,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     private static IPrecisionIconVisible iPrecisionIconVisible;
 
+    /**
+     * Register listener for the IPrecisionIconVisible.
+     *
+     * @param listener listeners to register.
+     */
     public static void registerListener(IPrecisionIconVisible listener) {
         iPrecisionIconVisible = listener;
     }
@@ -83,17 +88,18 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     }
 
     private String getDistanceUnit() {
-        ListPreference distanceUnitPreference = (ListPreference)findPreference(getString(R.string.distance_unit_title));
+        ListPreference distanceUnitPreference = findPreference(getString(R.string.distance_unit_title));
         return distanceUnitPreference.getValue();
     }
+
     private String getAreaUnit() {
-        ListPreference areaUnitPreference = (ListPreference)findPreference(getString(R.string.area_unit_title));
+        ListPreference areaUnitPreference = findPreference(getString(R.string.area_unit_title));
         return areaUnitPreference.getValue();
     }
 
     private boolean getPrecisionIconVisibleStatus() {
         String keyEnableStart = getString(R.string.precision_icon_title);
-        SwitchPreferenceCompat enableStart = (SwitchPreferenceCompat)findPreference(keyEnableStart);
+        SwitchPreferenceCompat enableStart = findPreference(keyEnableStart);
         return enableStart.isChecked();
     }
 }
