@@ -26,11 +26,14 @@ public class JsonStorage extends Activity {
 
     private static final String LOG_TAG = ItemFragment.class.getSimpleName();
 
-    public JsonStorage() {
-    }
-
+    /**
+     * Export surfaces to a selected file on the disk as a json.
+     *
+     * @param context specified context value.
+     * @param uri represents a Uniform Resource Identifier (URI) reference
+     * @param surfaces list of surfaces to be stored.
+     */
     public void exportToFile(Context context, Uri uri, List<Surface> surfaces) {
-
         OutputStream outputStream = null;
         String jsonOfSurfacesArray = new Gson().toJson(surfaces);
 
@@ -54,7 +57,13 @@ public class JsonStorage extends Activity {
         }
     }
 
-
+    /**
+     * Import surfaces from a selected file.
+     *
+     * @param context specified context value.
+     * @param uri represents a Uniform Resource Identifier (URI) reference
+     * @return List of surfaces stored in a file.
+     */
     public static List<Surface> importFromFile(Context context, Uri uri) {
         List<Surface> surfaces = null;
         InputStream inputStream = null;
@@ -73,8 +82,6 @@ public class JsonStorage extends Activity {
 
         } catch (FileNotFoundException e) {
             Log.d(LOG_TAG, "-----> File not found", e);
-        } catch (IOException e) {
-            Log.d(LOG_TAG, "-----> Error reading file", e);
         } finally {
             if (inputStream != null) {
                 try {

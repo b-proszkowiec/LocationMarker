@@ -181,6 +181,11 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         }
     }
 
+    /**
+     * Add last location point to a working surface.
+     *
+     * @return amount of points in a working surface.
+     */
     public int adPoint() {
         if (mLastLocation == null) {
             return 0;
@@ -188,6 +193,10 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         return SurfaceManager.getInstance().addPointToWorkingSurface(mLastLocation);
     }
 
+    /**
+     * Stop adding points to a working surface.
+     *
+     */
     public void finish() {
         if (mLastLocation == null) {
             return;
@@ -195,6 +204,11 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         SurfaceManager.getInstance().finish();
     }
 
+    /**
+     * Reset bottom layer to initial values.
+     * This will make only 'ADD POINT' button visible.
+     *
+     */
     public void resetBottomLayer() {
         addPointLayer.setVisibility(View.VISIBLE);
         saveLayer.setVisibility(View.INVISIBLE);
@@ -203,6 +217,13 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         stopAddingButton.setVisibility(View.INVISIBLE);
     }
 
+    /**
+     * Move bottom layer into adding points mode.
+     * If total amounts of points is equal or grater than 3, show also 'END' button
+     * to let the user to break and save working surface.
+     *
+     * @param markerAmount total amount of already added points.
+     */
     public static void updateBottomLayer(int markerAmount) {
         addPointLayer.setVisibility(View.VISIBLE);
         saveLayer.setVisibility(View.INVISIBLE);
@@ -214,6 +235,12 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         }
     }
 
+    /**
+     * Show new created surface on the map. This will make addPointLayer invisible and
+     * let the user to cancel or store new surface by clicking 'SAVE' button.
+     *
+     * @param surface surface to show on the map.
+     */
     public void hideAddLayerAndMoveToSurface(Surface surface) {
         addPointLayer.setVisibility(View.INVISIBLE);
         LatLng surfaceCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(surface.convertToLatLngList());
@@ -237,6 +264,10 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         return false;
     }
 
+    /**
+     * Initializes map. This should be done after grant proper permissions.
+     *
+     */
     public void initMap() {
         // initialize map fragment
         SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map_fragment);

@@ -2,11 +2,8 @@ package com.example.locationmarker.dialog;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.text.InputType;
 import android.widget.EditText;
-
-import com.example.locationmarker.surface.SurfaceManager;
 
 public class InputDialog {
     private static final String LOG_TAG = InputDialog.class.getSimpleName();
@@ -20,10 +17,20 @@ public class InputDialog {
         void onDialogTextInput(int pos, String text);
     }
 
+    /**
+     * Register listener for the OnDialogTextInputListener.
+     *
+     * @param listener listeners to register.
+     */
     public void setOnDialogTextInputListener(InputDialog.OnDialogTextInputListener listener) {
         onDialogTextInputListener = listener;
     }
 
+    /**
+     * Gets a InputDialog using the defaults.
+     *
+     * @return unique instance of InputDialog.
+     */
     public static InputDialog getInstance() {
         return INSTANCE;
     }
@@ -31,8 +38,13 @@ public class InputDialog {
     private InputDialog() {
     }
 
-    public void setContext(Context c) {
-        context = c;
+    /**
+     * Sets the value of the private context field to the specified.
+     *
+     * @param context specified context value.
+     */
+    public void setContext(Context context) {
+        this.context = context;
     }
 
     private static void userInput(final Runnable func) {
@@ -43,30 +55,26 @@ public class InputDialog {
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         aBuilder.setView(input);
 
-        aBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                alertDialogInputText = input.getText().toString();
-                func.run();
-            }
+        aBuilder.setPositiveButton("Ok", (dialog, which) -> {
+            alertDialogInputText = input.getText().toString();
+            func.run();
         });
-        aBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-                alertDialogInputText = "";
-            }
+        aBuilder.setNegativeButton("Cancel", (dialog, which) -> {
+            dialog.cancel();
+            alertDialogInputText = "";
         });
         aBuilder.show();
     }
 
+    /**
+     * Starts alert dialog to set name of the area in Locations view.
+     *
+     * @param itemPosition position of the item.
+     */
     public static void startAlertDialog(final int itemPosition) {
-        Runnable alertDialogRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (!alertDialogInputText.isEmpty()) {
-                    onDialogTextInputListener.onDialogTextInput(itemPosition, alertDialogInputText);
-                }
+        Runnable alertDialogRunnable = () -> {
+            if (!alertDialogInputText.isEmpty()) {
+                onDialogTextInputListener.onDialogTextInput(itemPosition, alertDialogInputText);
             }
         };
         userInput(alertDialogRunnable);

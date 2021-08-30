@@ -138,7 +138,7 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         List<Surface> surfaces = SurfaceManager.getInstance().getSurfaces();
         surfaces.remove(position);
         refreshItemsView();
-        SurfaceManager.getInstance().storeCurrentSurfaces();
+        SurfaceManager.getInstance().updateSurfaces();
     }
 
     @Override
@@ -147,7 +147,7 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         InputDialog.getInstance().setOnDialogTextInputListener((itemPosition, inputText) -> {
             Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
             surface.setName(inputText);
-            SurfaceManager.getInstance().storeCurrentSurfaces();
+            SurfaceManager.getInstance().updateSurfaces();
             adapter.notifyItemChanged(itemPosition);
             refreshItemsView();
         });

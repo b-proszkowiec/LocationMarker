@@ -9,6 +9,11 @@ public class OptionSettings {
     private static String distanceUnit;
     private static String areaUnit;
 
+    /**
+     * Gets a OptionSettings using the defaults.
+     *
+     * @return unique instance of OptionSettings.
+     */
     public static OptionSettings getInstance() {
         return INSTANCE;
     }
@@ -16,15 +21,30 @@ public class OptionSettings {
     private OptionSettings() {
     }
 
-
+    /**
+     * Gets whether precision icon status button is on/off.
+     *
+     * @return Status of enabling precision icon button.
+     */
     public boolean getShowPrecisionIconStatus() {
         return showPrecisionIconStatus;
     }
 
+    /**
+     * Sets whether precision icon status button is on/off.
+     *
+     * @param showPrecisionIconStatus on/off status of the button.
+     */
     public void setShowPrecisionIconStatus(boolean showPrecisionIconStatus) {
         OptionSettings.showPrecisionIconStatus = showPrecisionIconStatus;
     }
 
+    /**
+     * Converts distance unit from the meters to the one in preferences.
+     *
+     * @param distance distance in meters.
+     * @return Distance by the unit set in preferences.
+     */
     public String calculateDistanceAccordingToSettingUnit(double distance) {
         String formattedDistance;
 
@@ -41,10 +61,12 @@ public class OptionSettings {
         return formattedDistance;
     }
 
-    public void setDistanceUnit(String distanceUnit) {
-        OptionSettings.distanceUnit = distanceUnit;
-    }
-
+    /**
+     * Converts area unit from the square meters to the one in preferences.
+     *
+     * @param areaInSquareMeters area in square meters.
+     * @return Area by the unit set in preferences.
+     */
     public String calculateAreaAccordingToSettingUnit(double areaInSquareMeters) {
         String formattedArea;
 
@@ -68,6 +90,20 @@ public class OptionSettings {
         return formattedArea;
     }
 
+    /**
+     * Sets distance unit.
+     *
+     * @param distanceUnit distance unit string.
+     */
+    public void setDistanceUnit(String distanceUnit) {
+        OptionSettings.distanceUnit = distanceUnit;
+    }
+
+    /**
+     * Sets area unit.
+     *
+     * @param areaUnit area unit string.
+     */
     public static void setAreaUnit(String areaUnit) {
         OptionSettings.areaUnit = areaUnit;
     }

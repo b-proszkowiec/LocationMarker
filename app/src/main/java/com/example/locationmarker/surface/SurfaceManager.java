@@ -31,9 +31,9 @@ public class SurfaceManager implements Serializable {
     private static final long serialVersionUID = -5444204010422813540L;
     private static final SurfaceManager INSTANCE = new SurfaceManager();
     private static final String TEMP_NAME = "Name";
-    private Context context;
 
     // vars
+    private Context context;
     private Surface lastViewedSurface;
     private Surface workingSurface = new Surface(TEMP_NAME);
     private List<Surface> surfaces = new ArrayList<>();
@@ -41,23 +41,61 @@ public class SurfaceManager implements Serializable {
     private SurfaceManager() {
     }
 
+    /**
+     * Sets the value of the private context field to the specified.
+     *
+     * @param context specified context value.
+     */
     public void setContext(Context context) {
         this.context = context;
     }
 
+    /**
+     * Gets a SurfaceManager using the defaults.
+     *
+     * @return unique instance of SurfaceManager.
+     */
     public static SurfaceManager getInstance() {
         return INSTANCE;
     }
 
+    /**
+     * Stop adding new points to a working surface and create the polygon on the map.
+     * This will be happen by joining the last location point with the first one.
+     *
+     */
     public void finish() {
         refreshView(true, workingSurface);
     }
 
+    /**
+     * Stop adding new points to a working surface and reset the process.
+     *
+     */
     public void reset() {
         workingSurface.getLocationPoints().clear();
         refreshView(false, workingSurface);
     }
 
+    /**
+     * Import surfaces from a json file using specified uri.
+     *
+     * @param uri represents a Uniform Resource Identifier (URI) reference.
+     */
+    public void importFromJson(Uri uri) {
+        List<Surface> importedSurfaces = JsonStorage.importFromFile(context, uri);
+        if (importedSurfaces != null) {
+            surfaces = mergeSurfacesList(surfaces, importedSurfaces);
+            updateSurfaces();
+        }
+    }
+
+    /**
+     * Export surfaces to a json file using specified uri.
+     *
+     * @param context specified context value.
+     * @param uri represents a Uniform Resource Identifier (URI) reference.
+     */
     public void exportToJson(Context context, Uri uri) {
         JsonStorage instance = new JsonStorage();
         instance.exportToFile(context, uri, surfaces);
@@ -72,27 +110,34 @@ public class SurfaceManager implements Serializable {
                 .collect(Collectors.toList());
     }
 
-    public void importFromJson(Uri uri) {
-        List<Surface> importedSurfaces = JsonStorage.importFromFile(context, uri);
-        if (importedSurfaces != null) {
-            surfaces = mergeSurfacesList(surfaces, importedSurfaces);
-            storeCurrentSurfaces();
-        }
-    }
-
+    /**
+     * Add new created surface to surfaces list.
+     *
+     * @param name name of the surface.
+     */
     public void storeNewSurface(String name) {
         workingSurface.setName(name);
         surfaces.add(workingSurface);
         workingSurface = new Surface(TEMP_NAME);
 
         refreshView(false, workingSurface);
-        storeCurrentSurfaces();
+        updateSurfaces();
     }
 
-    public void storeCurrentSurfaces() {
+    /**
+     * Update surfaces in a temporary file.
+     * This will prevent loss of data after application restart.
+     *
+     */
+    public void updateSurfaces() {
         DataStorage.getInstance().saveData(context, surfaces);
     }
 
+    /**
+     * Restore surfaces from a temporary file.
+     * This is mostly done after application restart.
+     *
+     */
     public void restoreSavedSurfaces() {
         List<Surface> restoredSurfaces = (List<Surface>) DataStorage.getInstance().loadData(context);
         if (restoredSurfaces != null) {
@@ -100,6 +145,12 @@ public class SurfaceManager implements Serializable {
         }
     }
 
+    /**
+     * Add new location point to a working surface.
+     *
+     * @param location new point location
+     * @return amount of location points in current surface
+     */
     public int addPointToWorkingSurface(Location location) {
         setLastViewedSurface(null);
         if (workingSurface.getLocationPoints().size() > 0) {
@@ -115,6 +166,11 @@ public class SurfaceManager implements Serializable {
         return getPointsAmount();
     }
 
+    /**
+     * Remove selected marker from the map.
+     *
+     * @param marker marker to remove.
+     */
     public void removeMarker(Marker marker) {
         try {
             final int id = parseInt(marker.getTitle());
@@ -132,10 +188,28 @@ public class SurfaceManager implements Serializable {
         updateBottomLayer(workingSurface.getLocationPoints().size());
     }
 
-    private int getPointsAmount() {
-        return workingSurface.getLocationPoints().size();
+    /**
+     * Refresh view of the surface on the map.
+     *
+     * @param isAddingProcessFinished determines whether add points to surface is finished.
+     * @param surface current surface.
+     */
+    public void refreshView(boolean isAddingProcessFinished, Surface surface) {
+        MarkersManager.getInstance().showSurfaceOnMap(surface);
+        if (isAddingProcessFinished) {
+            double polygonArea = surface.computeArea();
+            MarkersManager.getInstance().drawPolygon(polygonArea, surface.convertToLatLngList());
+        } else if (surface.getLocationPoints().size() > 1) {
+            MarkersManager.getInstance().drawPolyline(false);
+        }
     }
 
+    /**
+     * Get center of given points. This is needed to recenter the map on selected surface.
+     *
+     * @param polygonPointsList location points which are vertices of the polygon.
+     * @return the center of given points.
+     */
     public LatLng getSurfaceCenterPoint(List<LatLng> polygonPointsList) {
         LatLng centerLatLng;
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -148,29 +222,43 @@ public class SurfaceManager implements Serializable {
         return centerLatLng;
     }
 
-    public void refreshView(boolean isAddingProcessFinished, Surface surface) {
-        MarkersManager.getInstance().showSurfaceOnMap(surface);
-        if (isAddingProcessFinished) {
-            double polygonArea = surface.computeArea();
-            MarkersManager.getInstance().drawPolygon(polygonArea, surface.convertToLatLngList());
-        } else if (surface.getLocationPoints().size() > 1) {
-            MarkersManager.getInstance().drawPolyline(false);
-        }
-    }
-
+    /**
+     * Gets surface which is currently edited.
+     *
+     * @return working surface.
+     */
     public Surface getWorkingSurface() {
         return workingSurface;
     }
 
+    /**
+     * Gets list of all surfaces.
+     *
+     * @return surfaces list.
+     */
     public List<Surface> getSurfaces() {
         return surfaces;
     }
 
+    /**
+     * Gets a surface which was previously selected to show, otherwise returns null.
+     *
+     * @return last viewed surface.
+     */
     public Surface getLastViewedSurface() {
         return lastViewedSurface;
     }
 
+    /**
+     * Sets last viewed surface to selected.
+     *
+     * @param lastViewedSurface last viewed surface.
+     */
     public void setLastViewedSurface(Surface lastViewedSurface) {
         this.lastViewedSurface = lastViewedSurface;
+    }
+
+    private int getPointsAmount() {
+        return workingSurface.getLocationPoints().size();
     }
 }

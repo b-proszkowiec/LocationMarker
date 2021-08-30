@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Location;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
@@ -38,9 +37,9 @@ import java.util.Optional;
 import static com.google.maps.android.SphericalUtil.interpolate;
 import static java.lang.Integer.parseInt;
 
+
 public class MarkersManager implements Comparator<LatLng> {
     private static final String LOG_TAG = MarkersManager.class.getSimpleName();
-    // vars
     private static Context context;
     private static MarkersManager instance;
     private static GoogleMap googleMap;
@@ -49,10 +48,20 @@ public class MarkersManager implements Comparator<LatLng> {
     // vars
     private Polyline polyline;
 
+    /**
+     * Sets the value of the private context field to the specified.
+     *
+     * @param context specified context value
+     */
     public static void setContext(Context context) {
         MarkersManager.context = context;
     }
 
+    /**
+     * Gets a MarkersManager using the defaults.
+     *
+     * @return unique instance of MarkersManager.
+     */
     public static MarkersManager getInstance() {
         if (instance == null) {
             return new MarkersManager();
@@ -66,6 +75,11 @@ public class MarkersManager implements Comparator<LatLng> {
         instance = this;
     }
 
+    /**
+     * Sets the value of the private googleMap field to the specified.
+     *
+     * @param gMap specified GoogleMap value.
+     */
     public static void setGoogleMap(GoogleMap gMap) {
         googleMap = gMap;
         googleMap.setOnMarkerClickListener(marker -> {
@@ -94,14 +108,11 @@ public class MarkersManager implements Comparator<LatLng> {
                         transparentView.setTranslationY(screenPosition.y);
 
                         PopupMenu popupMenu = new PopupMenu(context, transparentView);
-                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                            @Override
-                            public boolean onMenuItemClick(MenuItem item) {
-                                if(item.getTitle().equals(context.getString(R.string.marker_delete_popup))) {
-                                    SurfaceManager.getInstance().removeMarker(marker);
-                                }
-                                return false;
+                        popupMenu.setOnMenuItemClickListener(item -> {
+                            if(item.getTitle().equals(context.getString(R.string.marker_delete_popup))) {
+                                SurfaceManager.getInstance().removeMarker(marker);
                             }
+                            return false;
                         });
 
                         popupMenu.inflate(R.menu.marker_popup_menu);
@@ -112,6 +123,11 @@ public class MarkersManager implements Comparator<LatLng> {
         );
     }
 
+    /**
+     * Show given surface on the map based on location points on its edges.
+     *
+     * @param surface surface to show on the map.
+     */
     public void showSurfaceOnMap(Surface surface) {
         googleMap.clear();
 
@@ -122,6 +138,13 @@ public class MarkersManager implements Comparator<LatLng> {
         }
     }
 
+    /**
+     * Measures distance between two locations in meters.
+     *
+     * @param locStart start location
+     * @param locEnd end location
+     * @return Distance in Meters
+     */
     public static double calculateDistanceBetweenLocations(Location locStart, Location locEnd) {
         double distance = distance(locStart.getLatitude(), locEnd.getLatitude(),
                 locStart.getLongitude(), locEnd.getLongitude(), 0, 0);
@@ -153,11 +176,15 @@ public class MarkersManager implements Comparator<LatLng> {
         return Math.sqrt(distance);
     }
 
-
     public int compare(LatLng o1, LatLng o2) {
         return (int) (o2.latitude - o1.latitude) * 10 * 1000;
     }
 
+    /**
+     * Draws polyline on the map, based on points of the working surface.
+     *
+     * @param isAddingProcessFinished determines whether adding points to surface process is finished.
+     */
     public void drawPolyline(boolean isAddingProcessFinished) {
         if (polyline != null) {
             polyline.remove();
@@ -170,6 +197,12 @@ public class MarkersManager implements Comparator<LatLng> {
         writeDistancesOnMap(isAddingProcessFinished);
     }
 
+    /**
+     * Draws polygon on the map based on given location points.
+     *
+     * @param polygonArea area inside the points.
+     * @param points list of location points which represents vertices of the surface.
+     */
     public void drawPolygon(double polygonArea, List<LatLng> points) {
         PolygonOptions polygonOptions = new PolygonOptions()
                 .addAll(points)
@@ -177,8 +210,6 @@ public class MarkersManager implements Comparator<LatLng> {
 
         googleMap.addPolygon(polygonOptions);
         LatLng polygonCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(points);
-
-
         IconGenerator icg = new IconGenerator(context);
         icg.setColor(Color.GREEN); // transparent background
         icg.setTextAppearance(R.style.BlackText); // black text

@@ -19,6 +19,11 @@ public class DataStorage {
     private static final String LOG_TAG = DataStorage.class.getSimpleName();
     private static final DataStorage INSTANCE = new DataStorage();
 
+    /**
+     * Gets a DataStorage using the defaults.
+     *
+     * @return unique instance of DataStorage.
+     */
     public static DataStorage getInstance() {
         return INSTANCE;
     }
@@ -26,6 +31,13 @@ public class DataStorage {
     private DataStorage() {
     }
 
+    /**
+     * Save surfaces to a temporary file, so it can be restored in case of application restart.
+     * Location of the file is set to android default and not need to be known.
+     *
+     * @param context specified context value.
+     * @param surfaces list of surfaces to be stored.
+     */
     public void saveData(Context context, List<Surface> surfaces) {
         ObjectOutputStream objectOut = null;
 
@@ -48,6 +60,12 @@ public class DataStorage {
         }
     }
 
+    /**
+     * Restore surfaces from a temporary file. This procedure is performed after application restart.
+     *
+     * @param context specified context value.
+     * @return Object that represents saved surfaces.
+     */
     public Object loadData(Context context) {
         ObjectInputStream objectIn = null;
         Object object = null;
