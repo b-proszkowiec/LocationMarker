@@ -84,7 +84,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     @SuppressLint("DefaultLocale")
     @Override
     public void onLocationChanged(Location location) {
-        gpsPrecisionIconController.update(String.format("%.02f m", location.getAccuracy()));
+        gpsPrecisionIconController.update(location.getAccuracy());
         Log.d(LOG_TAG, "onLocationChanged: location has changed");
         mLastLocation = location;
     }
@@ -137,7 +137,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         MarkersManager.setContext(getContext());
         MarkersManager.getInstance().setGoogleMap(googleMap);
         LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 0.5f, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 0, this);
 
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setAllGesturesEnabled(true);
@@ -309,7 +309,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         stopAddingButton = getActivity().findViewById(R.id.stopAddingButton);
         Button saveButton = getActivity().findViewById(R.id.saveButton);
         Button resetButton = getActivity().findViewById(R.id.resetButton);
-        gpsPrecisionIconController = new GpsPrecisionIconController(getContext(), getActivity());
+        gpsPrecisionIconController = new GpsPrecisionIconController(getActivity());
         resetBottomLayer();
 
 
