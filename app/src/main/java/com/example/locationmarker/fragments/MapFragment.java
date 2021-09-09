@@ -38,7 +38,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import static android.content.Context.LOCATION_SERVICE;
 import static com.example.locationmarker.constants.LocationMarkerConstants.DEFAULT_ZOOM;
@@ -61,6 +64,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private static Button addPointButton;
     private static Button stopAddingButton;
     private GpsPrecisionIconController gpsPrecisionIconController;
+    private Marker tempPositionMarker;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -81,12 +85,23 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         }
     }
 
+
     @SuppressLint("DefaultLocale")
     @Override
     public void onLocationChanged(Location location) {
         gpsPrecisionIconController.update(location.getAccuracy());
         Log.d(LOG_TAG, "onLocationChanged: location has changed");
         mLastLocation = location;
+
+        if (tempPositionMarker != null) {
+            tempPositionMarker.remove();
+        }
+
+        tempPositionMarker = googleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                .title("temp_location")
+                .icon(BitmapDescriptorFactory
+                        .fromResource(R.drawable.temp_location_point)));
     }
 
     @Override
