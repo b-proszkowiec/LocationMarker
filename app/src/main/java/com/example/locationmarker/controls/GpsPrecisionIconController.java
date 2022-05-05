@@ -1,13 +1,13 @@
 package com.example.locationmarker.controls;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.animation.ScaleAnimation;
 import android.widget.Button;
 
 import com.example.locationmarker.R;
@@ -19,21 +19,20 @@ import static com.example.locationmarker.constants.LocationMarkerConstants.GpsPr
 public class GpsPrecisionIconController implements IPrecisionIconVisible {
 
     private static final String LOG_TAG = GpsPrecisionIconController.class.getSimpleName();
+    private final float SCALE_FACTOR = 0.7f;
 
     private final int EVENT = 104;
     private boolean isTimesUp;
+    private float startScale = 1;
     private Button precisionButton;
     private View precisionLayout;
-    private Context context;
 
     /**
      * Constructor of GpsPrecisionIconController.
      *
-     * @param context Context to working on.
      * @param activity Activity to working on.
      */
-    public GpsPrecisionIconController(Context context, Activity activity) {
-        this.context = context;
+    public GpsPrecisionIconController(Activity activity) {
         this.precisionButton = activity.findViewById(R.id.precisionButton);
         this.precisionLayout = activity.findViewById(R.id.precisionLayout);
         this.isTimesUp = true;
@@ -41,15 +40,40 @@ public class GpsPrecisionIconController implements IPrecisionIconVisible {
         setPrecisionLayoutVisible(OptionSettings.getInstance().getShowPrecisionIconStatus());
     }
 
+    private float getScaleValue(float accuracy) {
+        if (accuracy > 10f) {
+            return 1f;
+        }
+        if (accuracy < 2f) {
+            return SCALE_FACTOR;
+        }
+        float proportion = (accuracy - 2f) / 8f;
+        return proportion * (1f - SCALE_FACTOR) + SCALE_FACTOR;
+    }
+
+
     /**
      * Update value in precision button to the specified.
      *
-     * @param text value to show inside precision button.
+     * @param accuracy value to show inside precision button.
      */
-    public void update(String text) {
+    public void update(float accuracy) {
+
+        @SuppressLint("DefaultLocale") String text = String.format("%.02f m", accuracy);
+
         precisionButton.setText(text);
-        Animation animation = AnimationUtils.loadAnimation(context, R.anim.anim_scale);
+        float endScale = getScaleValue(accuracy);
+
+        Animation animation = new ScaleAnimation(
+                startScale, endScale,
+                startScale, endScale,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        animation.setFillAfter(true);
+        animation.setDuration(1000);
         precisionButton.startAnimation(animation);
+        startScale = endScale;
+
         Message msg = handler.obtainMessage(EVENT);
         handler.sendMessageDelayed(msg, NO_LOCATION_UPDATE_TIMEOUT);
         isTimesUp = false;

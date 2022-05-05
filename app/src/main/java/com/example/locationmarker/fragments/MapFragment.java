@@ -38,7 +38,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import static android.content.Context.LOCATION_SERVICE;
 import static com.example.locationmarker.constants.LocationMarkerConstants.DEFAULT_ZOOM;
@@ -61,6 +64,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private static Button addPointButton;
     private static Button stopAddingButton;
     private GpsPrecisionIconController gpsPrecisionIconController;
+    private Marker tempPositionMarker;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -81,12 +85,23 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         }
     }
 
+
     @SuppressLint("DefaultLocale")
     @Override
     public void onLocationChanged(Location location) {
-        gpsPrecisionIconController.update(String.format("%.02f m", location.getAccuracy()));
+        gpsPrecisionIconController.update(location.getAccuracy());
         Log.d(LOG_TAG, "onLocationChanged: location has changed");
         mLastLocation = location;
+
+        if (tempPositionMarker != null) {
+            tempPositionMarker.remove();
+        }
+
+        tempPositionMarker = googleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                .title("temp_location")
+                .icon(BitmapDescriptorFactory
+                        .fromResource(R.drawable.temp_location_point)));
     }
 
     @Override
@@ -137,7 +152,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         MarkersManager.setContext(getContext());
         MarkersManager.getInstance().setGoogleMap(googleMap);
         LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 0.5f, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 0, this);
 
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setAllGesturesEnabled(true);
@@ -309,7 +324,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         stopAddingButton = getActivity().findViewById(R.id.stopAddingButton);
         Button saveButton = getActivity().findViewById(R.id.saveButton);
         Button resetButton = getActivity().findViewById(R.id.resetButton);
-        gpsPrecisionIconController = new GpsPrecisionIconController(getContext(), getActivity());
+        gpsPrecisionIconController = new GpsPrecisionIconController(getActivity());
         resetBottomLayer();
 
 
