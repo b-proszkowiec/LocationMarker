@@ -228,8 +228,8 @@ public class MarkersManager implements Comparator<LatLng> {
         googleMap.addPolygon(polygonOptions);
         LatLng polygonCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(points);
         IconGenerator icg = new IconGenerator(context);
-        icg.setColor(Color.GREEN); // transparent background
-        icg.setTextAppearance(R.style.BlackText); // black text
+        icg.setColor(Color.LTGRAY);
+        icg.setTextAppearance(R.style.BlackText);
         Bitmap bm = icg.makeIcon(OptionSettings.getInstance().calculateAreaAccordingToSettingUnit(polygonArea));
 
         MarkerOptions markerOptions = new MarkerOptions()

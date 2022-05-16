@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
                 mapFragment.onHiddenChanged(false);
                 toolbarTextView.setText(R.string.app_name);
                 activeFragment = mapFragment;
+                SurfaceManager.getInstance().hideSurfaceButton();
                 return true;
 
             case R.id.itemFragment:

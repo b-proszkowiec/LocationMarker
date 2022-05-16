@@ -1,14 +1,18 @@
 package com.example.locationmarker.surface;
 
+import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.locationmarker.R;
 import com.example.locationmarker.markers.MarkersManager;
 import com.example.locationmarker.storage.DataStorage;
 import com.example.locationmarker.storage.JsonStorage;
@@ -38,7 +42,17 @@ public class SurfaceManager implements Serializable {
     private Surface workingSurface = new Surface(TEMP_NAME);
     private List<Surface> surfaces = new ArrayList<>();
 
+    private Button surfaceNameButton;
+
     private SurfaceManager() {
+    }
+
+    /**
+     * Sets the value of surface name button.
+     *
+     */
+    public void setSurfaceNameButton(Button surfaceNameButton) {
+        this.surfaceNameButton = surfaceNameButton;
     }
 
     /**
@@ -199,9 +213,15 @@ public class SurfaceManager implements Serializable {
         if (isAddingProcessFinished) {
             double polygonArea = surface.computeArea();
             MarkersManager.getInstance().drawPolygon(polygonArea, surface.convertToLatLngList());
+            surfaceNameButton.setVisibility(View.VISIBLE);
+            surfaceNameButton.setText(surface.getName());
         } else if (surface.getLocationPoints().size() > 1) {
             MarkersManager.getInstance().drawPolyline(false);
         }
+    }
+
+    public void hideSurfaceButton() {
+        surfaceNameButton.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -211,15 +231,9 @@ public class SurfaceManager implements Serializable {
      * @return the center of given points.
      */
     public LatLng getSurfaceCenterPoint(List<LatLng> polygonPointsList) {
-        LatLng centerLatLng;
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (int i = 0; i < polygonPointsList.size(); i++) {
-            builder.include(polygonPointsList.get(i));
-        }
-        LatLngBounds bounds = builder.build();
-        centerLatLng = bounds.getCenter();
-
-        return centerLatLng;
+        polygonPointsList.forEach(builder::include);
+        return builder.build().getCenter();
     }
 
     /**
