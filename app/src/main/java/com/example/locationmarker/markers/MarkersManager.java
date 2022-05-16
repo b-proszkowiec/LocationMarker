@@ -4,13 +4,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.util.Log;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
+
+import androidx.core.content.ContextCompat;
 
 import com.example.locationmarker.DetailsActivity;
 import com.example.locationmarker.R;
@@ -20,6 +24,7 @@ import com.example.locationmarker.surface.Surface;
 import com.example.locationmarker.surface.SurfaceManager;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -29,10 +34,10 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.ui.IconGenerator;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.google.maps.android.SphericalUtil.interpolate;
 import static java.lang.Integer.parseInt;
@@ -109,7 +114,7 @@ public class MarkersManager implements Comparator<LatLng> {
 
                         PopupMenu popupMenu = new PopupMenu(context, transparentView);
                         popupMenu.setOnMenuItemClickListener(item -> {
-                            if(item.getTitle().equals(context.getString(R.string.marker_delete_popup))) {
+                            if (item.getTitle().equals(context.getString(R.string.marker_delete_popup))) {
                                 SurfaceManager.getInstance().removeMarker(marker);
                             }
                             return false;
@@ -134,15 +139,27 @@ public class MarkersManager implements Comparator<LatLng> {
         for (LocationPoint locationPoint : surface.getLocationPoints()) {
             googleMap.addMarker(new MarkerOptions()
                     .position(locationPoint.getLatLng())
-                    .title("" + locationPoint.getOrderNumber()));
+                    .title("" + locationPoint.getOrderNumber())
+                    .icon(BitmapFromVector(R.drawable.edge_dot))
+                    .anchor(0.5f, 0.5f)
+            );
         }
+    }
+
+    private BitmapDescriptor BitmapFromVector(int vectorResId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
     /**
      * Measures distance between two locations in meters.
      *
      * @param locStart start location
-     * @param locEnd end location
+     * @param locEnd   end location
      * @return Distance in Meters
      */
     public static double calculateDistanceBetweenLocations(Location locStart, Location locEnd) {
@@ -201,7 +218,7 @@ public class MarkersManager implements Comparator<LatLng> {
      * Draws polygon on the map based on given location points.
      *
      * @param polygonArea area inside the points.
-     * @param points list of location points which represents vertices of the surface.
+     * @param points      list of location points which represents vertices of the surface.
      */
     public void drawPolygon(double polygonArea, List<LatLng> points) {
         PolygonOptions polygonOptions = new PolygonOptions()
@@ -224,11 +241,9 @@ public class MarkersManager implements Comparator<LatLng> {
     }
 
     private List<LatLng> getLatLngFromLocation() {
-        List<LatLng> points = new ArrayList<>();
-        for (LocationPoint locationPoint : SurfaceManager.getInstance().getWorkingSurface().getLocationPoints()) {
-            points.add(locationPoint.getLatLng());
-        }
-        return points;
+        return SurfaceManager.getInstance().getWorkingSurface().getLocationPoints().stream()
+                .map(LocationPoint::getLatLng)
+                .collect(Collectors.toList());
     }
 
     private static void showDetailsLayout(LocationPoint locationPoint) {

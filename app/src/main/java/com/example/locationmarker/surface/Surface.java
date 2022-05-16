@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Surface implements Serializable {
     private static final String LOG_TAG = Surface.class.getSimpleName();
@@ -47,11 +48,9 @@ public class Surface implements Serializable {
     }
 
     public List<LatLng> convertToLatLngList() {
-        List<LatLng> points = new ArrayList<>();
-        for (LocationPoint locationPoint : locationPoints) {
-            points.add(locationPoint.getLatLng());
-        }
-        return points;
+        return locationPoints.stream()
+                .map(LocationPoint::getLatLng)
+                .collect(Collectors.toList());
     }
 
     public double computeArea() {
