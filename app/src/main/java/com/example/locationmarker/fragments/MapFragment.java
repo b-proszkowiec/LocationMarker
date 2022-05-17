@@ -325,6 +325,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         Button saveButton = getActivity().findViewById(R.id.saveButton);
         Button resetButton = getActivity().findViewById(R.id.resetButton);
         gpsPrecisionIconController = new GpsPrecisionIconController(getActivity());
+        SurfaceManager.getInstance().setSurfaceNameButton(getActivity().findViewById(R.id.surfaceNameButton));
         resetBottomLayer();
 
 
