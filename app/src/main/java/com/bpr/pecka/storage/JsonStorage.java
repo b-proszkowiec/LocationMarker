@@ -5,13 +5,11 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
-import com.bpr.pecka.fragments.ItemFragment;
 import com.bpr.pecka.surface.Surface;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,73 +22,54 @@ import java.util.stream.Collectors;
 
 public class JsonStorage extends Activity {
 
-    private static final String LOG_TAG = ItemFragment.class.getSimpleName();
+    private static final String LOG_TAG = JsonStorage.class.getSimpleName();
 
     /**
-     * Export surfaces to a selected file on the disk as a json.
+     * Export surfaces to a selected file on the disk as a JSON.
      *
-     * @param context specified context value.
-     * @param uri represents a Uniform Resource Identifier (URI) reference
-     * @param surfaces list of surfaces to be stored.
+     * @param context  Specified context value.
+     * @param uri      Represents a Uniform Resource Identifier (URI) reference.
+     * @param surfaces List of surfaces to be stored.
      */
     public void exportToFile(Context context, Uri uri, List<Surface> surfaces) {
-        OutputStream outputStream = null;
         String jsonOfSurfacesArray = new Gson().toJson(surfaces);
 
-        try {
-            outputStream = context.getContentResolver().openOutputStream(uri);
-            byte[] strToBytes = jsonOfSurfacesArray.getBytes();
-            outputStream.write(strToBytes);
-
-        } catch (FileNotFoundException e) {
-            Log.d(LOG_TAG, "-----> File not found", e);
-        } catch (IOException e) {
-            Log.d(LOG_TAG, "-----> Error reading file", e);
-        } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    Log.d(LOG_TAG, "-----> Error reading file", e);
-                }
+        try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
+            if (outputStream == null) {
+                Log.e(LOG_TAG, "Failed to open output stream for URI: " + uri);
+                return;
             }
+            outputStream.write(jsonOfSurfacesArray.getBytes(StandardCharsets.UTF_8));
+            outputStream.flush();
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error exporting data to file: " + uri, e);
         }
     }
 
     /**
      * Import surfaces from a selected file.
      *
-     * @param context specified context value.
-     * @param uri represents a Uniform Resource Identifier (URI) reference
+     * @param context Specified context value.
+     * @param uri     Represents a Uniform Resource Identifier (URI) reference.
      * @return List of surfaces stored in a file.
      */
     public static List<Surface> importFromFile(Context context, Uri uri) {
-        List<Surface> surfaces = null;
-        InputStream inputStream = null;
+        try (InputStream inputStream = context.getContentResolver().openInputStream(uri)) {
+            if (inputStream == null) {
+                Log.e(LOG_TAG, "Failed to open input stream for URI: " + uri);
+                return new ArrayList<>();
+            }
 
-        try {
-            inputStream = context.getContentResolver().openInputStream(uri);
-
-            String fileContent = new BufferedReader(
-                    new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+            String fileContent = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                     .lines()
                     .collect(Collectors.joining("\n"));
 
-            Type surfaceALType = new TypeToken<ArrayList<Surface>>() {
-            }.getType();
-            surfaces = new Gson().fromJson(fileContent, surfaceALType);
+            Type surfaceListType = new TypeToken<ArrayList<Surface>>() {}.getType();
+            return new Gson().fromJson(fileContent, surfaceListType);
 
-        } catch (FileNotFoundException e) {
-            Log.d(LOG_TAG, "-----> File not found", e);
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    Log.d(LOG_TAG, "-----> Error reading file", e);
-                }
-            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error importing data from file: " + uri, e);
         }
-        return surfaces;
+        return new ArrayList<>();
     }
 }
