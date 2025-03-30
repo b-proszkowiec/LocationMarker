@@ -7,16 +7,16 @@
 
     <fragment
         android:id="@+id/mapsFragment"
-        android:name="com.example.locationmarker.fragments.MapFragment"
+        android:name="com.bpr.pecka.fragments.MapFragment"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_map" />
     <fragment
         android:id="@+id/itemFragment"
-        android:name="com.example.locationmarker.fragments.ItemFragment"
+        android:name="com.bpr.pecka.fragments.ItemFragment"
         android:label="fragment_item_list"
         tools:layout="@layout/fragment_item_list" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.locationmarker.fragments.SettingsFragment"
+        android:name="com.bpr.pecka.fragments.SettingsFragment"
         android:label="SettingsFragment2" />
 </navigation>

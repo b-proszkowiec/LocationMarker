@@ -4,12 +4,12 @@
 
     To get one, follow this link, follow the directions and press "Create" at the end:
 
-    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=5A:2A:C9:6F:E5:6F:C2:CB:2E:E8:27:A2:8C:E5:9A:DC:68:B4:2B:9F%3Bcom.example.locationmarker
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=5A:2A:C9:6F:E5:6F:C2:CB:2E:E8:27:A2:8C:E5:9A:DC:68:B4:2B:9F%3Bcom.bpr.locationmarker
 
     You can also add your credentials to an existing key, using these values:
 
     Package name:
-    com.example.locationmarker
+    com.bpr.locationmarker
 
     SHA-1 certificate fingerprint:
     5A:2A:C9:6F:E5:6F:C2:CB:2E:E8:27:A2:8C:E5:9A:DC:68:B4:2B:9F

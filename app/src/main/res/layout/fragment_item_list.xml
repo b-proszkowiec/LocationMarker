@@ -5,7 +5,7 @@
 
     <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/recyclerView"
-        android:name="com.example.locationmarker.ItemFragment"
+        android:name="com.bpr.locationmarker.ItemFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/darker_gray"
