@@ -151,6 +151,6 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
             adapter.notifyItemChanged(itemPosition);
             refreshItemsView();
         });
-        InputDialog.startAlertDialog(position);
+        InputDialog.getInstance().startAlertDialog(position);
     }
 }

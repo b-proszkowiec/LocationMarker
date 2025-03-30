@@ -6,12 +6,11 @@ import android.text.InputType;
 import android.widget.EditText;
 
 public class InputDialog {
-    private static final String LOG_TAG = InputDialog.class.getSimpleName();
-    private static final InputDialog INSTANCE = new InputDialog();
-    private static String alertDialogInputText;
-    private static Context context;
+    private static InputDialog instance;
+    private String alertDialogInputText = "";
+    private Context context;
 
-    private static OnDialogTextInputListener onDialogTextInputListener;
+    private OnDialogTextInputListener onDialogTextInputListener;
 
     public interface OnDialogTextInputListener {
         void onDialogTextInput(int pos, String text);
@@ -20,26 +19,29 @@ public class InputDialog {
     /**
      * Register listener for the OnDialogTextInputListener.
      *
-     * @param listener listeners to register.
+     * @param listener listener to register.
      */
-    public void setOnDialogTextInputListener(InputDialog.OnDialogTextInputListener listener) {
-        onDialogTextInputListener = listener;
+    public void setOnDialogTextInputListener(OnDialogTextInputListener listener) {
+        this.onDialogTextInputListener = listener;
     }
 
     /**
-     * Gets a InputDialog using the defaults.
+     * Gets an instance of InputDialog.
      *
      * @return unique instance of InputDialog.
      */
     public static InputDialog getInstance() {
-        return INSTANCE;
+        if (instance == null) {
+            instance = new InputDialog();
+        }
+        return instance;
     }
 
     private InputDialog() {
     }
 
     /**
-     * Sets the value of the private context field to the specified.
+     * Sets the context for the dialog.
      *
      * @param context specified context value.
      */
@@ -47,34 +49,41 @@ public class InputDialog {
         this.context = context;
     }
 
-    private static void userInput(final Runnable func) {
-        AlertDialog.Builder aBuilder = new AlertDialog.Builder(context);
+    private void userInput(final Runnable callback) {
+        if (context == null) {
+            throw new IllegalStateException("Context must be set before calling userInput()");
+        }
 
+        AlertDialog.Builder aBuilder = new AlertDialog.Builder(context);
         aBuilder.setTitle("Give a name for area:");
+
         final EditText input = new EditText(context);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         aBuilder.setView(input);
 
-        aBuilder.setPositiveButton("Ok", (dialog, which) -> {
-            alertDialogInputText = input.getText().toString();
-            func.run();
+        aBuilder.setPositiveButton("OK", (dialog, which) -> {
+            alertDialogInputText = input.getText().toString().trim();
+            if (!alertDialogInputText.isEmpty()) {
+                callback.run();
+            }
         });
-        aBuilder.setNegativeButton("Cancel", (dialog, which) -> {
-            dialog.cancel();
-            alertDialogInputText = "";
-        });
+
+        aBuilder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
         aBuilder.show();
     }
 
     /**
-     * Starts alert dialog to set name of the area in Locations view.
+     * Starts an alert dialog to set the name of the area in the Locations view.
      *
      * @param itemPosition position of the item.
      */
-    public static void startAlertDialog(final int itemPosition) {
+    public void startAlertDialog(final int itemPosition) {
         Runnable alertDialogRunnable = () -> {
-            if (!alertDialogInputText.isEmpty()) {
+            if (onDialogTextInputListener != null) {
                 onDialogTextInputListener.onDialogTextInput(itemPosition, alertDialogInputText);
+            } else {
+                throw new IllegalStateException("OnDialogTextInputListener is not set");
             }
         };
         userInput(alertDialogRunnable);
