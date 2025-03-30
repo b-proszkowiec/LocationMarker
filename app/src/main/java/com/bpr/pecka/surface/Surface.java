@@ -23,32 +23,32 @@ public class Surface implements Serializable {
     private static final long serialVersionUID = -5444204010422813540L;
 
     // vars
-    List<LocationPoint> locationPoints;
-    String locationName;
-    int locationPointCounter;
+    List<LocationPoint> pointsList;
+    String name;
+    int totalPoints;
     double areaInSquareMeters;
 
     public Surface(String locationName) {
-        this.locationPoints = new ArrayList<>();
-        this.locationName = locationName;
-        this.locationPointCounter = 0;
+        this.pointsList = new ArrayList<>();
+        this.name = locationName;
+        this.totalPoints = 0;
         this.areaInSquareMeters = -1;
     }
 
     void addPointToSurface(Location location) {
-        locationPoints.add(new LocationPoint(location, locationPointCounter++));
+        pointsList.add(new LocationPoint(location, totalPoints++));
     }
 
-    public List<LocationPoint> getLocationPoints() {
-        return locationPoints;
+    public List<LocationPoint> getPointsList() {
+        return pointsList;
     }
 
     public void setName(String locationName) {
-        this.locationName = locationName;
+        this.name = locationName;
     }
 
     public List<LatLng> convertToLatLngList() {
-        return locationPoints.stream()
+        return pointsList.stream()
                 .map(LocationPoint::getLatLng)
                 .collect(Collectors.toList());
     }
@@ -59,14 +59,13 @@ public class Surface implements Serializable {
     }
 
     public String getName() {
-        return locationName;
+        return name;
     }
 
     public String getArea() {
         return OptionSettings.getInstance().calculateAreaAccordingToSettingUnit(areaInSquareMeters);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public static <T> Predicate<T> distinctByKey(
             Function<? super T, ?> keyExtractor) {
 

@@ -119,7 +119,7 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
-        if (itemList.size() == 0) {
+        if (itemList.isEmpty()) {
             noItemsTextView.setVisibility(View.VISIBLE);
         } else {
             noItemsTextView.setVisibility(View.INVISIBLE);

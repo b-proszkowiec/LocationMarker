@@ -92,7 +92,7 @@ public class MarkersManager implements Comparator<LatLng> {
                     if (lastViewedSurface != null) {
                         try {
                             int id = parseInt(marker.getTitle());
-                            Optional<LocationPoint> locationPoint = lastViewedSurface.getLocationPoints().stream()
+                            Optional<LocationPoint> locationPoint = lastViewedSurface.getPointsList().stream()
                                     .filter(p -> p.getOrderNumber() == id)
                                     .findFirst();
 
@@ -136,7 +136,7 @@ public class MarkersManager implements Comparator<LatLng> {
     public void showSurfaceOnMap(Surface surface) {
         googleMap.clear();
 
-        for (LocationPoint locationPoint : surface.getLocationPoints()) {
+        for (LocationPoint locationPoint : surface.getPointsList()) {
             googleMap.addMarker(new MarkerOptions()
                     .position(locationPoint.getLatLng())
                     .title("" + locationPoint.getOrderNumber())
@@ -241,7 +241,7 @@ public class MarkersManager implements Comparator<LatLng> {
     }
 
     private List<LatLng> getLatLngFromLocation() {
-        return SurfaceManager.getInstance().getWorkingSurface().getLocationPoints().stream()
+        return SurfaceManager.getInstance().getWorkingSurface().getPointsList().stream()
                 .map(LocationPoint::getLatLng)
                 .collect(Collectors.toList());
     }

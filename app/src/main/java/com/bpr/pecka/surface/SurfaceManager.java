@@ -3,15 +3,11 @@ package com.bpr.pecka.surface;
 import android.content.Context;
 import android.location.Location;
 import android.net.Uri;
-import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.annotation.RequiresApi;
-
-import com.bpr.pecka.R;
 import com.bpr.pecka.markers.MarkersManager;
 import com.bpr.pecka.storage.DataStorage;
 import com.bpr.pecka.storage.JsonStorage;
@@ -86,7 +82,7 @@ public class SurfaceManager implements Serializable {
      *
      */
     public void reset() {
-        workingSurface.getLocationPoints().clear();
+        workingSurface.getPointsList().clear();
         refreshView(false, workingSurface);
     }
 
@@ -114,12 +110,11 @@ public class SurfaceManager implements Serializable {
         instance.exportToFile(context, uri, surfaces);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     List<Surface> mergeSurfacesList(List<Surface> targetSurfaces, List<Surface> surfacesToMerge) {
 
         targetSurfaces.addAll(surfacesToMerge);
         return targetSurfaces.stream()
-                .filter(distinctByKey(p -> p.getName()))
+                .filter(distinctByKey(Surface::getName))
                 .collect(Collectors.toList());
     }
 
@@ -166,8 +161,8 @@ public class SurfaceManager implements Serializable {
      */
     public int addPointToWorkingSurface(Location location) {
         setLastViewedSurface(null);
-        if (workingSurface.getLocationPoints().size() > 0) {
-            LocationPoint lastLocation = workingSurface.getLocationPoints().get(workingSurface.getLocationPoints().size() - 1);
+        if (!workingSurface.getPointsList().isEmpty()) {
+            LocationPoint lastLocation = workingSurface.getPointsList().get(workingSurface.getPointsList().size() - 1);
             double distance = MarkersManager.calculateDistanceBetweenLocations(lastLocation.getLocation(), location);
             if (distance < 1) {
                 Toast.makeText(context, String.format("Minimal distance should be at least %.1f m", 1.0), Toast.LENGTH_SHORT).show();
@@ -187,18 +182,18 @@ public class SurfaceManager implements Serializable {
     public void removeMarker(Marker marker) {
         try {
             final int id = parseInt(marker.getTitle());
-            Optional<LocationPoint> markerLocationPoint = workingSurface.getLocationPoints().stream()
+            Optional<LocationPoint> markerLocationPoint = workingSurface.getPointsList().stream()
                     .filter(p -> p.getOrderNumber() == id)
                     .findFirst();
             if(markerLocationPoint.isPresent()) {
-                workingSurface.getLocationPoints().remove(markerLocationPoint.get());
+                workingSurface.getPointsList().remove(markerLocationPoint.get());
                 refreshView(false, workingSurface);
             }
         } catch (NumberFormatException e) {
             Log.e(LOG_TAG, "NumberFormatException occurred while parsing: " + marker.getTitle());
         }
         // add control over button visibility
-        updateBottomLayer(workingSurface.getLocationPoints().size());
+        updateBottomLayer(workingSurface.getPointsList().size());
     }
 
     /**
@@ -214,7 +209,7 @@ public class SurfaceManager implements Serializable {
             MarkersManager.getInstance().drawPolygon(polygonArea, surface.convertToLatLngList());
             surfaceNameButton.setVisibility(View.VISIBLE);
             surfaceNameButton.setText(surface.getName());
-        } else if (surface.getLocationPoints().size() > 1) {
+        } else if (surface.getPointsList().size() > 1) {
             MarkersManager.getInstance().drawPolyline(false);
         }
     }
@@ -272,6 +267,6 @@ public class SurfaceManager implements Serializable {
     }
 
     private int getPointsAmount() {
-        return workingSurface.getLocationPoints().size();
+        return workingSurface.getPointsList().size();
     }
 }
