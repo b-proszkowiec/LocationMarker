@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bpr.pecka.R;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 
 public class FragmentListSingleItemAdapter extends RecyclerView.Adapter<FragmentListSingleItemAdapter.FragmentListSingleItemViewHolder> {
 
-    private ArrayList<FragmentListSingleItem> fragmentListSingleItemList;
+    private final ArrayList<FragmentListSingleItem> fragmentListSingleItemList;
     private OnItemClickListener onItemClickListener;
 
     public interface OnItemClickListener {
@@ -32,8 +33,8 @@ public class FragmentListSingleItemAdapter extends RecyclerView.Adapter<Fragment
     public static class FragmentListSingleItemViewHolder extends RecyclerView.ViewHolder {
 
         public ImageView imageView;
-        public TextView textView1;
-        public TextView textView2;
+        public TextView surfaceNameTextView;
+        public TextView areaTextView;
         public ImageView deleteImage;
         public ImageView editImage;
 
@@ -41,8 +42,8 @@ public class FragmentListSingleItemAdapter extends RecyclerView.Adapter<Fragment
             super(itemView);
 
             imageView = itemView.findViewById(R.id.imageViewFragmentList);
-            textView1 = itemView.findViewById(R.id.textFragmentListView1);
-            textView2 = itemView.findViewById(R.id.textFragmentListView2);
+            surfaceNameTextView = itemView.findViewById(R.id.textFragmentListView1);
+            areaTextView = itemView.findViewById(R.id.textFragmentListView2);
             deleteImage = itemView.findViewById(R.id.delete_item);
             editImage = itemView.findViewById(R.id.edit_item);
 
@@ -78,19 +79,19 @@ public class FragmentListSingleItemAdapter extends RecyclerView.Adapter<Fragment
         fragmentListSingleItemList = fragmentListSingleItemArrayList;
     }
 
+    @NonNull
     @Override
     public FragmentListSingleItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_single_item, parent, false);
-        FragmentListSingleItemViewHolder evh = new FragmentListSingleItemViewHolder(view, onItemClickListener);
-        return evh;
+        return new FragmentListSingleItemViewHolder(view, onItemClickListener);
     }
 
     @Override
     public void onBindViewHolder(FragmentListSingleItemViewHolder holder, int position) {
         FragmentListSingleItem currentItem = fragmentListSingleItemList.get(position);
         holder.imageView.setImageResource(currentItem.getImageResource());
-        holder.textView1.setText(currentItem.getText1());
-        holder.textView2.setText(currentItem.getText2());
+        holder.surfaceNameTextView.setText(currentItem.getName());
+        holder.areaTextView.setText(currentItem.getDescription());
     }
 
     @Override
