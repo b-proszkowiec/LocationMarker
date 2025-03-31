@@ -47,10 +47,6 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         }
     }
 
-    public interface OnLocationItemClickListener {
-        void onLocationItemClickListener(int itemPosition);
-    }
-
     public void setOnLocationItemClickListener(OnLocationItemClickListener listener) {
         onLocationItemClickListener = listener;
     }
@@ -66,13 +62,13 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     @Override
     public void onStart() {
         super.onStart();
-        Button importButton = getActivity().findViewById(R.id.importButton);
+        Button importButton = requireActivity().findViewById(R.id.importButton);
         importButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "Import button clicked");
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.setType("application/json");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
-            this.getActivity().setIntent(intent);
+            requireActivity().setIntent(intent);
             try {
                 this.startActivityForResult(intent, OPEN_FILE);
             } catch (android.content.ActivityNotFoundException ex) {
@@ -80,13 +76,13 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
                         Toast.LENGTH_SHORT).show();
             }
         });
-        Button exportButton = getActivity().findViewById(R.id.exportButton);
+        Button exportButton = requireActivity().findViewById(R.id.exportButton);
         exportButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "Export button clicked");
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("application/json");
-            this.getActivity().setIntent(intent);
+            requireActivity().setIntent(intent);
             try {
                 this.startActivityForResult(intent, WRITE_FILE);
             } catch (android.content.ActivityNotFoundException ex) {
@@ -111,7 +107,7 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         for (Surface surface : surfaces) {
             itemList.add(new FragmentListSingleItem(R.drawable.ic_single_item_graphic, surface.getName(), surface.getArea()));
         }
-        RecyclerView recyclerView = getActivity().findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = requireActivity().findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         adapter = new FragmentListSingleItemAdapter(itemList);
@@ -119,10 +115,8 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
-        if (itemList.isEmpty()) {
-            noItemsTextView.setVisibility(View.VISIBLE);
-        } else {
-            noItemsTextView.setVisibility(View.INVISIBLE);
+        if (noItemsTextView != null) {
+            noItemsTextView.setVisibility(itemList.isEmpty() ? View.VISIBLE : View.INVISIBLE);
         }
     }
 
@@ -152,5 +146,9 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
             refreshItemsView();
         });
         InputDialog.getInstance().startAlertDialog(position);
+    }
+
+    public interface OnLocationItemClickListener {
+        void onLocationItemClickListener(int itemPosition);
     }
 }

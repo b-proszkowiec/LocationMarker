@@ -1,24 +1,27 @@
 package com.bpr.pecka.settings;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class OptionSettings {
     private static final String LOG_TAG = OptionSettings.class.getSimpleName();
-    private static final OptionSettings INSTANCE = new OptionSettings();
+    private static final OptionSettings instance = new OptionSettings();
 
-    // vars
-    private static boolean showPrecisionIconStatus;
-    private static String distanceUnit;
-    private static String areaUnit;
-
-    /**
-     * Gets a OptionSettings using the defaults.
-     *
-     * @return unique instance of OptionSettings.
-     */
-    public static OptionSettings getInstance() {
-        return INSTANCE;
-    }
+    private boolean showPrecisionIconStatus = false;
+    private String distanceUnit = "m";
+    private String areaUnit = "m²";
 
     private OptionSettings() {
+    }
+
+    /**
+     * Gets a unique instance of OptionSettings.
+     *
+     * @return Singleton instance of OptionSettings.
+     */
+    @NonNull
+    public static OptionSettings getInstance() {
+        return instance;
     }
 
     /**
@@ -26,7 +29,7 @@ public class OptionSettings {
      *
      * @return Status of enabling precision icon button.
      */
-    public boolean getShowPrecisionIconStatus() {
+    public boolean isShowPrecisionIconStatus() {
         return showPrecisionIconStatus;
     }
 
@@ -36,58 +39,55 @@ public class OptionSettings {
      * @param showPrecisionIconStatus on/off status of the button.
      */
     public void setShowPrecisionIconStatus(boolean showPrecisionIconStatus) {
-        OptionSettings.showPrecisionIconStatus = showPrecisionIconStatus;
+        this.showPrecisionIconStatus = showPrecisionIconStatus;
     }
 
     /**
-     * Converts distance unit from the meters to the one in preferences.
+     * Converts distance unit from meters to the preferred unit.
      *
      * @param distance distance in meters.
-     * @return Distance by the unit set in preferences.
+     * @return Formatted distance string.
      */
+    @NonNull
     public String calculateDistanceAccordingToSettingUnit(double distance) {
-        String formattedDistance;
+        if (distanceUnit == null) {
+            distanceUnit = "m";
+        }
 
         switch (distanceUnit) {
             case "m":
-                formattedDistance = String.format("%.2f ", distance) + "m";
-                break;
+                return String.format("%.2f m", distance);
             case "km":
-                formattedDistance = String.format("%.3f ", distance / 1000) + "km";
-                break;
+                return String.format("%.3f km", distance / 1000);
             default:
-                formattedDistance = "";
+                return String.format("%.2f ?", distance);
         }
-        return formattedDistance;
     }
 
     /**
-     * Converts area unit from the square meters to the one in preferences.
+     * Converts area unit from square meters to the preferred unit.
      *
      * @param areaInSquareMeters area in square meters.
-     * @return Area by the unit set in preferences.
+     * @return Formatted area string.
      */
+    @NonNull
     public String calculateAreaAccordingToSettingUnit(double areaInSquareMeters) {
-        String formattedArea;
+        if (areaUnit == null) {
+            areaUnit = "m²";
+        }
 
         switch (areaUnit) {
-            case "m\u00B2":        // square meters
-                formattedArea = String.format("%.2f m\u00B2", areaInSquareMeters);
-                break;
+            case "m²":
+                return String.format("%.2f m²", areaInSquareMeters);
             case "ar":
-                formattedArea = String.format("%.2f ar", areaInSquareMeters / 100);
-                break;
+                return String.format("%.2f ar", areaInSquareMeters / 100);
             case "ha":
-                formattedArea = String.format("%.2f ha", areaInSquareMeters / (10*1000));
-                break;
-            case "km\u00B2":
-                formattedArea = String.format("%.2f km\u00B2", areaInSquareMeters / (1000*1000));
-                break;
+                return String.format("%.2f ha", areaInSquareMeters / 10_000);
+            case "km²":
+                return String.format("%.2f km²", areaInSquareMeters / 1_000_000);
             default:
-                formattedArea = "n/a";
-                break;
+                return "n/a";
         }
-        return formattedArea;
     }
 
     /**
@@ -95,8 +95,10 @@ public class OptionSettings {
      *
      * @param distanceUnit distance unit string.
      */
-    public void setDistanceUnit(String distanceUnit) {
-        OptionSettings.distanceUnit = distanceUnit;
+    public void setDistanceUnit(@Nullable String distanceUnit) {
+        if (distanceUnit != null && !distanceUnit.isEmpty()) {
+            this.distanceUnit = distanceUnit;
+        }
     }
 
     /**
@@ -104,7 +106,9 @@ public class OptionSettings {
      *
      * @param areaUnit area unit string.
      */
-    public static void setAreaUnit(String areaUnit) {
-        OptionSettings.areaUnit = areaUnit;
+    public void setAreaUnit(@Nullable String areaUnit) {
+        if (areaUnit != null && !areaUnit.isEmpty()) {
+            this.areaUnit = areaUnit;
+        }
     }
 }

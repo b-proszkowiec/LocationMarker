@@ -23,9 +23,33 @@ public class MainActivity extends AppCompatActivity {
     private final MapFragment mapFragment = new MapFragment();
     private final ItemFragment itemFragment = new ItemFragment();
     private final SettingsFragment settingFragment = new SettingsFragment();
-    private FragmentManager fragmentManager = getSupportFragmentManager();
+    private final FragmentManager fragmentManager = getSupportFragmentManager();
     private Fragment activeFragment = mapFragment;
     private TextView toolbarTextView;
+    private final BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = item -> {
+        int itemId = item.getItemId();
+
+        if (itemId == R.id.mapsFragment) {
+            fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
+            mapFragment.onHiddenChanged(false);
+            toolbarTextView.setText(R.string.app_name);
+            activeFragment = mapFragment;
+            SurfaceManager.getInstance().hideSurfaceButton();
+            return true;
+        } else if (itemId == R.id.itemFragment) {
+            fragmentManager.beginTransaction().hide(activeFragment).show(itemFragment).commit();
+            toolbarTextView.setText(R.string.ic_location_text);
+            activeFragment = itemFragment;
+            return true;
+        } else if (itemId == R.id.settingsFragment) {
+            fragmentManager.beginTransaction().hide(activeFragment).show(settingFragment).commit();
+            toolbarTextView.setText(R.string.ic_settings_text);
+            activeFragment = settingFragment;
+            return true;
+        }
+        return false;
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,32 +62,6 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager.beginTransaction().add(R.id.fragment_container, settingFragment, "3").hide(settingFragment).commit();
         fragmentManager.beginTransaction().add(R.id.fragment_container, itemFragment, "2").hide(itemFragment).commit();
     }
-
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = item -> {
-        switch (item.getItemId()) {
-            case R.id.mapsFragment:
-                fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
-                mapFragment.onHiddenChanged(false);
-                toolbarTextView.setText(R.string.app_name);
-                activeFragment = mapFragment;
-                SurfaceManager.getInstance().hideSurfaceButton();
-                return true;
-
-            case R.id.itemFragment:
-                fragmentManager.beginTransaction().hide(activeFragment).show(itemFragment).commit();
-                toolbarTextView.setText(R.string.ic_location_text);
-                activeFragment = itemFragment;
-                return true;
-
-            case R.id.settingsFragment:
-                fragmentManager.beginTransaction().hide(activeFragment).show(settingFragment).commit();
-                toolbarTextView.setText(R.string.ic_settings_text);
-                activeFragment = settingFragment;
-                return true;
-        }
-        return false;
-    };
 
     @Override
     protected void onStart() {

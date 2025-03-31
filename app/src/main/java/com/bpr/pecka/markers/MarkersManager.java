@@ -1,5 +1,8 @@
 package com.bpr.pecka.markers;
 
+import static com.google.maps.android.SphericalUtil.interpolate;
+import static java.lang.Integer.parseInt;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -11,9 +14,10 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import com.bpr.pecka.DetailsActivity;
@@ -36,30 +40,23 @@ import com.google.maps.android.ui.IconGenerator;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.google.maps.android.SphericalUtil.interpolate;
-import static java.lang.Integer.parseInt;
-
 
 public class MarkersManager implements Comparator<LatLng> {
-    private static final String LOG_TAG = MarkersManager.class.getSimpleName();
-    private static Context context;
-    private static MarkersManager instance;
-    private static GoogleMap googleMap;
-    private static View transparentView;
 
-    // vars
+    private static final String LOG_TAG = MarkersManager.class.getSimpleName();
+    private static MarkersManager instance;
+
+    private final Context context;
+    private GoogleMap googleMap;
     private Polyline polyline;
 
-    /**
-     * Sets the value of the private context field to the specified.
-     *
-     * @param context specified context value
-     */
-    public static void setContext(Context context) {
-        MarkersManager.context = context;
+
+    private MarkersManager(@NonNull Context context) {
+        this.context = context;
     }
 
     /**
@@ -67,17 +64,48 @@ public class MarkersManager implements Comparator<LatLng> {
      *
      * @return unique instance of MarkersManager.
      */
-    public static MarkersManager getInstance() {
+    public static synchronized MarkersManager getInstance(@NonNull Context context) {
         if (instance == null) {
-            return new MarkersManager();
+            instance = new MarkersManager(context);
         }
         return instance;
     }
 
-    private MarkersManager() {
-        RelativeLayout mMapViewRoot = ((Activity) context).findViewById(R.id.marker_layout);
-        transparentView = View.inflate(context, R.layout.transparent_layout, mMapViewRoot);
-        instance = this;
+    /**
+     * Measures distance between two locations in meters.
+     *
+     * @param locStart start location
+     * @param locEnd   end location
+     * @return Distance in Meters
+     */
+    public static double calculateDistanceBetweenLocations(Location locStart, Location locEnd) {
+
+        return distance(locStart.getLatitude(), locEnd.getLatitude(),
+                locStart.getLongitude(), locEnd.getLongitude(), 0, 0);
+    }
+
+    /**
+     * Calculate distance between two points in latitude and longitude taking
+     * into account height difference. If you are not interested in height
+     * difference pass 0.0. Uses Haversine method as its base.
+     * <p>
+     * lat1, lon1 Start point lat2, lon2 End point el1 Start altitude in meters
+     * el2 End altitude in meters
+     *
+     * @return Distance in Meters
+     */
+    public static double distance(double lat1, double lat2, double lon1,
+                                  double lon2, double el1, double el2) {
+        final int R = 6371; // Radius of the earth
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c * 1000; // convert to meters
+        distance = Math.pow(distance, 2) + Math.pow(el1 - el2, 2);
+        return Math.sqrt(distance);
     }
 
     /**
@@ -85,48 +113,57 @@ public class MarkersManager implements Comparator<LatLng> {
      *
      * @param gMap specified GoogleMap value.
      */
-    public static void setGoogleMap(GoogleMap gMap) {
+    public void setGoogleMap(GoogleMap gMap) {
         googleMap = gMap;
         googleMap.setOnMarkerClickListener(marker -> {
-                    Surface lastViewedSurface = SurfaceManager.getInstance().getLastViewedSurface();
-                    if (lastViewedSurface != null) {
-                        try {
-                            int id = parseInt(marker.getTitle());
-                            Optional<LocationPoint> locationPoint = lastViewedSurface.getPointsList().stream()
-                                    .filter(p -> p.getOrderNumber() == id)
-                                    .findFirst();
+            Surface lastViewedSurface = SurfaceManager.getInstance().getLastViewedSurface();
+            if (lastViewedSurface != null) {
+                try {
+                    int id = parseInt(marker.getTitle());
+                    Optional<LocationPoint> locationPoint = lastViewedSurface.getPointsList().stream()
+                            .filter(p -> p.getOrderNumber() == id)
+                            .findFirst();
 
-                            if (locationPoint.isPresent()) {
-                                showDetailsLayout(locationPoint.get());
-                                return true;
-                            }
-                            Log.e(LOG_TAG, "Unable to recognized LocationPoint object of selected marker!");
-                        } catch (NumberFormatException e) {
-                            Log.e(LOG_TAG, "NumberFormatException occurred while parsing: " + marker.getTitle());
-                        }
-                        return false;
-                    } else {
-                        Projection projection = googleMap.getProjection();
-                        LatLng markerLocation = marker.getPosition();
-                        Point screenPosition = projection.toScreenLocation(markerLocation);
-                        transparentView.setTranslationX(screenPosition.x);
-                        transparentView.setTranslationY(screenPosition.y);
-
-                        PopupMenu popupMenu = new PopupMenu(context, transparentView);
-                        popupMenu.setOnMenuItemClickListener(item -> {
-                            if (item.getTitle().equals(context.getString(R.string.marker_delete_popup))) {
-                                SurfaceManager.getInstance().removeMarker(marker);
-                            }
-                            return false;
-                        });
-
-                        popupMenu.inflate(R.menu.marker_popup_menu);
-                        popupMenu.show();
+                    if (locationPoint.isPresent()) {
+                        showDetailsLayout(locationPoint.get());
                         return true;
                     }
+                    Log.e(LOG_TAG, "Unable to recognize LocationPoint object of selected marker!");
+                } catch (NumberFormatException e) {
+                    Log.e(LOG_TAG, "NumberFormatException occurred while parsing: " + marker.getTitle());
                 }
-        );
+                return false;
+            } else {
+                Projection projection = googleMap.getProjection();
+                LatLng markerLocation = marker.getPosition();
+                Point screenPosition = projection.toScreenLocation(markerLocation);
+
+                Activity activity = (Activity) this.context;
+                ViewGroup rootView = activity.findViewById(android.R.id.content);
+
+                View transparentView = new View(this.context);
+                transparentView.setLayoutParams(new ViewGroup.LayoutParams(1, 1));
+                transparentView.setX(screenPosition.x);
+                transparentView.setY(screenPosition.y);
+                rootView.addView(transparentView);
+
+                PopupMenu popupMenu = new PopupMenu(this.context, transparentView);
+                popupMenu.setOnMenuItemClickListener(item -> {
+                    if (Objects.equals(item.getTitle(), this.context.getString(R.string.marker_delete_popup))) {
+                        SurfaceManager.getInstance().removeMarker(marker);
+                    }
+                    return false;
+                });
+
+                popupMenu.inflate(R.menu.marker_popup_menu);
+                popupMenu.show();
+                popupMenu.setOnDismissListener(menu -> rootView.removeView(transparentView));
+
+                return true;
+            }
+        });
     }
+
 
     /**
      * Show given surface on the map based on location points on its edges.
@@ -148,49 +185,12 @@ public class MarkersManager implements Comparator<LatLng> {
 
     private BitmapDescriptor BitmapFromVector(int vectorResId) {
         Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        assert vectorDrawable != null;
         vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }
-
-    /**
-     * Measures distance between two locations in meters.
-     *
-     * @param locStart start location
-     * @param locEnd   end location
-     * @return Distance in Meters
-     */
-    public static double calculateDistanceBetweenLocations(Location locStart, Location locEnd) {
-        double distance = distance(locStart.getLatitude(), locEnd.getLatitude(),
-                locStart.getLongitude(), locEnd.getLongitude(), 0, 0);
-
-        return distance;
-    }
-
-    /**
-     * Calculate distance between two points in latitude and longitude taking
-     * into account height difference. If you are not interested in height
-     * difference pass 0.0. Uses Haversine method as its base.
-     * <p>
-     * lat1, lon1 Start point lat2, lon2 End point el1 Start altitude in meters
-     * el2 End altitude in meters
-     *
-     * @returns Distance in Meters
-     */
-    public static double distance(double lat1, double lat2, double lon1,
-                                  double lon2, double el1, double el2) {
-        final int R = 6371; // Radius of the earth
-        double latDistance = Math.toRadians(lat2 - lat1);
-        double lonDistance = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = R * c * 1000; // convert to meters
-        distance = Math.pow(distance, 2) + Math.pow(el1 - el2, 2);
-        return Math.sqrt(distance);
     }
 
     public int compare(LatLng o1, LatLng o2) {
@@ -246,7 +246,7 @@ public class MarkersManager implements Comparator<LatLng> {
                 .collect(Collectors.toList());
     }
 
-    private static void showDetailsLayout(LocationPoint locationPoint) {
+    private void showDetailsLayout(LocationPoint locationPoint) {
         Intent intent = new Intent(context, DetailsActivity.class);
         intent.putExtra("LocationPoint", locationPoint);
         context.startActivity(intent);

@@ -25,6 +25,34 @@ public class JsonStorage extends Activity {
     private static final String LOG_TAG = JsonStorage.class.getSimpleName();
 
     /**
+     * Import surfaces from a selected file.
+     *
+     * @param context Specified context value.
+     * @param uri     Represents a Uniform Resource Identifier (URI) reference.
+     * @return List of surfaces stored in a file.
+     */
+    public static List<Surface> importFromFile(Context context, Uri uri) {
+        try (InputStream inputStream = context.getContentResolver().openInputStream(uri)) {
+            if (inputStream == null) {
+                Log.e(LOG_TAG, "Failed to open input stream for URI: " + uri);
+                return new ArrayList<>();
+            }
+
+            String fileContent = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+                    .lines()
+                    .collect(Collectors.joining("\n"));
+
+            Type surfaceListType = new TypeToken<ArrayList<Surface>>() {
+            }.getType();
+            return new Gson().fromJson(fileContent, surfaceListType);
+
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error importing data from file: " + uri, e);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
      * Export surfaces to a selected file on the disk as a JSON.
      *
      * @param context  Specified context value.
@@ -44,32 +72,5 @@ public class JsonStorage extends Activity {
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error exporting data to file: " + uri, e);
         }
-    }
-
-    /**
-     * Import surfaces from a selected file.
-     *
-     * @param context Specified context value.
-     * @param uri     Represents a Uniform Resource Identifier (URI) reference.
-     * @return List of surfaces stored in a file.
-     */
-    public static List<Surface> importFromFile(Context context, Uri uri) {
-        try (InputStream inputStream = context.getContentResolver().openInputStream(uri)) {
-            if (inputStream == null) {
-                Log.e(LOG_TAG, "Failed to open input stream for URI: " + uri);
-                return new ArrayList<>();
-            }
-
-            String fileContent = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
-                    .lines()
-                    .collect(Collectors.joining("\n"));
-
-            Type surfaceListType = new TypeToken<ArrayList<Surface>>() {}.getType();
-            return new Gson().fromJson(fileContent, surfaceListType);
-
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error importing data from file: " + uri, e);
-        }
-        return new ArrayList<>();
     }
 }

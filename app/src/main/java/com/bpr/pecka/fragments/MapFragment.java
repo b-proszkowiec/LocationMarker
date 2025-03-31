@@ -1,7 +1,13 @@
 package com.bpr.pecka.fragments;
 
+import static android.content.Context.LOCATION_SERVICE;
+import static com.bpr.pecka.constants.LocationMarkerConstants.DEFAULT_ZOOM;
+import static com.bpr.pecka.constants.LocationMarkerConstants.INIT_LOCATION_LAT;
+import static com.bpr.pecka.constants.LocationMarkerConstants.INIT_LOCATION_LON;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -43,11 +49,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import static android.content.Context.LOCATION_SERVICE;
-import static com.bpr.pecka.constants.LocationMarkerConstants.DEFAULT_ZOOM;
-import static com.bpr.pecka.constants.LocationMarkerConstants.INIT_LOCATION_LAT;
-import static com.bpr.pecka.constants.LocationMarkerConstants.INIT_LOCATION_LON;
-
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
     private static final String LOG_TAG = MapFragment.class.getSimpleName();
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -58,13 +59,30 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     private static Location mLastLocation = null;
     private static GoogleMap googleMap;
-    private FusedLocationProviderClient fusedLocationClient;
-
     private static LinearLayout addPointLayer, saveLayer;
     private static Button addPointButton;
     private static Button stopAddingButton;
+    private FusedLocationProviderClient fusedLocationClient;
     private GpsPrecisionIconController gpsPrecisionIconController;
     private Marker tempPositionMarker;
+
+    /**
+     * Move bottom layer into adding points mode.
+     * If total amounts of points is equal or grater than 3, show also 'END' button
+     * to let the user to break and save working surface.
+     *
+     * @param markerAmount total amount of already added points.
+     */
+    public static void updateBottomLayer(int markerAmount) {
+        addPointLayer.setVisibility(View.VISIBLE);
+        saveLayer.setVisibility(View.INVISIBLE);
+        addPointButton.setVisibility(View.VISIBLE);
+        stopAddingButton.setVisibility(View.VISIBLE);
+
+        if (markerAmount < 3) {
+            stopAddingButton.setVisibility(View.INVISIBLE);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -85,7 +103,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         }
     }
 
-
     @SuppressLint("DefaultLocale")
     @Override
     public void onLocationChanged(Location location) {
@@ -105,18 +122,13 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
+    public void onProviderEnabled(@NonNull String provider) {
+        Toast.makeText(getContext(), "GPS has been enabled!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
+    public void onProviderDisabled(@NonNull String provider) {
+        Toast.makeText(getContext(), "GPS has been disabled!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -132,7 +144,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         Toast.makeText(getContext(), "Map is ready", Toast.LENGTH_SHORT).show();
 
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -149,9 +162,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             mLastLocation = location;
         });
         googleMap.setMyLocationEnabled(true);
-        MarkersManager.setContext(getContext());
-        MarkersManager.getInstance().setGoogleMap(googleMap);
-        LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
+        MarkersManager.getInstance(requireContext()).setGoogleMap(googleMap);
+        LocationManager locationManager = (LocationManager) requireContext().getSystemService(LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 0, this);
 
         UiSettings uiSettings = googleMap.getUiSettings();
@@ -163,13 +175,13 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private boolean areGrantedPermission() {
         String[] permissions = {FINE_LOCATION, COURSE_LOCATION, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE};
 
-        if (ContextCompat.checkSelfPermission(this.getContext(),
+        if (ContextCompat.checkSelfPermission(requireContext(),
                 FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            if (ContextCompat.checkSelfPermission(getContext(),
+            if (ContextCompat.checkSelfPermission(requireContext(),
                     COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                if (ContextCompat.checkSelfPermission(this.getContext(),
+                if (ContextCompat.checkSelfPermission(requireContext(),
                         WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    if (ContextCompat.checkSelfPermission(this.getContext(),
+                    if (ContextCompat.checkSelfPermission(requireContext(),
                             READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                         return true;
                     }
@@ -184,14 +196,12 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
         if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0) {
-                for (int grantResult : grantResults) {
-                    if (grantResult != PackageManager.PERMISSION_GRANTED) {
-                        requestPermissions(permissions, PERMISSION_REQUEST_CODE);
-                        return;
-                    }
-                    initMap();
+            for (int grantResult : grantResults) {
+                if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(permissions, PERMISSION_REQUEST_CODE);
+                    return;
                 }
+                initMap();
             }
         }
     }
@@ -210,7 +220,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     /**
      * Stop adding points to a working surface.
-     *
      */
     public void finish() {
         if (mLastLocation == null) {
@@ -222,7 +231,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     /**
      * Reset bottom layer to initial values.
      * This will make only 'ADD POINT' button visible.
-     *
      */
     public void resetBottomLayer() {
         addPointLayer.setVisibility(View.VISIBLE);
@@ -230,24 +238,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         addPointButton.setVisibility(View.VISIBLE);
         stopAddingButton.setVisibility(View.INVISIBLE);
-    }
-
-    /**
-     * Move bottom layer into adding points mode.
-     * If total amounts of points is equal or grater than 3, show also 'END' button
-     * to let the user to break and save working surface.
-     *
-     * @param markerAmount total amount of already added points.
-     */
-    public static void updateBottomLayer(int markerAmount) {
-        addPointLayer.setVisibility(View.VISIBLE);
-        saveLayer.setVisibility(View.INVISIBLE);
-        addPointButton.setVisibility(View.VISIBLE);
-        stopAddingButton.setVisibility(View.VISIBLE);
-
-        if(markerAmount < 3) {
-            stopAddingButton.setVisibility(View.INVISIBLE);
-        }
     }
 
     /**
@@ -264,7 +254,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     private boolean isServicesOK() {
         Log.d(LOG_TAG, "isServicesOK: Checking google services version");
-        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getContext());
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(requireContext());
 
         if (available == ConnectionResult.SUCCESS) {
             // everything is fine and user can make map requests
@@ -281,14 +271,13 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     /**
      * Initializes map. This should be done after grant proper permissions.
-     *
      */
     public void initMap() {
         // initialize map fragment
         SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map_fragment);
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         fusedLocationClient.getLastLocation()
@@ -300,6 +289,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                         turnOnLocationAlert();
                     }
                 });
+        assert supportMapFragment != null;
         supportMapFragment.getMapAsync(this);
     }
 
@@ -309,23 +299,24 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         alertDialog.setMessage("Localization is not enabled. Do you want to go to settings menu?");
         alertDialog.setPositiveButton("Settings", (dialog, which) -> {
             Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            getContext().startActivity(intent);
+            requireContext().startActivity(intent);
         });
         alertDialog.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         alertDialog.show();
     }
 
     private void initMapLayer() {
+        Activity activity = requireActivity();
         // initialize custom buttons and layers
-        addPointLayer = getActivity().findViewById(R.id.addPointEndLayer);
-        saveLayer = getActivity().findViewById(R.id.saveResetLayer);
+        addPointLayer = activity.findViewById(R.id.addPointEndLayer);
+        saveLayer = activity.findViewById(R.id.saveResetLayer);
 
-        addPointButton = getActivity().findViewById(R.id.addPointButton);
-        stopAddingButton = getActivity().findViewById(R.id.stopAddingButton);
-        Button saveButton = getActivity().findViewById(R.id.saveButton);
-        Button resetButton = getActivity().findViewById(R.id.resetButton);
-        gpsPrecisionIconController = new GpsPrecisionIconController(getActivity());
-        SurfaceManager.getInstance().setSurfaceNameButton(getActivity().findViewById(R.id.surfaceNameButton));
+        addPointButton = activity.findViewById(R.id.addPointButton);
+        stopAddingButton = activity.findViewById(R.id.stopAddingButton);
+        Button saveButton = activity.findViewById(R.id.saveButton);
+        Button resetButton = activity.findViewById(R.id.resetButton);
+        gpsPrecisionIconController = new GpsPrecisionIconController(activity);
+        SurfaceManager.getInstance().setSurfaceNameButton(activity.findViewById(R.id.surfaceNameButton));
         resetBottomLayer();
 
 

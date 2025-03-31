@@ -12,17 +12,7 @@ public class InputDialog {
 
     private OnDialogTextInputListener onDialogTextInputListener;
 
-    public interface OnDialogTextInputListener {
-        void onDialogTextInput(int pos, String text);
-    }
-
-    /**
-     * Register listener for the OnDialogTextInputListener.
-     *
-     * @param listener listener to register.
-     */
-    public void setOnDialogTextInputListener(OnDialogTextInputListener listener) {
-        this.onDialogTextInputListener = listener;
+    private InputDialog() {
     }
 
     /**
@@ -37,7 +27,13 @@ public class InputDialog {
         return instance;
     }
 
-    private InputDialog() {
+    /**
+     * Register listener for the OnDialogTextInputListener.
+     *
+     * @param listener listener to register.
+     */
+    public void setOnDialogTextInputListener(OnDialogTextInputListener listener) {
+        this.onDialogTextInputListener = listener;
     }
 
     /**
@@ -87,5 +83,9 @@ public class InputDialog {
             }
         };
         userInput(alertDialogRunnable);
+    }
+
+    public interface OnDialogTextInputListener {
+        void onDialogTextInput(int pos, String text);
     }
 }

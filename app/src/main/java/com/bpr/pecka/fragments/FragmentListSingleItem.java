@@ -1,25 +1,25 @@
 package com.bpr.pecka.fragments;
 
 public class FragmentListSingleItem {
-    private int imageResource;
-    private String text1;
-    private String text2;
+    private final int imageResource;
+    private final String name;
+    private final String description;
 
     public FragmentListSingleItem(int mImageResource, String text1, String text2) {
         this.imageResource = mImageResource;
-        this.text1 = text1;
-        this.text2 = text2;
+        this.name = text1;
+        this.description = text2;
     }
 
     public int getImageResource() {
         return imageResource;
     }
 
-    public String getText1() {
-        return text1;
+    public String getName() {
+        return name;
     }
 
-    public String getText2() {
-        return text2;
+    public String getDescription() {
+        return description;
     }
 }
