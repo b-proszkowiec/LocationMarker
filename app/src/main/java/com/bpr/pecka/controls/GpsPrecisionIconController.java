@@ -24,12 +24,9 @@ public class GpsPrecisionIconController implements IPrecisionIconVisible {
     private static final String LOG_TAG = GpsPrecisionIconController.class.getSimpleName();
     private static final float SCALE_FACTOR = 0.7f;
     private static final int EVENT = 104;
-
-    private boolean isTimesUp;
-    private float startScale = 1;
     private final Button precisionButton;
     private final View precisionLayout;
-
+    private boolean isTimesUp;
     @SuppressLint("HandlerLeak")
     private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -47,6 +44,7 @@ public class GpsPrecisionIconController implements IPrecisionIconVisible {
             }
         }
     };
+    private float startScale = 1;
 
     /**
      * Constructor of GpsPrecisionIconController.

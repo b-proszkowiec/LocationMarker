@@ -1,5 +1,8 @@
 package com.bpr.pecka.markers;
 
+import static com.google.maps.android.SphericalUtil.interpolate;
+import static java.lang.Integer.parseInt;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -40,9 +43,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static com.google.maps.android.SphericalUtil.interpolate;
-import static java.lang.Integer.parseInt;
 
 
 public class MarkersManager implements Comparator<LatLng> {

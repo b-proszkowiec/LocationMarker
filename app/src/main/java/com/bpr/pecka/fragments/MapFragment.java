@@ -1,5 +1,10 @@
 package com.bpr.pecka.fragments;
 
+import static android.content.Context.LOCATION_SERVICE;
+import static com.bpr.pecka.constants.LocationMarkerConstants.DEFAULT_ZOOM;
+import static com.bpr.pecka.constants.LocationMarkerConstants.INIT_LOCATION_LAT;
+import static com.bpr.pecka.constants.LocationMarkerConstants.INIT_LOCATION_LON;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -44,11 +49,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import static android.content.Context.LOCATION_SERVICE;
-import static com.bpr.pecka.constants.LocationMarkerConstants.DEFAULT_ZOOM;
-import static com.bpr.pecka.constants.LocationMarkerConstants.INIT_LOCATION_LAT;
-import static com.bpr.pecka.constants.LocationMarkerConstants.INIT_LOCATION_LON;
-
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
     private static final String LOG_TAG = MapFragment.class.getSimpleName();
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -59,13 +59,30 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     private static Location mLastLocation = null;
     private static GoogleMap googleMap;
-    private FusedLocationProviderClient fusedLocationClient;
-
     private static LinearLayout addPointLayer, saveLayer;
     private static Button addPointButton;
     private static Button stopAddingButton;
+    private FusedLocationProviderClient fusedLocationClient;
     private GpsPrecisionIconController gpsPrecisionIconController;
     private Marker tempPositionMarker;
+
+    /**
+     * Move bottom layer into adding points mode.
+     * If total amounts of points is equal or grater than 3, show also 'END' button
+     * to let the user to break and save working surface.
+     *
+     * @param markerAmount total amount of already added points.
+     */
+    public static void updateBottomLayer(int markerAmount) {
+        addPointLayer.setVisibility(View.VISIBLE);
+        saveLayer.setVisibility(View.INVISIBLE);
+        addPointButton.setVisibility(View.VISIBLE);
+        stopAddingButton.setVisibility(View.VISIBLE);
+
+        if (markerAmount < 3) {
+            stopAddingButton.setVisibility(View.INVISIBLE);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -85,7 +102,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             SurfaceManager.getInstance().reset();
         }
     }
-
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -128,7 +144,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         Toast.makeText(getContext(), "Map is ready", Toast.LENGTH_SHORT).show();
 
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -203,7 +220,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     /**
      * Stop adding points to a working surface.
-     *
      */
     public void finish() {
         if (mLastLocation == null) {
@@ -215,7 +231,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     /**
      * Reset bottom layer to initial values.
      * This will make only 'ADD POINT' button visible.
-     *
      */
     public void resetBottomLayer() {
         addPointLayer.setVisibility(View.VISIBLE);
@@ -223,24 +238,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         addPointButton.setVisibility(View.VISIBLE);
         stopAddingButton.setVisibility(View.INVISIBLE);
-    }
-
-    /**
-     * Move bottom layer into adding points mode.
-     * If total amounts of points is equal or grater than 3, show also 'END' button
-     * to let the user to break and save working surface.
-     *
-     * @param markerAmount total amount of already added points.
-     */
-    public static void updateBottomLayer(int markerAmount) {
-        addPointLayer.setVisibility(View.VISIBLE);
-        saveLayer.setVisibility(View.INVISIBLE);
-        addPointButton.setVisibility(View.VISIBLE);
-        stopAddingButton.setVisibility(View.VISIBLE);
-
-        if(markerAmount < 3) {
-            stopAddingButton.setVisibility(View.INVISIBLE);
-        }
     }
 
     /**
@@ -274,7 +271,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     /**
      * Initializes map. This should be done after grant proper permissions.
-     *
      */
     public void initMap() {
         // initialize map fragment

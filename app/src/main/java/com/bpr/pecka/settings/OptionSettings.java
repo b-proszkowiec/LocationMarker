@@ -11,6 +11,9 @@ public class OptionSettings {
     private String distanceUnit = "m";
     private String areaUnit = "m²";
 
+    private OptionSettings() {
+    }
+
     /**
      * Gets a unique instance of OptionSettings.
      *
@@ -19,9 +22,6 @@ public class OptionSettings {
     @NonNull
     public static OptionSettings getInstance() {
         return instance;
-    }
-
-    private OptionSettings() {
     }
 
     /**

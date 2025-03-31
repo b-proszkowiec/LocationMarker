@@ -47,10 +47,6 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         }
     }
 
-    public interface OnLocationItemClickListener {
-        void onLocationItemClickListener(int itemPosition);
-    }
-
     public void setOnLocationItemClickListener(OnLocationItemClickListener listener) {
         onLocationItemClickListener = listener;
     }
@@ -150,5 +146,9 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
             refreshItemsView();
         });
         InputDialog.getInstance().startAlertDialog(position);
+    }
+
+    public interface OnLocationItemClickListener {
+        void onLocationItemClickListener(int itemPosition);
     }
 }

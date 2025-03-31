@@ -18,16 +18,40 @@ public class FragmentListSingleItemAdapter extends RecyclerView.Adapter<Fragment
     private final ArrayList<FragmentListSingleItem> fragmentListSingleItemList;
     private OnItemClickListener onItemClickListener;
 
+    public FragmentListSingleItemAdapter(ArrayList<FragmentListSingleItem> fragmentListSingleItemArrayList) {
+        fragmentListSingleItemList = fragmentListSingleItemArrayList;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        onItemClickListener = listener;
+    }
+
+    @NonNull
+    @Override
+    public FragmentListSingleItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_single_item, parent, false);
+        return new FragmentListSingleItemViewHolder(view, onItemClickListener);
+    }
+
+    @Override
+    public void onBindViewHolder(FragmentListSingleItemViewHolder holder, int position) {
+        FragmentListSingleItem currentItem = fragmentListSingleItemList.get(position);
+        holder.imageView.setImageResource(currentItem.getImageResource());
+        holder.surfaceNameTextView.setText(currentItem.getName());
+        holder.areaTextView.setText(currentItem.getDescription());
+    }
+
+    @Override
+    public int getItemCount() {
+        return fragmentListSingleItemList.size();
+    }
+
     public interface OnItemClickListener {
         void onItemClick(int position);
 
         void onDeleteClick(int position);
 
         void onEditClick(int position);
-    }
-
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        onItemClickListener = listener;
     }
 
     public static class FragmentListSingleItemViewHolder extends RecyclerView.ViewHolder {
@@ -73,29 +97,5 @@ public class FragmentListSingleItemAdapter extends RecyclerView.Adapter<Fragment
                 }
             });
         }
-    }
-
-    public FragmentListSingleItemAdapter(ArrayList<FragmentListSingleItem> fragmentListSingleItemArrayList) {
-        fragmentListSingleItemList = fragmentListSingleItemArrayList;
-    }
-
-    @NonNull
-    @Override
-    public FragmentListSingleItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_single_item, parent, false);
-        return new FragmentListSingleItemViewHolder(view, onItemClickListener);
-    }
-
-    @Override
-    public void onBindViewHolder(FragmentListSingleItemViewHolder holder, int position) {
-        FragmentListSingleItem currentItem = fragmentListSingleItemList.get(position);
-        holder.imageView.setImageResource(currentItem.getImageResource());
-        holder.surfaceNameTextView.setText(currentItem.getName());
-        holder.areaTextView.setText(currentItem.getDescription());
-    }
-
-    @Override
-    public int getItemCount() {
-        return fragmentListSingleItemList.size();
     }
 }
