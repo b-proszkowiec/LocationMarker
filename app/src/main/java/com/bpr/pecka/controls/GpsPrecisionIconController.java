@@ -58,7 +58,7 @@ public class GpsPrecisionIconController implements IPrecisionIconVisible {
         this.precisionLayout = activity.findViewById(R.id.precisionLayout);
         this.isTimesUp = true;
         SettingsFragment.registerListener(this);
-        setPrecisionLayoutVisible(OptionSettings.getInstance().getShowPrecisionIconStatus());
+        setPrecisionLayoutVisible(OptionSettings.getInstance().isShowPrecisionIconStatus());
     }
 
     private float getScaleValue(float accuracy) {
