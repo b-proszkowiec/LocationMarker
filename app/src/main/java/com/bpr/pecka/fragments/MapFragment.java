@@ -145,9 +145,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             mLastLocation = location;
         });
         googleMap.setMyLocationEnabled(true);
-        MarkersManager.setContext(getContext());
-        MarkersManager.getInstance().setGoogleMap(googleMap);
-        LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
+        MarkersManager.getInstance(requireContext()).setGoogleMap(googleMap);
+        LocationManager locationManager = (LocationManager) requireContext().getSystemService(LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 0, this);
 
         UiSettings uiSettings = googleMap.getUiSettings();
@@ -294,6 +293,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                         turnOnLocationAlert();
                     }
                 });
+        assert supportMapFragment != null;
         supportMapFragment.getMapAsync(this);
     }
 

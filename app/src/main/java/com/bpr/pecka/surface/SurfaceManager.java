@@ -203,14 +203,14 @@ public class SurfaceManager implements Serializable {
      * @param surface current surface.
      */
     public void refreshView(boolean isAddingProcessFinished, Surface surface) {
-        MarkersManager.getInstance().showSurfaceOnMap(surface);
+        MarkersManager.getInstance(context).showSurfaceOnMap(surface);
         if (isAddingProcessFinished) {
             double polygonArea = surface.computeArea();
-            MarkersManager.getInstance().drawPolygon(polygonArea, surface.convertToLatLngList());
+            MarkersManager.getInstance(context).drawPolygon(polygonArea, surface.convertToLatLngList());
             surfaceNameButton.setVisibility(View.VISIBLE);
             surfaceNameButton.setText(surface.getName());
         } else if (surface.getPointsList().size() > 1) {
-            MarkersManager.getInstance().drawPolyline(false);
+            MarkersManager.getInstance(context).drawPolyline(false);
         }
     }
 
