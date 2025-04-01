@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
             = item -> {
         int itemId = item.getItemId();
 
-        if (itemId == R.id.mapsFragment) {
+        if (itemId == R.id.mapFragment) {
             fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
             mapFragment.onHiddenChanged(false);
             toolbarTextView.setText(R.string.app_name);
@@ -55,10 +55,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        SurfaceManager.getInstance().addMapMarkerListener(mapFragment);
         toolbarTextView = this.findViewById(R.id.toolbar_textView);
         BottomNavigationView navigation = findViewById(R.id.bottom_navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        fragmentManager.beginTransaction().add(R.id.fragment_container, mapFragment, "1").commit();
         fragmentManager.beginTransaction().add(R.id.fragment_container, settingFragment, "3").hide(settingFragment).commit();
         fragmentManager.beginTransaction().add(R.id.fragment_container, itemFragment, "2").hide(itemFragment).commit();
     }

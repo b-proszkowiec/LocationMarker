@@ -32,6 +32,7 @@ import androidx.fragment.app.Fragment;
 import com.bpr.pecka.R;
 import com.bpr.pecka.controls.GpsPrecisionIconController;
 import com.bpr.pecka.dialog.InputDialog;
+import com.bpr.pecka.event.IMapMarker;
 import com.bpr.pecka.markers.MarkersManager;
 import com.bpr.pecka.surface.Surface;
 import com.bpr.pecka.surface.SurfaceManager;
@@ -49,7 +50,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
+public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback, IMapMarker {
     private static final String LOG_TAG = MapFragment.class.getSimpleName();
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -59,9 +60,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     private static Location mLastLocation = null;
     private static GoogleMap googleMap;
-    private static LinearLayout addPointLayer, saveLayer;
-    private static Button addPointButton;
-    private static Button stopAddingButton;
+    private LinearLayout addPointLayer, saveLayer;
+    private Button addPointButton;
+    private Button stopAddingButton;
     private FusedLocationProviderClient fusedLocationClient;
     private GpsPrecisionIconController gpsPrecisionIconController;
     private Marker tempPositionMarker;
@@ -71,15 +72,15 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
      * If total amounts of points is equal or grater than 3, show also 'END' button
      * to let the user to break and save working surface.
      *
-     * @param markerAmount total amount of already added points.
+     * @param markers total amount of already added points.
      */
-    public static void updateBottomLayer(int markerAmount) {
+    public void updateBottomLayer(int markers) {
         addPointLayer.setVisibility(View.VISIBLE);
         saveLayer.setVisibility(View.INVISIBLE);
         addPointButton.setVisibility(View.VISIBLE);
         stopAddingButton.setVisibility(View.VISIBLE);
 
-        if (markerAmount < 3) {
+        if (markers < 3) {
             stopAddingButton.setVisibility(View.INVISIBLE);
         }
     }
@@ -348,5 +349,10 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             int itemPosition = SurfaceManager.getInstance().getSurfaces().size();
             InputDialog.getInstance().startAlertDialog(itemPosition);
         });
+    }
+
+    @Override
+    public void onLocationMarkerDelete(int markers) {
+        updateBottomLayer(markers);
     }
 }

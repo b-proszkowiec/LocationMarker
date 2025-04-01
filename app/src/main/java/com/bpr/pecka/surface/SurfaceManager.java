@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.bpr.pecka.event.IMapMarker;
 import com.bpr.pecka.markers.MarkersManager;
 import com.bpr.pecka.storage.DataStorage;
 import com.bpr.pecka.storage.JsonStorage;
@@ -21,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.bpr.pecka.fragments.MapFragment.updateBottomLayer;
 import static com.bpr.pecka.surface.Surface.distinctByKey;
 import static java.lang.Integer.parseInt;
 
@@ -36,6 +36,7 @@ public class SurfaceManager implements Serializable {
     private Surface lastViewedSurface;
     private Surface workingSurface = new Surface(TEMP_NAME);
     private List<Surface> surfaces = new ArrayList<>();
+    private IMapMarker mapMarkerListener;
 
     private Button surfaceNameButton;
 
@@ -110,6 +111,10 @@ public class SurfaceManager implements Serializable {
         instance.exportToFile(context, uri, surfaces);
     }
 
+    public void addMapMarkerListener(IMapMarker mapMarkerFragment) {
+        mapMarkerListener = mapMarkerFragment;
+    }
+
     List<Surface> mergeSurfacesList(List<Surface> targetSurfaces, List<Surface> surfacesToMerge) {
 
         targetSurfaces.addAll(surfacesToMerge);
@@ -135,7 +140,6 @@ public class SurfaceManager implements Serializable {
     /**
      * Update surfaces in a temporary file.
      * This will prevent loss of data after application restart.
-     *
      */
     public void updateSurfaces() {
         DataStorage.getInstance().saveData(context, surfaces);
@@ -180,9 +184,10 @@ public class SurfaceManager implements Serializable {
      * @param marker marker to remove.
      */
     public void removeMarker(Marker marker) {
+        List<LocationPoint> locationPoints = workingSurface.getPointsList();
         try {
             final int id = parseInt(marker.getTitle());
-            Optional<LocationPoint> markerLocationPoint = workingSurface.getPointsList().stream()
+            Optional<LocationPoint> markerLocationPoint = locationPoints.stream()
                     .filter(p -> p.getOrderNumber() == id)
                     .findFirst();
             if(markerLocationPoint.isPresent()) {
@@ -193,7 +198,7 @@ public class SurfaceManager implements Serializable {
             Log.e(LOG_TAG, "NumberFormatException occurred while parsing: " + marker.getTitle());
         }
         // add control over button visibility
-        updateBottomLayer(workingSurface.getPointsList().size());
+        mapMarkerListener.onLocationMarkerDelete(locationPoints.size());
     }
 
     /**
