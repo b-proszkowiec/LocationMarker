@@ -1,5 +1,7 @@
 package com.bpr.pecka.fragments;
 
+import static com.bpr.pecka.constants.LocationMarkerConstants.LOCATIONS_ITEM_SELECTED;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -122,10 +124,11 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     }
 
     @Override
-    public void onItemClick(int position) {
+    public void onItemClick(int itemNumber) {
         Log.d(LOG_TAG, "onItemClick occurred");
-//        onLocationItemClickListener.onLocationItemClickListener(position);
+//        onLocationItemClickListener.onLocationItemClickListener(itemNumber);
         Intent intent = new Intent(getContext(), SurfaceDetailsActivity.class);
+        intent.putExtra(LOCATIONS_ITEM_SELECTED, itemNumber);
         startActivity(intent);
     }
 
