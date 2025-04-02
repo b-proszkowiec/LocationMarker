@@ -4,13 +4,16 @@ import static android.content.Context.LOCATION_SERVICE;
 import static com.bpr.pecka.constants.LocationMarkerConstants.DEFAULT_ZOOM;
 import static com.bpr.pecka.constants.LocationMarkerConstants.INIT_LOCATION_LAT;
 import static com.bpr.pecka.constants.LocationMarkerConstants.INIT_LOCATION_LON;
+import static com.bpr.pecka.constants.LocationMarkerConstants.LAST_KNOWN_LOCATION;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -22,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,7 +37,6 @@ import com.bpr.pecka.R;
 import com.bpr.pecka.controls.GpsPrecisionIconController;
 import com.bpr.pecka.dialog.InputDialog;
 import com.bpr.pecka.event.IMapMarker;
-import com.bpr.pecka.markers.MapMarker;
 import com.bpr.pecka.surface.EditSurface;
 import com.bpr.pecka.surface.Surface;
 import com.bpr.pecka.surface.SurfaceManager;
@@ -44,12 +47,15 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.Objects;
 
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback, IMapMarker {
     private static final String LOG_TAG = MapFragment.class.getSimpleName();
@@ -119,7 +125,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         tempPositionMarker = googleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                .title("temp_location")
+                .title(LAST_KNOWN_LOCATION)
                 .icon(BitmapDescriptorFactory
                         .fromResource(R.drawable.temp_location_point)));
     }
@@ -136,7 +142,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        editSurface = new EditSurface(requireContext(), googleMap);
+        editSurface = new EditSurface(requireActivity(), googleMap);
         LatLng initLocation = new LatLng(INIT_LOCATION_LAT, INIT_LOCATION_LON);
         MapFragment.googleMap = googleMap;
         initMapLayer();
@@ -174,9 +180,37 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         uiSettings.setMapToolbarEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
 
-//        googleMap.setOnMarkerClickListener(marker -> {
-//
-//        });
+        googleMap.setOnMarkerClickListener(marker -> {
+            if (!LAST_KNOWN_LOCATION.equals(marker.getTitle()))
+            {
+                Context context = requireContext();
+                Projection projection = googleMap.getProjection();
+                LatLng markerLocation = marker.getPosition();
+                Point screenPosition = projection.toScreenLocation(markerLocation);
+
+                Activity activity = requireActivity();
+                ViewGroup rootView = activity.findViewById(android.R.id.content);
+
+                View transparentView = new View(context);
+                transparentView.setLayoutParams(new ViewGroup.LayoutParams(1, 1));
+                transparentView.setX(screenPosition.x);
+                transparentView.setY(screenPosition.y);
+                rootView.addView(transparentView);
+
+                PopupMenu popupMenu = new PopupMenu(context, transparentView);
+                popupMenu.setOnMenuItemClickListener(item -> {
+                    if (Objects.equals(item.getTitle(), context.getString(R.string.marker_delete_popup))) {
+                        editSurface.removeMapMarker(marker);
+                    }
+                    return false;
+                });
+
+                popupMenu.inflate(R.menu.marker_popup_menu);
+                popupMenu.show();
+                popupMenu.setOnDismissListener(menu -> rootView.removeView(transparentView));
+            }
+            return true;
+        });
     }
 
     private boolean areGrantedPermission() {
@@ -354,7 +388,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 editSurface.storeNewSurface(text);
                 resetBottomLayer();
             });
-//            int itemPosition = SurfaceManager.getInstance().getSurfaces().size();
+            int itemPosition = SurfaceManager.getInstance().getSurfaces().size();
             InputDialog.getInstance().startAlertDialog(2);
         });
     }

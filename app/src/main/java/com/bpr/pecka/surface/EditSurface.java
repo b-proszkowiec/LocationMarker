@@ -1,10 +1,22 @@
 package com.bpr.pecka.surface;
 
+import static java.lang.Integer.parseInt;
+
+import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
+import com.bpr.pecka.R;
+import com.bpr.pecka.storage.SurfaceRepository;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.Marker;
+
+import java.util.List;
+import java.util.Optional;
 
 public class EditSurface extends MapSurface{
 
@@ -13,10 +25,11 @@ public class EditSurface extends MapSurface{
     private static final String TEMP_NAME = "Name";
 
     private Surface workingSurface = new Surface(TEMP_NAME);
+    private Button surfaceNameButton;
 
-
-    public EditSurface(Context context, GoogleMap googleMap) {
-        super(context, googleMap);
+    public EditSurface(Activity activity, GoogleMap googleMap) {
+        super(activity.getApplicationContext(), googleMap);
+        surfaceNameButton = activity.findViewById(R.id.surfaceNameButton);
     }
 
     /**
@@ -51,8 +64,8 @@ public class EditSurface extends MapSurface{
         if (isAddingProcessFinished) {
             double polygonArea = surface.computeArea();
             drawPolygon(polygonArea, surface.convertToLatLngList());
-//            surfaceNameButton.setVisibility(View.VISIBLE);
-//            surfaceNameButton.setText(surface.getName());
+            surfaceNameButton.setVisibility(View.VISIBLE);
+            surfaceNameButton.setText(surface.getName());
         } else if (surface.getPoints().size() > 1) {
             drawPolyline(false, workingSurface);
         }
@@ -85,9 +98,31 @@ public class EditSurface extends MapSurface{
      */
     public void storeNewSurface(String name) {
         workingSurface.setName(name);
-        workingSurface = new Surface(TEMP_NAME);
+        SurfaceRepository.addSurface(workingSurface);
 
-        refreshView(true, workingSurface);
+        workingSurface = new Surface(TEMP_NAME);
+        refreshView(false, workingSurface);
     }
 
+    /**
+     * Remove selected marker from the map.
+     *
+     * @param marker marker to remove.
+     */
+    public void removeMapMarker(Marker marker) {
+        List<LocationPoint> locationPoints = workingSurface.getPoints();
+        try {
+            final int id = parseInt(marker.getTitle());
+            Optional<LocationPoint> markerLocationPoint = locationPoints.stream()
+                    .filter(p -> p.getOrderNumber() == id)
+                    .findFirst();
+            if(markerLocationPoint.isPresent()) {
+                workingSurface.getPoints().remove(markerLocationPoint.get());
+                refreshView(false, workingSurface);
+            }
+        } catch (NumberFormatException e) {
+            Log.e(LOG_TAG, "NumberFormatException occurred while parsing: " + marker.getTitle());
+        }
+
+    }
 }
