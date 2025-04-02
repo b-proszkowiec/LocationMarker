@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bpr.pecka.R;
+import com.bpr.pecka.SurfaceDetailsActivity;
 import com.bpr.pecka.dialog.InputDialog;
 import com.bpr.pecka.surface.Surface;
 import com.bpr.pecka.surface.SurfaceManager;
@@ -123,7 +124,9 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     @Override
     public void onItemClick(int position) {
         Log.d(LOG_TAG, "onItemClick occurred");
-        onLocationItemClickListener.onLocationItemClickListener(position);
+//        onLocationItemClickListener.onLocationItemClickListener(position);
+        Intent intent = new Intent(getContext(), SurfaceDetailsActivity.class);
+        startActivity(intent);
     }
 
     @Override

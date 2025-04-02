@@ -43,4 +43,7 @@
     <!-- Marker Popups -->
     <string name="marker_delete_popup">Delete</string>
 
+    <!-- Surface details activity -->
+    <string name="surface_name">Surface name</string>
+
 </resources>
