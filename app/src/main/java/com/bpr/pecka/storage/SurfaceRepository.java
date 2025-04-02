@@ -32,6 +32,9 @@ public class SurfaceRepository {
         }
     }
 
+    public static void updateInAutoStorage() {
+        AutoDataStorage.getInstance().saveData(context, surfaces);
+    }
 
     public static boolean addSurface(Surface surface) {
         boolean alreadyExist = surfaces.stream().anyMatch(p -> p.getName().equals(surface.getName()));
@@ -44,7 +47,9 @@ public class SurfaceRepository {
 
 
     public static boolean removeSurface(Surface surface) {
-        return surfaces.removeIf(p -> p.getName().equals(surface.getName()));
+        boolean status =  surfaces.removeIf(p -> p.getName().equals(surface.getName()));
+        updateInAutoStorage();
+        return status;
     }
 
 
@@ -54,6 +59,7 @@ public class SurfaceRepository {
 
     public static List<Surface> importFromJsonFile(Context context, Uri uri) {
         surfaces = JsonFileStorage.importFromFile(context, uri);
+        updateInAutoStorage();
         return  surfaces;
     }
 

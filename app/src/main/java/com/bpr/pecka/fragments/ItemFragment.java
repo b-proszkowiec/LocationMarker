@@ -24,7 +24,6 @@ import com.bpr.pecka.dialog.InputDialog;
 import com.bpr.pecka.storage.SurfaceRepository;
 import com.bpr.pecka.surface.ShowSurface;
 import com.bpr.pecka.surface.Surface;
-import com.bpr.pecka.surface.SurfaceManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,25 +135,25 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     }
 
     @Override
-    public void onDeleteClick(int position) {
+    public void onDeleteClick(int itemIndex) {
         Log.d(LOG_TAG, "onDeleteClick occurred");
-        List<Surface> surfaces = new ArrayList<>();
-        surfaces.remove(position);
+        List<Surface> surfaces = SurfaceRepository.getSurfaces();
+        surfaces.remove(itemIndex);
+        SurfaceRepository.updateInAutoStorage();
         refreshItemsView();
-//        SurfaceManager.getInstance().updateSurfaces();
     }
 
     @Override
-    public void onEditClick(int position) {
+    public void onEditClick(int itemIndex) {
         Log.d(LOG_TAG, "onEditClick occurred");
         InputDialog.getInstance().setOnDialogTextInputListener((itemPosition, inputText) -> {
-//            Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
-//            surface.setName(inputText);
-//            SurfaceManager.getInstance().updateSurfaces();
-//            adapter.notifyItemChanged(itemPosition);
-//            refreshItemsView();
+            Surface surface = SurfaceRepository.getSurfaces().get(itemPosition);
+            surface.setName(inputText);
+            SurfaceRepository.updateInAutoStorage();
+            adapter.notifyItemChanged(itemPosition);
+            refreshItemsView();
         });
-        InputDialog.getInstance().startAlertDialog(position);
+        InputDialog.getInstance().startAlertDialog(itemIndex);
     }
 
     public interface OnLocationItemClickListener {
