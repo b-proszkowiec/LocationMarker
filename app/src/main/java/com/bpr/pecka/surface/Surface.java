@@ -1,9 +1,6 @@
 package com.bpr.pecka.surface;
 
 import android.location.Location;
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
 
 import com.bpr.pecka.settings.OptionSettings;
 import com.google.android.gms.maps.model.LatLng;
@@ -39,7 +36,7 @@ public class Surface implements Serializable {
         pointsList.add(new LocationPoint(location, totalPoints++));
     }
 
-    public List<LocationPoint> getPointsList() {
+    public List<LocationPoint> getPoints() {
         return pointsList;
     }
 

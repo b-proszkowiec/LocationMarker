@@ -21,6 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bpr.pecka.R;
 import com.bpr.pecka.SurfaceDetailsActivity;
 import com.bpr.pecka.dialog.InputDialog;
+import com.bpr.pecka.storage.SurfaceRepository;
+import com.bpr.pecka.surface.ShowSurface;
 import com.bpr.pecka.surface.Surface;
 import com.bpr.pecka.surface.SurfaceManager;
 
@@ -35,14 +37,15 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     private FragmentListSingleItemAdapter adapter;
     private OnLocationItemClickListener onLocationItemClickListener;
     private TextView noItemsTextView;
+    private ShowSurface showSurface;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == WRITE_FILE && resultCode == Activity.RESULT_OK) {
-            SurfaceManager.getInstance().exportToJson(getContext(), intent.getData());
+            SurfaceRepository.exportToJsonFile(getContext(), intent.getData());
         } else if (requestCode == OPEN_FILE && resultCode == Activity.RESULT_OK) {
-            SurfaceManager.getInstance().importFromJson(intent.getData());
+            SurfaceRepository.importFromJsonFile(getContext(), intent.getData());
             refreshItemsView();
         } else {
             Toast.makeText(getContext(), "Please install a File Manager.",
@@ -105,7 +108,7 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
 
     private void refreshItemsView() {
         ArrayList<FragmentListSingleItem> itemList = new ArrayList<>();
-        List<Surface> surfaces = SurfaceManager.getInstance().getSurfaces();
+        List<Surface> surfaces = SurfaceRepository.getSurfaces();
 
         for (Surface surface : surfaces) {
             itemList.add(new FragmentListSingleItem(R.drawable.ic_single_item_graphic, surface.getName(), surface.getArea()));
@@ -135,21 +138,21 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     @Override
     public void onDeleteClick(int position) {
         Log.d(LOG_TAG, "onDeleteClick occurred");
-        List<Surface> surfaces = SurfaceManager.getInstance().getSurfaces();
+        List<Surface> surfaces = new ArrayList<>();
         surfaces.remove(position);
         refreshItemsView();
-        SurfaceManager.getInstance().updateSurfaces();
+//        SurfaceManager.getInstance().updateSurfaces();
     }
 
     @Override
     public void onEditClick(int position) {
         Log.d(LOG_TAG, "onEditClick occurred");
         InputDialog.getInstance().setOnDialogTextInputListener((itemPosition, inputText) -> {
-            Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
-            surface.setName(inputText);
-            SurfaceManager.getInstance().updateSurfaces();
-            adapter.notifyItemChanged(itemPosition);
-            refreshItemsView();
+//            Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
+//            surface.setName(inputText);
+//            SurfaceManager.getInstance().updateSurfaces();
+//            adapter.notifyItemChanged(itemPosition);
+//            refreshItemsView();
         });
         InputDialog.getInstance().startAlertDialog(position);
     }

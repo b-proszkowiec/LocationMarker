@@ -16,11 +16,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-public class DataStorage {
-    private static final String LOG_TAG = DataStorage.class.getSimpleName();
-    private static final DataStorage INSTANCE = new DataStorage();
+public class AutoDataStorage {
+    private static final String LOG_TAG = AutoDataStorage.class.getSimpleName();
+    private static final AutoDataStorage INSTANCE = new AutoDataStorage();
 
-    private DataStorage() {
+    private AutoDataStorage() {
     }
 
     /**
@@ -28,7 +28,7 @@ public class DataStorage {
      *
      * @return unique instance of DataStorage.
      */
-    public static DataStorage getInstance() {
+    public static AutoDataStorage getInstance() {
         return INSTANCE;
     }
 

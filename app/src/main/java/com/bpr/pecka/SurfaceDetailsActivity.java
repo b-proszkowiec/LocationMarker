@@ -1,6 +1,5 @@
 package com.bpr.pecka;
 
-import static com.bpr.pecka.constants.LocationMarkerConstants.DEFAULT_ZOOM;
 import static com.bpr.pecka.constants.LocationMarkerConstants.LOCATIONS_ITEM_SELECTED;
 
 import static java.lang.Integer.parseInt;
@@ -16,12 +15,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bpr.pecka.surface.LocationPoint;
 import com.bpr.pecka.surface.Surface;
-import com.bpr.pecka.surface.SurfaceManager;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Optional;
 
@@ -44,7 +40,7 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
         TextView surfaceNameTextView = this.findViewById(R.id.surface_name);
         if (getIntent().hasExtra(LOCATIONS_ITEM_SELECTED)) {
             int itemPosition = getIntent().getIntExtra(LOCATIONS_ITEM_SELECTED, 0);
-            this.surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
+//            this.surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
             surfaceNameTextView.setText(this.surface.getName());
         }
 
@@ -63,16 +59,16 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
-        SurfaceManager.getInstance().setLastViewedSurface(surface);
-        SurfaceManager.getInstance().refreshView(true, surface);
-
-        LatLng surfaceCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(surface.convertToLatLngList());
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(surfaceCenter, DEFAULT_ZOOM));
+//        SurfaceManager.getInstance().setLastViewedSurface(surface);
+//        SurfaceManager.getInstance().refreshView(true, surface);
+//
+//        LatLng surfaceCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(surface.convertToLatLngList());
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(surfaceCenter, DEFAULT_ZOOM));
 
         mMap.setOnMarkerClickListener(marker -> {
             try {
                 int id = parseInt(marker.getTitle());
-                Optional<LocationPoint> locationPoint = surface.getPointsList().stream()
+                Optional<LocationPoint> locationPoint = surface.getPoints().stream()
                         .filter(p -> p.getOrderNumber() == id)
                         .findFirst();
 

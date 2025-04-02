@@ -33,7 +33,8 @@ import com.bpr.pecka.R;
 import com.bpr.pecka.controls.GpsPrecisionIconController;
 import com.bpr.pecka.dialog.InputDialog;
 import com.bpr.pecka.event.IMapMarker;
-import com.bpr.pecka.markers.MarkersManager;
+import com.bpr.pecka.markers.MapMarker;
+import com.bpr.pecka.surface.EditSurface;
 import com.bpr.pecka.surface.Surface;
 import com.bpr.pecka.surface.SurfaceManager;
 import com.google.android.gms.common.ConnectionResult;
@@ -66,6 +67,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private FusedLocationProviderClient fusedLocationClient;
     private GpsPrecisionIconController gpsPrecisionIconController;
     private Marker tempPositionMarker;
+    private EditSurface editSurface;
 
     /**
      * Move bottom layer into adding points mode.
@@ -100,7 +102,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         super.onHiddenChanged(hidden);
         if (!hidden && googleMap != null) {
             resetBottomLayer();
-            SurfaceManager.getInstance().reset();
+//            SurfaceManager.getInstance().reset();
         }
     }
 
@@ -134,6 +136,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        editSurface = new EditSurface(requireContext(), googleMap);
         LatLng initLocation = new LatLng(INIT_LOCATION_LAT, INIT_LOCATION_LON);
         MapFragment.googleMap = googleMap;
         initMapLayer();
@@ -163,7 +166,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             mLastLocation = location;
         });
         googleMap.setMyLocationEnabled(true);
-        MarkersManager.getInstance(requireContext()).setGoogleMap(googleMap);
         LocationManager locationManager = (LocationManager) requireContext().getSystemService(LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 0, this);
 
@@ -220,7 +222,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         if (mLastLocation == null) {
             return 0;
         }
-        return SurfaceManager.getInstance().addPointToWorkingSurface(mLastLocation);
+        return editSurface.addPointToWorkingSurface(mLastLocation);
     }
 
     /**
@@ -230,7 +232,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         if (mLastLocation == null) {
             return;
         }
-        SurfaceManager.getInstance().finish();
+        editSurface.finish();
     }
 
     /**
@@ -253,8 +255,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
      */
     public void hideAddLayerAndMoveToSurface(Surface surface) {
         addPointLayer.setVisibility(View.INVISIBLE);
-        LatLng surfaceCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(surface.convertToLatLngList());
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(surfaceCenter, DEFAULT_ZOOM));
+//        LatLng surfaceCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(surface.convertToLatLngList());
+//        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(surfaceCenter, DEFAULT_ZOOM));
     }
 
     private boolean isServicesOK() {
@@ -321,7 +323,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         Button saveButton = activity.findViewById(R.id.saveButton);
         Button resetButton = activity.findViewById(R.id.resetButton);
         gpsPrecisionIconController = new GpsPrecisionIconController(activity);
-        SurfaceManager.getInstance().setSurfaceNameButton(activity.findViewById(R.id.surfaceNameButton));
+//        SurfaceManager.getInstance().setSurfaceNameButton(activity.findViewById(R.id.surfaceNameButton));
         resetBottomLayer();
 
 
@@ -340,18 +342,20 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         resetButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "onClickResetButton: button clicked");
-            SurfaceManager.getInstance().reset();
+//            SurfaceManager.getInstance().reset();
+            editSurface.reset();
             resetBottomLayer();
         });
 
         saveButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "onClickSaveButton: button clicked");
             InputDialog.getInstance().setOnDialogTextInputListener((pos, text) -> {
-                SurfaceManager.getInstance().storeNewSurface(text);
+//                SurfaceManager.getInstance().storeNewSurface(text);
+                editSurface.storeNewSurface(text);
                 resetBottomLayer();
             });
-            int itemPosition = SurfaceManager.getInstance().getSurfaces().size();
-            InputDialog.getInstance().startAlertDialog(itemPosition);
+//            int itemPosition = SurfaceManager.getInstance().getSurfaces().size();
+            InputDialog.getInstance().startAlertDialog(2);
         });
     }
 
