@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Pecki</string>
-    <string name="google_maps_api_key">ENTER_YOUR_KEY_HERE</string>
     <string name="ic_map_text">Map</string>
     <string name="ic_location_text">Locations</string>
     <string name="ic_settings_text">Settings</string>
