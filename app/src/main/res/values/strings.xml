@@ -45,5 +45,6 @@
 
     <!-- Surface details activity -->
     <string name="surface_name">Surface name</string>
+    <string name="go_back_button">Go back button</string>
 
 </resources>
