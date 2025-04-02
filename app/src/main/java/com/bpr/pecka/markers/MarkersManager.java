@@ -1,18 +1,15 @@
 package com.bpr.pecka.markers;
 
 import static com.google.maps.android.SphericalUtil.interpolate;
-import static java.lang.Integer.parseInt;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
@@ -20,7 +17,6 @@ import android.widget.PopupMenu;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import com.bpr.pecka.DetailsActivity;
 import com.bpr.pecka.R;
 import com.bpr.pecka.settings.OptionSettings;
 import com.bpr.pecka.surface.LocationPoint;
@@ -38,14 +34,12 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.ui.IconGenerator;
 
 import java.text.DecimalFormat;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
-public class MarkersManager implements Comparator<LatLng> {
+public class MarkersManager {
 
     private static final String LOG_TAG = MarkersManager.class.getSimpleName();
     private static MarkersManager instance;
@@ -116,52 +110,35 @@ public class MarkersManager implements Comparator<LatLng> {
     public void setGoogleMap(GoogleMap gMap) {
         googleMap = gMap;
         googleMap.setOnMarkerClickListener(marker -> {
-            Surface lastViewedSurface = SurfaceManager.getInstance().getLastViewedSurface();
-            if (lastViewedSurface != null) {
-                try {
-                    int id = parseInt(marker.getTitle());
-                    Optional<LocationPoint> locationPoint = lastViewedSurface.getPointsList().stream()
-                            .filter(p -> p.getOrderNumber() == id)
-                            .findFirst();
 
-                    if (locationPoint.isPresent()) {
-                        showDetailsLayout(locationPoint.get());
-                        return true;
-                    }
-                    Log.e(LOG_TAG, "Unable to recognize LocationPoint object of selected marker!");
-                } catch (NumberFormatException e) {
-                    Log.e(LOG_TAG, "NumberFormatException occurred while parsing: " + marker.getTitle());
+            Projection projection = googleMap.getProjection();
+            LatLng markerLocation = marker.getPosition();
+            Point screenPosition = projection.toScreenLocation(markerLocation);
+
+            Activity activity = (Activity) this.context;
+            ViewGroup rootView = activity.findViewById(android.R.id.content);
+
+            View transparentView = new View(this.context);
+            transparentView.setLayoutParams(new ViewGroup.LayoutParams(1, 1));
+            transparentView.setX(screenPosition.x);
+            transparentView.setY(screenPosition.y);
+            rootView.addView(transparentView);
+
+            PopupMenu popupMenu = new PopupMenu(this.context, transparentView);
+            popupMenu.setOnMenuItemClickListener(item -> {
+                if (Objects.equals(item.getTitle(), this.context.getString(R.string.marker_delete_popup))) {
+                    SurfaceManager.getInstance().removeMarker(marker);
                 }
                 return false;
-            } else {
-                Projection projection = googleMap.getProjection();
-                LatLng markerLocation = marker.getPosition();
-                Point screenPosition = projection.toScreenLocation(markerLocation);
+            });
 
-                Activity activity = (Activity) this.context;
-                ViewGroup rootView = activity.findViewById(android.R.id.content);
+            popupMenu.inflate(R.menu.marker_popup_menu);
+            popupMenu.show();
+            popupMenu.setOnDismissListener(menu -> rootView.removeView(transparentView));
 
-                View transparentView = new View(this.context);
-                transparentView.setLayoutParams(new ViewGroup.LayoutParams(1, 1));
-                transparentView.setX(screenPosition.x);
-                transparentView.setY(screenPosition.y);
-                rootView.addView(transparentView);
-
-                PopupMenu popupMenu = new PopupMenu(this.context, transparentView);
-                popupMenu.setOnMenuItemClickListener(item -> {
-                    if (Objects.equals(item.getTitle(), this.context.getString(R.string.marker_delete_popup))) {
-                        SurfaceManager.getInstance().removeMarker(marker);
-                    }
-                    return false;
-                });
-
-                popupMenu.inflate(R.menu.marker_popup_menu);
-                popupMenu.show();
-                popupMenu.setOnDismissListener(menu -> rootView.removeView(transparentView));
-
-                return true;
+            return true;
             }
-        });
+        );
     }
 
 
@@ -193,9 +170,7 @@ public class MarkersManager implements Comparator<LatLng> {
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    public int compare(LatLng o1, LatLng o2) {
-        return (int) (o2.latitude - o1.latitude) * 10 * 1000;
-    }
+
 
     /**
      * Draws polyline on the map, based on points of the working surface.
@@ -246,11 +221,7 @@ public class MarkersManager implements Comparator<LatLng> {
                 .collect(Collectors.toList());
     }
 
-    private void showDetailsLayout(LocationPoint locationPoint) {
-        Intent intent = new Intent(context, DetailsActivity.class);
-        intent.putExtra("LocationPoint", locationPoint);
-        context.startActivity(intent);
-    }
+
 
     private void writeDistancesOnMap(boolean isAddingProcessFinished) {
         List<LatLng> points = getLatLngFromLocation();

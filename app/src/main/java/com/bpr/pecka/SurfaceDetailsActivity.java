@@ -3,12 +3,18 @@ package com.bpr.pecka;
 import static com.bpr.pecka.constants.LocationMarkerConstants.DEFAULT_ZOOM;
 import static com.bpr.pecka.constants.LocationMarkerConstants.LOCATIONS_ITEM_SELECTED;
 
+import static java.lang.Integer.parseInt;
+
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bpr.pecka.surface.LocationPoint;
 import com.bpr.pecka.surface.Surface;
 import com.bpr.pecka.surface.SurfaceManager;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -17,9 +23,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Optional;
 
 
 public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapReadyCallback {
+
+    private static final String LOG_TAG = SurfaceDetailsActivity.class.getSimpleName();
+
     private Surface surface;
     private GoogleMap mMap;
 
@@ -58,5 +68,30 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
 
         LatLng surfaceCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(surface.convertToLatLngList());
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(surfaceCenter, DEFAULT_ZOOM));
+
+        mMap.setOnMarkerClickListener(marker -> {
+            try {
+                int id = parseInt(marker.getTitle());
+                Optional<LocationPoint> locationPoint = surface.getPointsList().stream()
+                        .filter(p -> p.getOrderNumber() == id)
+                        .findFirst();
+
+                if (locationPoint.isPresent()) {
+                    showDetailsLayout(locationPoint.get());
+                    return true;
+                }
+                Log.e(LOG_TAG, "Unable to recognize LocationPoint object of selected marker!");
+            } catch (NumberFormatException e) {
+                Log.e(LOG_TAG, "NumberFormatException occurred while parsing: " + marker.getTitle());
+            }
+            return false;
+        });
+    }
+
+    private void showDetailsLayout(LocationPoint locationPoint) {
+        Context context = getApplicationContext();
+        Intent intent = new Intent(getApplicationContext(), DetailsActivity.class);
+        intent.putExtra("LocationPoint", locationPoint);
+        context.startActivity(intent);
     }
 }

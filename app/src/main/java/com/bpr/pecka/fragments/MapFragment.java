@@ -171,6 +171,10 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         uiSettings.setAllGesturesEnabled(true);
         uiSettings.setMapToolbarEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
+
+//        googleMap.setOnMarkerClickListener(marker -> {
+//
+//        });
     }
 
     private boolean areGrantedPermission() {
