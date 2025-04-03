@@ -20,9 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JsonStorage extends Activity {
+public class JsonFileStorage extends Activity {
 
-    private static final String LOG_TAG = JsonStorage.class.getSimpleName();
+    private static final String LOG_TAG = JsonFileStorage.class.getSimpleName();
+
 
     /**
      * Import surfaces from a selected file.
@@ -59,7 +60,7 @@ public class JsonStorage extends Activity {
      * @param uri      Represents a Uniform Resource Identifier (URI) reference.
      * @param surfaces List of surfaces to be stored.
      */
-    public void exportToFile(Context context, Uri uri, List<Surface> surfaces) {
+    public static void exportToFile(Context context, Uri uri, List<Surface> surfaces) {
         String jsonOfSurfacesArray = new Gson().toJson(surfaces);
 
         try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {

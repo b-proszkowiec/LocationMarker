@@ -1,5 +1,7 @@
 package com.bpr.pecka.fragments;
 
+import static com.bpr.pecka.constants.LocationMarkerConstants.LOCATIONS_ITEM_SELECTED;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,9 +19,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bpr.pecka.R;
+import com.bpr.pecka.SurfaceDetailsActivity;
 import com.bpr.pecka.dialog.InputDialog;
+import com.bpr.pecka.storage.SurfaceRepository;
 import com.bpr.pecka.surface.Surface;
-import com.bpr.pecka.surface.SurfaceManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,25 +33,20 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     private static final int OPEN_FILE = 1856;
 
     private FragmentListSingleItemAdapter adapter;
-    private OnLocationItemClickListener onLocationItemClickListener;
     private TextView noItemsTextView;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == WRITE_FILE && resultCode == Activity.RESULT_OK) {
-            SurfaceManager.getInstance().exportToJson(getContext(), intent.getData());
+            SurfaceRepository.exportToJsonFile(getContext(), intent.getData());
         } else if (requestCode == OPEN_FILE && resultCode == Activity.RESULT_OK) {
-            SurfaceManager.getInstance().importFromJson(intent.getData());
+            SurfaceRepository.importFromJsonFile(getContext(), intent.getData());
             refreshItemsView();
         } else {
             Toast.makeText(getContext(), "Please install a File Manager.",
                     Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public void setOnLocationItemClickListener(OnLocationItemClickListener listener) {
-        onLocationItemClickListener = listener;
     }
 
     @Override
@@ -102,7 +100,7 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
 
     private void refreshItemsView() {
         ArrayList<FragmentListSingleItem> itemList = new ArrayList<>();
-        List<Surface> surfaces = SurfaceManager.getInstance().getSurfaces();
+        List<Surface> surfaces = SurfaceRepository.getSurfaces();
 
         for (Surface surface : surfaces) {
             itemList.add(new FragmentListSingleItem(R.drawable.ic_single_item_graphic, surface.getName(), surface.getArea()));
@@ -121,34 +119,32 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     }
 
     @Override
-    public void onItemClick(int position) {
+    public void onItemClick(int itemNumber) {
         Log.d(LOG_TAG, "onItemClick occurred");
-        onLocationItemClickListener.onLocationItemClickListener(position);
+        Intent intent = new Intent(getContext(), SurfaceDetailsActivity.class);
+        intent.putExtra(LOCATIONS_ITEM_SELECTED, itemNumber);
+        startActivity(intent);
     }
 
     @Override
-    public void onDeleteClick(int position) {
+    public void onDeleteClick(int itemIndex) {
         Log.d(LOG_TAG, "onDeleteClick occurred");
-        List<Surface> surfaces = SurfaceManager.getInstance().getSurfaces();
-        surfaces.remove(position);
+        List<Surface> surfaces = SurfaceRepository.getSurfaces();
+        surfaces.remove(itemIndex);
+        SurfaceRepository.updateInAutoStorage();
         refreshItemsView();
-        SurfaceManager.getInstance().updateSurfaces();
     }
 
     @Override
-    public void onEditClick(int position) {
+    public void onEditClick(int itemIndex) {
         Log.d(LOG_TAG, "onEditClick occurred");
         InputDialog.getInstance().setOnDialogTextInputListener((itemPosition, inputText) -> {
-            Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
+            Surface surface = SurfaceRepository.getSurfaces().get(itemPosition);
             surface.setName(inputText);
-            SurfaceManager.getInstance().updateSurfaces();
+            SurfaceRepository.updateInAutoStorage();
             adapter.notifyItemChanged(itemPosition);
             refreshItemsView();
         });
-        InputDialog.getInstance().startAlertDialog(position);
-    }
-
-    public interface OnLocationItemClickListener {
-        void onLocationItemClickListener(int itemPosition);
+        InputDialog.getInstance().startAlertDialog(itemIndex);
     }
 }

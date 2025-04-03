@@ -11,8 +11,7 @@ import com.bpr.pecka.dialog.InputDialog;
 import com.bpr.pecka.fragments.ItemFragment;
 import com.bpr.pecka.fragments.MapFragment;
 import com.bpr.pecka.fragments.SettingsFragment;
-import com.bpr.pecka.surface.Surface;
-import com.bpr.pecka.surface.SurfaceManager;
+import com.bpr.pecka.storage.SurfaceRepository;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
@@ -35,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
             mapFragment.onHiddenChanged(false);
             toolbarTextView.setText(R.string.app_name);
             activeFragment = mapFragment;
-            SurfaceManager.getInstance().hideSurfaceButton();
+//            SurfaceManager.getInstance().hideSurfaceButton();
             return true;
         } else if (itemId == R.id.itemFragment) {
             fragmentManager.beginTransaction().hide(activeFragment).show(itemFragment).commit();
@@ -55,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        SurfaceManager.getInstance().addMapMarkerListener(mapFragment);
         toolbarTextView = this.findViewById(R.id.toolbar_textView);
         BottomNavigationView navigation = findViewById(R.id.bottom_navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -67,18 +65,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        SurfaceManager.getInstance().setContext(getApplicationContext());
-        SurfaceManager.getInstance().restoreSavedSurfaces();
+        SurfaceRepository.restoreSavedSurfaces(getApplicationContext());
         InputDialog.getInstance().setContext(this);
 
-        itemFragment.setOnLocationItemClickListener(itemPosition -> {
-            fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
-            activeFragment = mapFragment;
-            Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
-            // set last active surface
-            SurfaceManager.getInstance().setLastViewedSurface(surface);
-            SurfaceManager.getInstance().refreshView(true, surface);
-            mapFragment.hideAddLayerAndMoveToSurface(surface);
-        });
+//        itemFragment.setOnLocationItemClickListener(itemPosition -> {
+//            fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
+//            activeFragment = mapFragment;
+////            Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
+//            // set last active surface
+////            SurfaceManager.getInstance().setLastViewedSurface(surface);
+////            SurfaceManager.getInstance().refreshView(true, surface);
+////            mapFragment.hideAddLayerAndMoveToSurface(surface);
+//        });
     }
 }

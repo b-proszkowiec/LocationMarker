@@ -1,36 +1,25 @@
-package com.bpr.pecka.markers;
+package com.bpr.pecka.surface;
 
+import static com.bpr.pecka.constants.LocationMarkerConstants.DEFAULT_ZOOM;
 import static com.google.maps.android.SphericalUtil.interpolate;
-import static java.lang.Integer.parseInt;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.PopupMenu;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import com.bpr.pecka.DetailsActivity;
 import com.bpr.pecka.R;
 import com.bpr.pecka.settings.OptionSettings;
-import com.bpr.pecka.surface.LocationPoint;
-import com.bpr.pecka.surface.Surface;
-import com.bpr.pecka.surface.SurfaceManager;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -38,38 +27,19 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.ui.IconGenerator;
 
 import java.text.DecimalFormat;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-
-public class MarkersManager implements Comparator<LatLng> {
-
-    private static final String LOG_TAG = MarkersManager.class.getSimpleName();
-    private static MarkersManager instance;
-
-    private final Context context;
-    private GoogleMap googleMap;
+public class MapSurface {
+    protected Context context;
+    protected GoogleMap googleMap;
     private Polyline polyline;
 
-
-    private MarkersManager(@NonNull Context context) {
+    public MapSurface(Context context, GoogleMap googleMap) {
         this.context = context;
+        this.googleMap = googleMap;
     }
 
-    /**
-     * Gets a MarkersManager using the defaults.
-     *
-     * @return unique instance of MarkersManager.
-     */
-    public static synchronized MarkersManager getInstance(@NonNull Context context) {
-        if (instance == null) {
-            instance = new MarkersManager(context);
-        }
-        return instance;
-    }
 
     /**
      * Measures distance between two locations in meters.
@@ -108,62 +78,6 @@ public class MarkersManager implements Comparator<LatLng> {
         return Math.sqrt(distance);
     }
 
-    /**
-     * Sets the value of the private googleMap field to the specified.
-     *
-     * @param gMap specified GoogleMap value.
-     */
-    public void setGoogleMap(GoogleMap gMap) {
-        googleMap = gMap;
-        googleMap.setOnMarkerClickListener(marker -> {
-            Surface lastViewedSurface = SurfaceManager.getInstance().getLastViewedSurface();
-            if (lastViewedSurface != null) {
-                try {
-                    int id = parseInt(marker.getTitle());
-                    Optional<LocationPoint> locationPoint = lastViewedSurface.getPointsList().stream()
-                            .filter(p -> p.getOrderNumber() == id)
-                            .findFirst();
-
-                    if (locationPoint.isPresent()) {
-                        showDetailsLayout(locationPoint.get());
-                        return true;
-                    }
-                    Log.e(LOG_TAG, "Unable to recognize LocationPoint object of selected marker!");
-                } catch (NumberFormatException e) {
-                    Log.e(LOG_TAG, "NumberFormatException occurred while parsing: " + marker.getTitle());
-                }
-                return false;
-            } else {
-                Projection projection = googleMap.getProjection();
-                LatLng markerLocation = marker.getPosition();
-                Point screenPosition = projection.toScreenLocation(markerLocation);
-
-                Activity activity = (Activity) this.context;
-                ViewGroup rootView = activity.findViewById(android.R.id.content);
-
-                View transparentView = new View(this.context);
-                transparentView.setLayoutParams(new ViewGroup.LayoutParams(1, 1));
-                transparentView.setX(screenPosition.x);
-                transparentView.setY(screenPosition.y);
-                rootView.addView(transparentView);
-
-                PopupMenu popupMenu = new PopupMenu(this.context, transparentView);
-                popupMenu.setOnMenuItemClickListener(item -> {
-                    if (Objects.equals(item.getTitle(), this.context.getString(R.string.marker_delete_popup))) {
-                        SurfaceManager.getInstance().removeMarker(marker);
-                    }
-                    return false;
-                });
-
-                popupMenu.inflate(R.menu.marker_popup_menu);
-                popupMenu.show();
-                popupMenu.setOnDismissListener(menu -> rootView.removeView(transparentView));
-
-                return true;
-            }
-        });
-    }
-
 
     /**
      * Show given surface on the map based on location points on its edges.
@@ -171,9 +85,16 @@ public class MarkersManager implements Comparator<LatLng> {
      * @param surface surface to show on the map.
      */
     public void showSurfaceOnMap(Surface surface) {
-        googleMap.clear();
+        LatLng surfaceCenter = getSurfaceCenterPoint(surface.convertToLatLngList());
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(surfaceCenter, DEFAULT_ZOOM));
 
-        for (LocationPoint locationPoint : surface.getPointsList()) {
+        double polygonArea = surface.computeArea();
+        drawPolygon(polygonArea, surface.convertToLatLngList());
+        showLocationMarkerOnMap(surface.getPoints());
+    }
+
+    protected void showLocationMarkerOnMap(List<LocationPoint> locationPoints) {
+        for (LocationPoint locationPoint : locationPoints) {
             googleMap.addMarker(new MarkerOptions()
                     .position(locationPoint.getLatLng())
                     .title("" + locationPoint.getOrderNumber())
@@ -183,7 +104,20 @@ public class MarkersManager implements Comparator<LatLng> {
         }
     }
 
-    private BitmapDescriptor BitmapFromVector(int vectorResId) {
+    /**
+     * Get center of given points. This is needed to recenter the map on selected surface.
+     *
+     * @param polygonPointsList location points which are vertices of the polygon.
+     * @return the center of given points.
+     */
+    public LatLng getSurfaceCenterPoint(List<LatLng> polygonPointsList) {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        polygonPointsList.forEach(builder::include);
+        return builder.build().getCenter();
+    }
+
+
+    protected BitmapDescriptor BitmapFromVector(int vectorResId) {
         Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
         assert vectorDrawable != null;
         vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
@@ -193,26 +127,6 @@ public class MarkersManager implements Comparator<LatLng> {
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    public int compare(LatLng o1, LatLng o2) {
-        return (int) (o2.latitude - o1.latitude) * 10 * 1000;
-    }
-
-    /**
-     * Draws polyline on the map, based on points of the working surface.
-     *
-     * @param isAddingProcessFinished determines whether adding points to surface process is finished.
-     */
-    public void drawPolyline(boolean isAddingProcessFinished) {
-        if (polyline != null) {
-            polyline.remove();
-        }
-
-        PolylineOptions polylineOptions = new PolylineOptions().color(Color.GREEN);
-        List<LatLng> points = getLatLngFromLocation();
-        polyline = googleMap.addPolyline(polylineOptions.addAll(points));
-
-        writeDistancesOnMap(isAddingProcessFinished);
-    }
 
     /**
      * Draws polygon on the map based on given location points.
@@ -226,7 +140,7 @@ public class MarkersManager implements Comparator<LatLng> {
                 .fillColor(R.color.black);
 
         googleMap.addPolygon(polygonOptions);
-        LatLng polygonCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(points);
+        LatLng polygonCenter = getSurfaceCenterPoint(points);
         IconGenerator icg = new IconGenerator(context);
         icg.setColor(Color.LTGRAY);
         icg.setTextAppearance(R.style.BlackText);
@@ -240,20 +154,32 @@ public class MarkersManager implements Comparator<LatLng> {
         googleMap.addMarker(markerOptions);
     }
 
-    private List<LatLng> getLatLngFromLocation() {
-        return SurfaceManager.getInstance().getWorkingSurface().getPointsList().stream()
+
+    /**
+     * Draws polyline on the map, based on points of the working surface.
+     *
+     * @param isAddingProcessFinished determines whether adding points to surface process is finished.
+     */
+    public void drawPolyline(boolean isAddingProcessFinished, Surface surface) {
+        if (polyline != null) {
+            polyline.remove();
+        }
+
+        PolylineOptions polylineOptions = new PolylineOptions().color(Color.GREEN);
+        List<LatLng> points = getLatLngFromLocation(surface);
+        polyline = googleMap.addPolyline(polylineOptions.addAll(points));
+
+        writeDistancesOnMap(isAddingProcessFinished, surface);
+    }
+
+    private List<LatLng> c(Surface surface) {
+        return surface.getPoints().stream()
                 .map(LocationPoint::getLatLng)
                 .collect(Collectors.toList());
     }
 
-    private void showDetailsLayout(LocationPoint locationPoint) {
-        Intent intent = new Intent(context, DetailsActivity.class);
-        intent.putExtra("LocationPoint", locationPoint);
-        context.startActivity(intent);
-    }
-
-    private void writeDistancesOnMap(boolean isAddingProcessFinished) {
-        List<LatLng> points = getLatLngFromLocation();
+    private void writeDistancesOnMap(boolean isAddingProcessFinished, Surface surface) {
+        List<LatLng> points = getLatLngFromLocation(surface);
         int len = points.size();
         LatLng locStart, locEnd;
         for (int i = 0; i < len; i++) {
@@ -285,4 +211,11 @@ public class MarkersManager implements Comparator<LatLng> {
             googleMap.addMarker(markerOptions);
         }
     }
+
+    protected List<LatLng> getLatLngFromLocation(Surface surface) {
+        return surface.getPoints().stream()
+                .map(LocationPoint::getLatLng)
+                .collect(Collectors.toList());
+    }
+
 }
