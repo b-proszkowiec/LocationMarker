@@ -13,11 +13,14 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bpr.pecka.storage.SurfaceRepository;
 import com.bpr.pecka.surface.LocationPoint;
+import com.bpr.pecka.surface.ShowSurface;
 import com.bpr.pecka.surface.Surface;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Optional;
 
@@ -28,12 +31,12 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
 
     private Surface surface;
     private GoogleMap mMap;
+    private ShowSurface showSurface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_surface);
-
         ImageButton button = this.findViewById(R.id.btn_close);
         button.setOnClickListener(v -> finish());
 
@@ -41,6 +44,7 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
         if (getIntent().hasExtra(LOCATIONS_ITEM_SELECTED)) {
             int itemPosition = getIntent().getIntExtra(LOCATIONS_ITEM_SELECTED, 0);
 //            this.surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
+            this.surface = SurfaceRepository.getSurfaces().get(itemPosition);
             surfaceNameTextView.setText(this.surface.getName());
         }
 
@@ -55,15 +59,11 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        showSurface = new ShowSurface(getApplicationContext(), googleMap);
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
-//        SurfaceManager.getInstance().setLastViewedSurface(surface);
-//        SurfaceManager.getInstance().refreshView(true, surface);
-//
-//        LatLng surfaceCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(surface.convertToLatLngList());
-//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(surfaceCenter, DEFAULT_ZOOM));
+        showSurface.showSurfaceOnMap(this.surface);
 
         mMap.setOnMarkerClickListener(marker -> {
             try {
@@ -73,7 +73,7 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
                         .findFirst();
 
                 if (locationPoint.isPresent()) {
-                    showDetailsLayout(locationPoint.get());
+                    showDetailsLayout(locationPoint.get(), getBaseContext());
                     return true;
                 }
                 Log.e(LOG_TAG, "Unable to recognize LocationPoint object of selected marker!");
@@ -84,10 +84,10 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
         });
     }
 
-    private void showDetailsLayout(LocationPoint locationPoint) {
-        Context context = getApplicationContext();
-        Intent intent = new Intent(getApplicationContext(), DetailsActivity.class);
+    private void showDetailsLayout(LocationPoint locationPoint, Context context) {
+        Intent intent = new Intent(context, DetailsActivity.class);
         intent.putExtra("LocationPoint", locationPoint);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 }

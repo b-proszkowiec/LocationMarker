@@ -4,12 +4,9 @@ import android.content.Context;
 
 import com.google.android.gms.maps.GoogleMap;
 
-public class ShowSurface {
-    private Context context;
-    private GoogleMap googleMap;
+public class ShowSurface  extends  MapSurface{
 
     public ShowSurface(Context context, GoogleMap googleMap) {
-        this.context = context;
-        this.googleMap = googleMap;
+        super(context, googleMap);
     }
 }

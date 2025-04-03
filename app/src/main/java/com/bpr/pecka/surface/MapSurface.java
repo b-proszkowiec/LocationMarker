@@ -1,5 +1,6 @@
 package com.bpr.pecka.surface;
 
+import static com.bpr.pecka.constants.LocationMarkerConstants.DEFAULT_ZOOM;
 import static com.google.maps.android.SphericalUtil.interpolate;
 
 import android.content.Context;
@@ -14,6 +15,7 @@ import androidx.core.content.ContextCompat;
 
 import com.bpr.pecka.R;
 import com.bpr.pecka.settings.OptionSettings;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -84,9 +86,18 @@ public class MapSurface {
      * @param surface surface to show on the map.
      */
     public void showSurfaceOnMap(Surface surface) {
-        googleMap.clear();
+//        googleMap.clear();
 
-        for (LocationPoint locationPoint : surface.getPoints()) {
+        LatLng surfaceCenter = getSurfaceCenterPoint(surface.convertToLatLngList());
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(surfaceCenter, DEFAULT_ZOOM));
+
+        double polygonArea = surface.computeArea();
+        drawPolygon(polygonArea, surface.convertToLatLngList());
+        showLocationMarkerOnMap(surface.getPoints());
+    }
+
+    protected void showLocationMarkerOnMap(List<LocationPoint> locationPoints) {
+        for (LocationPoint locationPoint : locationPoints) {
             googleMap.addMarker(new MarkerOptions()
                     .position(locationPoint.getLatLng())
                     .title("" + locationPoint.getOrderNumber())
@@ -110,7 +121,7 @@ public class MapSurface {
 
 
 
-    private BitmapDescriptor BitmapFromVector(int vectorResId) {
+    protected BitmapDescriptor BitmapFromVector(int vectorResId) {
         Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
         assert vectorDrawable != null;
         vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());

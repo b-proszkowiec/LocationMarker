@@ -3,12 +3,13 @@ package com.bpr.pecka.surface;
 import static java.lang.Integer.parseInt;
 
 import android.app.Activity;
-import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.bpr.pecka.R;
 import com.bpr.pecka.storage.SurfaceRepository;
@@ -21,11 +22,10 @@ import java.util.Optional;
 public class EditSurface extends MapSurface{
 
     private static final String LOG_TAG = EditSurface.class.getSimpleName();
-    private static final long serialVersionUID = -5444204010422813540L;
     private static final String TEMP_NAME = "Name";
 
     private Surface workingSurface = new Surface(TEMP_NAME);
-    private Button surfaceNameButton;
+    private final Button surfaceNameButton;
 
     public EditSurface(Activity activity, GoogleMap googleMap) {
         super(activity.getApplicationContext(), googleMap);
@@ -60,15 +60,26 @@ public class EditSurface extends MapSurface{
      * @param surface current surface.
      */
     public void refreshView(boolean isAddingProcessFinished, Surface surface) {
-        showSurfaceOnMap(surface);
+        googleMap.clear();
         if (isAddingProcessFinished) {
-            double polygonArea = surface.computeArea();
-            drawPolygon(polygonArea, surface.convertToLatLngList());
+            showSurfaceOnMap(surface);
             surfaceNameButton.setVisibility(View.VISIBLE);
             surfaceNameButton.setText(surface.getName());
-        } else if (surface.getPoints().size() > 1) {
-            drawPolyline(false, workingSurface);
+        } else {
+            showLocationMarkerOnMap(surface.getPoints());
+            if (surface.getPoints().size() > 1) {
+                drawPolyline(false, workingSurface);
+            }
         }
+//
+//        if (isAddingProcessFinished) {
+//            double polygonArea = surface.computeArea();
+//            drawPolygon(polygonArea, surface.convertToLatLngList());
+//            surfaceNameButton.setVisibility(View.VISIBLE);
+//            surfaceNameButton.setText(surface.getName());
+//        } else if (surface.getPoints().size() > 1) {
+//            drawPolyline(false, workingSurface);
+//        }
     }
 
     /**
@@ -86,7 +97,7 @@ public class EditSurface extends MapSurface{
      *
      */
     public void reset() {
-        workingSurface.getPoints().clear();
+        workingSurface = new Surface(TEMP_NAME);
         refreshView(false, workingSurface);
     }
 
@@ -109,7 +120,7 @@ public class EditSurface extends MapSurface{
      *
      * @param marker marker to remove.
      */
-    public void removeMapMarker(Marker marker) {
+    public void removeMapMarker(@NonNull Marker marker) {
         List<LocationPoint> locationPoints = workingSurface.getPoints();
         try {
             final int id = parseInt(marker.getTitle());

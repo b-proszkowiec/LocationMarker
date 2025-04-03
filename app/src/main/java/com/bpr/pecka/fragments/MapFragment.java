@@ -384,7 +384,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         saveButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "onClickSaveButton: button clicked");
             InputDialog.getInstance().setOnDialogTextInputListener((pos, text) -> {
-//                SurfaceManager.getInstance().storeNewSurface(text);
                 editSurface.storeNewSurface(text);
                 resetBottomLayer();
             });
