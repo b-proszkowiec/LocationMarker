@@ -34,9 +34,7 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     private static final int OPEN_FILE = 1856;
 
     private FragmentListSingleItemAdapter adapter;
-    private OnLocationItemClickListener onLocationItemClickListener;
     private TextView noItemsTextView;
-    private ShowSurface showSurface;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -50,10 +48,6 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
             Toast.makeText(getContext(), "Please install a File Manager.",
                     Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public void setOnLocationItemClickListener(OnLocationItemClickListener listener) {
-        onLocationItemClickListener = listener;
     }
 
     @Override
@@ -128,7 +122,6 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     @Override
     public void onItemClick(int itemNumber) {
         Log.d(LOG_TAG, "onItemClick occurred");
-//        onLocationItemClickListener.onLocationItemClickListener(itemNumber);
         Intent intent = new Intent(getContext(), SurfaceDetailsActivity.class);
         intent.putExtra(LOCATIONS_ITEM_SELECTED, itemNumber);
         startActivity(intent);
@@ -154,9 +147,5 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
             refreshItemsView();
         });
         InputDialog.getInstance().startAlertDialog(itemIndex);
-    }
-
-    public interface OnLocationItemClickListener {
-        void onLocationItemClickListener(int itemPosition);
     }
 }

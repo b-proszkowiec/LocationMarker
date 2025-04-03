@@ -9,7 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.view.View;
 
 import androidx.core.content.ContextCompat;
 
@@ -86,8 +85,6 @@ public class MapSurface {
      * @param surface surface to show on the map.
      */
     public void showSurfaceOnMap(Surface surface) {
-//        googleMap.clear();
-
         LatLng surfaceCenter = getSurfaceCenterPoint(surface.convertToLatLngList());
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(surfaceCenter, DEFAULT_ZOOM));
 
@@ -118,7 +115,6 @@ public class MapSurface {
         polygonPointsList.forEach(builder::include);
         return builder.build().getCenter();
     }
-
 
 
     protected BitmapDescriptor BitmapFromVector(int vectorResId) {

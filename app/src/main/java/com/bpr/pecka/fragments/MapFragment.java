@@ -37,9 +37,8 @@ import com.bpr.pecka.R;
 import com.bpr.pecka.controls.GpsPrecisionIconController;
 import com.bpr.pecka.dialog.InputDialog;
 import com.bpr.pecka.event.IMapMarker;
+import com.bpr.pecka.storage.SurfaceRepository;
 import com.bpr.pecka.surface.EditSurface;
-import com.bpr.pecka.surface.Surface;
-import com.bpr.pecka.surface.SurfaceManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -101,15 +100,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             initMap();
         }
         return view;
-    }
-
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-        if (!hidden && googleMap != null) {
-            resetBottomLayer();
-//            SurfaceManager.getInstance().reset();
-        }
     }
 
     @SuppressLint("DefaultLocale")
@@ -281,29 +271,15 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         stopAddingButton.setVisibility(View.INVISIBLE);
     }
 
-    /**
-     * Show new created surface on the map. This will make addPointLayer invisible and
-     * let the user to cancel or store new surface by clicking 'SAVE' button.
-     *
-     * @param surface surface to show on the map.
-     */
-    public void hideAddLayerAndMoveToSurface(Surface surface) {
-        addPointLayer.setVisibility(View.INVISIBLE);
-//        LatLng surfaceCenter = SurfaceManager.getInstance().getSurfaceCenterPoint(surface.convertToLatLngList());
-//        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(surfaceCenter, DEFAULT_ZOOM));
-    }
-
     private boolean isServicesOK() {
         Log.d(LOG_TAG, "isServicesOK: Checking google services version");
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(requireContext());
 
         if (available == ConnectionResult.SUCCESS) {
-            // everything is fine and user can make map requests
             Log.d(LOG_TAG, "isServicesOK: Google play services is working");
             return true;
         } else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
-            // an error occured but we can resolve it
-            Log.d(LOG_TAG, "isServicesOK: an error occured but we can fix it");
+            Log.d(LOG_TAG, "isServicesOK: an error ocurred but we can fix it");
         } else {
             Toast.makeText(getContext(), "You can't make map requests", Toast.LENGTH_SHORT).show();
         }
@@ -357,7 +333,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         Button saveButton = activity.findViewById(R.id.saveButton);
         Button resetButton = activity.findViewById(R.id.resetButton);
         gpsPrecisionIconController = new GpsPrecisionIconController(activity);
-//        SurfaceManager.getInstance().setSurfaceNameButton(activity.findViewById(R.id.surfaceNameButton));
         resetBottomLayer();
 
 
@@ -376,7 +351,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         resetButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "onClickResetButton: button clicked");
-//            SurfaceManager.getInstance().reset();
             editSurface.reset();
             resetBottomLayer();
         });
@@ -387,8 +361,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 editSurface.storeNewSurface(text);
                 resetBottomLayer();
             });
-            int itemPosition = SurfaceManager.getInstance().getSurfaces().size();
-            InputDialog.getInstance().startAlertDialog(2);
+            int itemPosition = SurfaceRepository.getSurfaces().size();
+            InputDialog.getInstance().startAlertDialog(itemPosition);
         });
     }
 

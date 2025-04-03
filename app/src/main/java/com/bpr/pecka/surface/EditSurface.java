@@ -19,13 +19,12 @@ import com.google.android.gms.maps.model.Marker;
 import java.util.List;
 import java.util.Optional;
 
-public class EditSurface extends MapSurface{
+public class EditSurface extends MapSurface {
 
     private static final String LOG_TAG = EditSurface.class.getSimpleName();
     private static final String TEMP_NAME = "Name";
-
-    private Surface workingSurface = new Surface(TEMP_NAME);
     private final Button surfaceNameButton;
+    private Surface workingSurface = new Surface(TEMP_NAME);
 
     public EditSurface(Activity activity, GoogleMap googleMap) {
         super(activity.getApplicationContext(), googleMap);
@@ -57,7 +56,7 @@ public class EditSurface extends MapSurface{
      * Refresh view of the surface on the map.
      *
      * @param isAddingProcessFinished determines whether add points to surface is finished.
-     * @param surface current surface.
+     * @param surface                 current surface.
      */
     public void refreshView(boolean isAddingProcessFinished, Surface surface) {
         googleMap.clear();
@@ -71,21 +70,11 @@ public class EditSurface extends MapSurface{
                 drawPolyline(false, workingSurface);
             }
         }
-//
-//        if (isAddingProcessFinished) {
-//            double polygonArea = surface.computeArea();
-//            drawPolygon(polygonArea, surface.convertToLatLngList());
-//            surfaceNameButton.setVisibility(View.VISIBLE);
-//            surfaceNameButton.setText(surface.getName());
-//        } else if (surface.getPoints().size() > 1) {
-//            drawPolyline(false, workingSurface);
-//        }
     }
 
     /**
      * Stop adding new points to a working surface and create the polygon on the map.
      * This will be happen by joining the last location point with the first one.
-     *
      */
     public void finish() {
         refreshView(true, workingSurface);
@@ -94,7 +83,6 @@ public class EditSurface extends MapSurface{
 
     /**
      * Stop adding new points to a working surface and reset the process.
-     *
      */
     public void reset() {
         workingSurface = new Surface(TEMP_NAME);
@@ -127,7 +115,7 @@ public class EditSurface extends MapSurface{
             Optional<LocationPoint> markerLocationPoint = locationPoints.stream()
                     .filter(p -> p.getOrderNumber() == id)
                     .findFirst();
-            if(markerLocationPoint.isPresent()) {
+            if (markerLocationPoint.isPresent()) {
                 workingSurface.getPoints().remove(markerLocationPoint.get());
                 refreshView(false, workingSurface);
             }
