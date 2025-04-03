@@ -362,7 +362,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 resetBottomLayer();
             });
             int itemPosition = SurfaceRepository.getSurfaces().size();
-            InputDialog.getInstance().startAlertDialog(itemPosition);
+            InputDialog.getInstance().startAlertDialog(itemPosition, "");
         });
     }
 

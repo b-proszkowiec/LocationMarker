@@ -55,6 +55,7 @@ public class InputDialog {
 
         final EditText input = new EditText(context);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setText(alertDialogInputText);
         aBuilder.setView(input);
 
         aBuilder.setPositiveButton("OK", (dialog, which) -> {
@@ -74,7 +75,7 @@ public class InputDialog {
      *
      * @param itemPosition position of the item.
      */
-    public void startAlertDialog(final int itemPosition) {
+    public void startAlertDialog(final int itemPosition, String previousText) {
         Runnable alertDialogRunnable = () -> {
             if (onDialogTextInputListener != null) {
                 onDialogTextInputListener.onDialogTextInput(itemPosition, alertDialogInputText);
@@ -82,6 +83,7 @@ public class InputDialog {
                 throw new IllegalStateException("OnDialogTextInputListener is not set");
             }
         };
+        alertDialogInputText = previousText;
         userInput(alertDialogRunnable);
     }
 

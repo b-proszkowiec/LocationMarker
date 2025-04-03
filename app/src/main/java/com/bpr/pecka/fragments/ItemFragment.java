@@ -138,13 +138,13 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     @Override
     public void onEditClick(int itemIndex) {
         Log.d(LOG_TAG, "onEditClick occurred");
+        Surface surface = SurfaceRepository.getSurfaces().get(itemIndex);
         InputDialog.getInstance().setOnDialogTextInputListener((itemPosition, inputText) -> {
-            Surface surface = SurfaceRepository.getSurfaces().get(itemPosition);
             surface.setName(inputText);
             SurfaceRepository.updateInAutoStorage();
             adapter.notifyItemChanged(itemPosition);
             refreshItemsView();
         });
-        InputDialog.getInstance().startAlertDialog(itemIndex);
+        InputDialog.getInstance().startAlertDialog(itemIndex, surface.getName());
     }
 }
