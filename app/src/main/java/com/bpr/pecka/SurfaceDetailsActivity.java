@@ -15,12 +15,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bpr.pecka.storage.SurfaceRepository;
 import com.bpr.pecka.surface.LocationPoint;
-import com.bpr.pecka.surface.ShowSurface;
+import com.bpr.pecka.surface.MapSurface;
 import com.bpr.pecka.surface.Surface;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Optional;
 
@@ -31,7 +30,7 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
 
     private Surface surface;
     private GoogleMap mMap;
-    private ShowSurface showSurface;
+    private MapSurface mapSurface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +58,11 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        showSurface = new ShowSurface(getApplicationContext(), googleMap);
+        mapSurface = new MapSurface(getApplicationContext(), googleMap);
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
-        showSurface.showSurfaceOnMap(this.surface);
+        mapSurface.showSurfaceOnMap(this.surface);
 
         mMap.setOnMarkerClickListener(marker -> {
             try {

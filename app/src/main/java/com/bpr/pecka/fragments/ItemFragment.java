@@ -22,7 +22,6 @@ import com.bpr.pecka.R;
 import com.bpr.pecka.SurfaceDetailsActivity;
 import com.bpr.pecka.dialog.InputDialog;
 import com.bpr.pecka.storage.SurfaceRepository;
-import com.bpr.pecka.surface.ShowSurface;
 import com.bpr.pecka.surface.Surface;
 
 import java.util.ArrayList;
