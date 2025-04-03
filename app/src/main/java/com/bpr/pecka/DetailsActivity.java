@@ -2,6 +2,7 @@ package com.bpr.pecka;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,12 +22,13 @@ public class DetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
+        ImageButton button = this.findViewById(R.id.btn_close);
+        button.setOnClickListener(v -> finish());
         idValue = findViewById(R.id.id_value);
         latitudeValue = findViewById(R.id.latitude_value);
         longitudeValue = findViewById(R.id.longitude_value);
         accuracyValue = findViewById(R.id.accuracy_value);
-        TextView toolbarTextView = findViewById(R.id.toolbar_textView);
-        toolbarTextView.setText(R.string.ic_details_text);
+
         LocationPoint locationPoint = (LocationPoint) getIntent().getSerializableExtra(LocationPoint.class.getSimpleName());
         if (locationPoint != null) {
             fillDetailsData(locationPoint);

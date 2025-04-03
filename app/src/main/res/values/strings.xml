@@ -34,6 +34,7 @@
     <string name="export_button_text">Export</string>
 
     <!-- Location Details -->
+    <string name="details_title">Location details</string>
     <string name="details_id">Id</string>
     <string name="details_latitude">Latitude</string>
     <string name="details_longitude">Longitude</string>
