@@ -41,9 +41,26 @@
         android:paddingEnd="10dp">
 
         <TextView
+            android:id="@+id/surface_name_entry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/details_surface"
+            android:theme="@style/LocationDetailEntryAppearance" />
+
+        <TextView
+            android:id="@+id/surface_name_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/surface_name_entry"
+            android:padding="10dp"
+            android:text="@string/details_default"
+            android:theme="@style/LocationDetailValueAppearance" />
+
+        <TextView
             android:id="@+id/id_entry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/surface_name_value"
             android:text="@string/details_id"
             android:theme="@style/LocationDetailEntryAppearance" />
 
@@ -55,7 +72,6 @@
             android:padding="10dp"
             android:text="@string/details_default"
             android:theme="@style/LocationDetailValueAppearance" />
-
 
         <TextView
             android:id="@+id/latitude_entry"

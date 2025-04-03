@@ -7,6 +7,8 @@ public final class LocationMarkerConstants {
     public static final double INIT_LOCATION_LON = 19.93725953201794;
     public static final String LOCATIONS_ITEM_SELECTED = "LOCATIONS_ITEM_SELECTED";
     public static final String LAST_KNOWN_LOCATION = "LAST_KNOWN_LOCATION";
+    public static final String LOCATION_POINT = "LOCATION_POINT";
+    public static final String SURFACE_NAME = "SURFACE_NAME";
 
     private LocationMarkerConstants() {
     }

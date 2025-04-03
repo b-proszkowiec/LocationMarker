@@ -1,5 +1,8 @@
 package com.bpr.pecka;
 
+import static com.bpr.pecka.constants.LocationMarkerConstants.LOCATION_POINT;
+import static com.bpr.pecka.constants.LocationMarkerConstants.SURFACE_NAME;
+
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.widget.ImageButton;
@@ -10,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bpr.pecka.surface.LocationPoint;
 
 public class DetailsActivity extends AppCompatActivity {
-
+    private TextView surfaceNameValue;
     private TextView latitudeValue;
     private TextView longitudeValue;
     private TextView accuracyValue;
@@ -24,22 +27,29 @@ public class DetailsActivity extends AppCompatActivity {
 
         ImageButton button = this.findViewById(R.id.btn_close);
         button.setOnClickListener(v -> finish());
+        surfaceNameValue = findViewById(R.id.surface_name_value);
         idValue = findViewById(R.id.id_value);
         latitudeValue = findViewById(R.id.latitude_value);
         longitudeValue = findViewById(R.id.longitude_value);
         accuracyValue = findViewById(R.id.accuracy_value);
 
-        LocationPoint locationPoint = (LocationPoint) getIntent().getSerializableExtra(LocationPoint.class.getSimpleName());
-        if (locationPoint != null) {
-            fillDetailsData(locationPoint);
+
+        if (getIntent().hasExtra(LOCATION_POINT) && getIntent().hasExtra(SURFACE_NAME)) {
+            LocationPoint locationPoint = (LocationPoint) getIntent()
+                    .getSerializableExtra(LOCATION_POINT);
+
+            String surfaceName = getIntent().getStringExtra(SURFACE_NAME);
+            assert locationPoint != null;
+            fillDetailsData(locationPoint, surfaceName);
         }
     }
 
     @SuppressLint("DefaultLocale")
-    private void fillDetailsData(LocationPoint locationPoint) {
+    private void fillDetailsData(LocationPoint locationPoint, String surfaceName) {
+        surfaceNameValue.setText(surfaceName);
         idValue.setText(String.format("%s", locationPoint.getOrderNumber()));
         latitudeValue.setText(String.format("%f", locationPoint.getLatLng().latitude));
         longitudeValue.setText(String.format("%f", locationPoint.getLatLng().longitude));
-        accuracyValue.setText(String.format("%f", locationPoint.getAccuracy()));
+        accuracyValue.setText(String.format("%.1f m", locationPoint.getAccuracy()));
     }
 }

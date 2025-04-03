@@ -1,6 +1,8 @@
 package com.bpr.pecka;
 
 import static com.bpr.pecka.constants.LocationMarkerConstants.LOCATIONS_ITEM_SELECTED;
+import static com.bpr.pecka.constants.LocationMarkerConstants.LOCATION_POINT;
+import static com.bpr.pecka.constants.LocationMarkerConstants.SURFACE_NAME;
 
 import static java.lang.Integer.parseInt;
 
@@ -71,7 +73,7 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
                         .findFirst();
 
                 if (locationPoint.isPresent()) {
-                    showDetailsLayout(locationPoint.get(), getBaseContext());
+                    showDetailsLayout(locationPoint.get(), surface.getName(), getBaseContext());
                     return true;
                 }
                 Log.e(LOG_TAG, "Unable to recognize LocationPoint object of selected marker!");
@@ -82,9 +84,10 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
         });
     }
 
-    private void showDetailsLayout(LocationPoint locationPoint, Context context) {
+    private void showDetailsLayout(LocationPoint locationPoint, String surfaceName, Context context) {
         Intent intent = new Intent(context, DetailsActivity.class);
-        intent.putExtra("LocationPoint", locationPoint);
+        intent.putExtra(LOCATION_POINT, locationPoint);
+        intent.putExtra(SURFACE_NAME, surfaceName);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
