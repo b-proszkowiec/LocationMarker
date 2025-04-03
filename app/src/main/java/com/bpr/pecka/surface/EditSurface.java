@@ -23,6 +23,7 @@ public class EditSurface extends MapSurface {
 
     private static final String LOG_TAG = EditSurface.class.getSimpleName();
     private static final String TEMP_NAME = "Name";
+    private static final double MINIMAL_DISTANCE = 0.5;
     private final Button surfaceNameButton;
     private Surface workingSurface = new Surface(TEMP_NAME);
 
@@ -41,8 +42,11 @@ public class EditSurface extends MapSurface {
         if (!workingSurface.getPoints().isEmpty()) {
             LocationPoint lastLocation = workingSurface.getPoints().get(workingSurface.getPoints().size() - 1);
             double distance = calculateDistanceBetweenLocations(lastLocation.getLocation(), location);
-            if (distance < 1) {
-                Toast.makeText(this.context, String.format("Minimal distance should be at least %.1f m", 1.0), Toast.LENGTH_SHORT).show();
+            if (distance < MINIMAL_DISTANCE) {
+                Toast.makeText(this.context,
+                                String.format("Minimal is %.1f m", MINIMAL_DISTANCE),
+                                Toast.LENGTH_SHORT)
+                        .show();
                 return workingSurface.getPoints().size();
             }
         }
