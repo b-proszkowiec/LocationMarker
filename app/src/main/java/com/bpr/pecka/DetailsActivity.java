@@ -16,6 +16,7 @@ public class DetailsActivity extends AppCompatActivity {
     private TextView surfaceNameValue;
     private TextView latitudeValue;
     private TextView longitudeValue;
+    private TextView altitudeValue;
     private TextView accuracyValue;
     private TextView idValue;
 
@@ -31,6 +32,7 @@ public class DetailsActivity extends AppCompatActivity {
         idValue = findViewById(R.id.id_value);
         latitudeValue = findViewById(R.id.latitude_value);
         longitudeValue = findViewById(R.id.longitude_value);
+        altitudeValue = findViewById(R.id.altitude_value);
         accuracyValue = findViewById(R.id.accuracy_value);
 
 
@@ -50,6 +52,7 @@ public class DetailsActivity extends AppCompatActivity {
         idValue.setText(String.format("%s", locationPoint.getOrderNumber()));
         latitudeValue.setText(String.format("%f", locationPoint.getLatLng().latitude));
         longitudeValue.setText(String.format("%f", locationPoint.getLatLng().longitude));
+        altitudeValue.setText(String.format("%f", locationPoint.getAltitude()));
         accuracyValue.setText(String.format("%.1f m", locationPoint.getAccuracy()));
     }
 }

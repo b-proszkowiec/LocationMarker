@@ -39,6 +39,7 @@
     <string name="details_id">Id</string>
     <string name="details_latitude">Latitude</string>
     <string name="details_longitude">Longitude</string>
+    <string name="details_altitude">Altitude</string>
     <string name="details_accuracy">Accuracy</string>
     <string name="details_default">n/a</string>
 
