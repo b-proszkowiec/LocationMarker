@@ -1,5 +1,6 @@
 package com.bpr.pecka;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -11,6 +12,7 @@ import com.bpr.pecka.dialog.InputDialog;
 import com.bpr.pecka.fragments.ItemFragment;
 import com.bpr.pecka.fragments.MapFragment;
 import com.bpr.pecka.fragments.SettingsFragment;
+import com.bpr.pecka.service.LocationService;
 import com.bpr.pecka.storage.SurfaceRepository;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -60,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager.beginTransaction().add(R.id.fragment_container, mapFragment, "1").commit();
         fragmentManager.beginTransaction().add(R.id.fragment_container, settingFragment, "3").hide(settingFragment).commit();
         fragmentManager.beginTransaction().add(R.id.fragment_container, itemFragment, "2").hide(itemFragment).commit();
+
+        Intent serviceIntent = new Intent(this, LocationService.class);
+        startService(serviceIntent);
     }
 
     @Override
