@@ -3,13 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:name="com.bpr.locationmarker.ItemFragment"
+        android:name=".ItemFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/darker_gray"
         android:padding="4dp"
+        android:layout_above="@+id/saveResetLayer"
         android:scrollbars="vertical" />
 
     <TextView
@@ -18,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="No items to show" />
+        android:text="@string/no_items_to_show" />
 
     <RelativeLayout
         android:id="@+id/saveResetLayer"
@@ -33,9 +34,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
             android:background="@drawable/custom_button"
-            android:onClick="onClickExportButton"
             android:text="@string/export_button_text"
             android:textColor="#ffffff" />
 
@@ -43,10 +43,9 @@
             android:id="@+id/importButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:layout_toLeftOf="@id/exportButton"
+            android:layout_marginEnd="5dp"
+            android:layout_toStartOf="@id/exportButton"
             android:background="@drawable/custom_button"
-            android:onClick="onClickImportButton"
             android:text="@string/import_button_text"
             android:textColor="#ffffff" />
 
