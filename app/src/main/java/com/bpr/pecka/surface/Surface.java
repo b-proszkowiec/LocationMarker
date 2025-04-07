@@ -20,24 +20,24 @@ public class Surface implements Serializable {
     private static final long serialVersionUID = -5444204010422813540L;
 
     // vars
-    List<LocationPoint> pointsList;
     String name;
-    int totalPoints;
-    double areaInSquareMeters;
+    int totalMeasurements;
+    double squareMeters;
+    List<LocationPoint> points;
 
     public Surface(String locationName) {
-        this.pointsList = new ArrayList<>();
+        this.points = new ArrayList<>();
         this.name = locationName;
-        this.totalPoints = 0;
-        this.areaInSquareMeters = -1;
+        this.totalMeasurements = 0;
+        this.squareMeters = -1;
     }
 
     void addPointToSurface(Location location) {
-        pointsList.add(new LocationPoint(location, totalPoints++));
+        points.add(new LocationPoint(location, totalMeasurements++));
     }
 
     public List<LocationPoint> getPoints() {
-        return pointsList;
+        return points;
     }
 
     public void setName(String locationName) {
@@ -45,14 +45,14 @@ public class Surface implements Serializable {
     }
 
     public List<LatLng> convertToLatLngList() {
-        return pointsList.stream()
+        return points.stream()
                 .map(LocationPoint::getLatLng)
                 .collect(Collectors.toList());
     }
 
     public double computeArea() {
-        areaInSquareMeters = SphericalUtil.computeArea(convertToLatLngList());
-        return areaInSquareMeters;
+        squareMeters = SphericalUtil.computeArea(convertToLatLngList());
+        return squareMeters;
     }
 
     public String getName() {
@@ -60,7 +60,7 @@ public class Surface implements Serializable {
     }
 
     public String getArea() {
-        return OptionSettings.getInstance().calculateAreaAccordingToSettingUnit(areaInSquareMeters);
+        return OptionSettings.getInstance().calculateAreaAccordingToSettingUnit(squareMeters);
     }
 
     public static <T> Predicate<T> distinctByKey(

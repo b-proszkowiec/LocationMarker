@@ -67,15 +67,5 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         SurfaceRepository.restoreSavedSurfaces(getApplicationContext());
         InputDialog.getInstance().setContext(this);
-
-//        itemFragment.setOnLocationItemClickListener(itemPosition -> {
-//            fragmentManager.beginTransaction().hide(activeFragment).show(mapFragment).commit();
-//            activeFragment = mapFragment;
-////            Surface surface = SurfaceManager.getInstance().getSurfaces().get(itemPosition);
-//            // set last active surface
-////            SurfaceManager.getInstance().setLastViewedSurface(surface);
-////            SurfaceManager.getInstance().refreshView(true, surface);
-////            mapFragment.hideAddLayerAndMoveToSurface(surface);
-//        });
     }
 }
