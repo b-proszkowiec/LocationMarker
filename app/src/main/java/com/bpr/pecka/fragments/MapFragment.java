@@ -1,6 +1,5 @@
 package com.bpr.pecka.fragments;
 
-import static android.content.Context.LOCATION_SERVICE;
 import static com.bpr.pecka.constants.LocationMarkerConstants.DEFAULT_ZOOM;
 import static com.bpr.pecka.constants.LocationMarkerConstants.INIT_LOCATION_LAT;
 import static com.bpr.pecka.constants.LocationMarkerConstants.INIT_LOCATION_LON;
@@ -16,8 +15,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,7 +41,11 @@ import com.bpr.pecka.surface.EditSurface;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -72,6 +75,27 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private FusedLocationProviderClient fusedLocationClient;
     private GpsPrecisionIconController gpsPrecisionIconController;
     private Marker tempPositionMarker;
+    private final LocationCallback locationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(@NonNull LocationResult locationResult) {
+            Location location = locationResult.getLastLocation();
+            if (location != null) {
+                Log.d(LOG_TAG, "Updated location: " + location.getLatitude() + ", " + location.getLongitude());
+                gpsPrecisionIconController.update(location.getAccuracy());
+                mLastLocation = location;
+
+                if (tempPositionMarker != null) {
+                    tempPositionMarker.remove();
+                }
+
+                tempPositionMarker = googleMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                        .title(LAST_KNOWN_LOCATION)
+                        .icon(BitmapDescriptorFactory
+                                .fromResource(R.drawable.temp_location_point)));
+            }
+        }
+    };
     private EditSurface editSurface;
 
     /**
@@ -137,7 +161,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         MapFragment.googleMap = googleMap;
         initMapLayer();
 
-        // vars
         googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(initLocation, DEFAULT_ZOOM));
         googleMap.setPadding(0, 300, 0, 0);
@@ -146,24 +169,30 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+            Log.e(LOG_TAG, "The required permissions have not been granted.");
             return;
         }
+
+        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY)
+                .setMinUpdateIntervalMillis(1000)
+                .build();
+
+        fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+        );
+
         fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
             if (location != null) {
-                Log.d(LOG_TAG, "onSuccess: successfully got last location");
+                Log.d(LOG_TAG, "onSuccess: got last location");
+                mLastLocation = location;
+            } else {
+                Log.d(LOG_TAG, "onSuccess: last location was null");
             }
-            mLastLocation = location;
         });
+
         googleMap.setMyLocationEnabled(true);
-        LocationManager locationManager = (LocationManager) requireContext().getSystemService(LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 0, this);
 
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setAllGesturesEnabled(true);
@@ -171,8 +200,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         uiSettings.setZoomControlsEnabled(true);
 
         googleMap.setOnMarkerClickListener(marker -> {
-            if (!LAST_KNOWN_LOCATION.equals(marker.getTitle()))
-            {
+            if (!LAST_KNOWN_LOCATION.equals(marker.getTitle())) {
                 Context context = requireContext();
                 Projection projection = googleMap.getProjection();
                 LatLng markerLocation = marker.getPosition();
@@ -290,7 +318,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
      * Initializes map. This should be done after grant proper permissions.
      */
     public void initMap() {
-        // initialize map fragment
         SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map_fragment);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED

@@ -53,6 +53,6 @@ public class DetailsActivity extends AppCompatActivity {
         latitudeValue.setText(String.format("%f", locationPoint.getLatLng().latitude));
         longitudeValue.setText(String.format("%f", locationPoint.getLatLng().longitude));
         altitudeValue.setText(String.format("%f", locationPoint.getAltitude()));
-        accuracyValue.setText(String.format("%.1f m", locationPoint.getAccuracy()));
+        accuracyValue.setText(String.format("%.2f m", locationPoint.getAccuracy()));
     }
 }
