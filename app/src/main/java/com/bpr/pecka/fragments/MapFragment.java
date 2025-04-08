@@ -34,6 +34,7 @@ import androidx.fragment.app.Fragment;
 
 import com.bpr.pecka.R;
 import com.bpr.pecka.controls.GpsPrecisionIconController;
+import com.bpr.pecka.dialog.ConfirmationDialog;
 import com.bpr.pecka.dialog.InputDialog;
 import com.bpr.pecka.event.IMapMarker;
 import com.bpr.pecka.storage.SurfaceRepository;
@@ -218,7 +219,11 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 PopupMenu popupMenu = new PopupMenu(context, transparentView);
                 popupMenu.setOnMenuItemClickListener(item -> {
                     if (Objects.equals(item.getTitle(), context.getString(R.string.marker_delete_popup))) {
-                        editSurface.removeMapMarker(marker);
+                        ConfirmationDialog.show(
+                                getContext(),
+                                "Are you sure?",
+                                () -> editSurface.removeMapMarker(marker)
+                        );
                     }
                     return false;
                 });
@@ -370,10 +375,11 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         stopAddingButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "onClickEndButton: button clicked");
-            finish();
-
-            addPointLayer.setVisibility(View.INVISIBLE);
-            saveLayer.setVisibility(View.VISIBLE);
+            ConfirmationDialog.show(getContext(), "Are you sure?", () -> {
+                finish();
+                addPointLayer.setVisibility(View.INVISIBLE);
+                saveLayer.setVisibility(View.VISIBLE);
+            });
         });
 
         resetButton.setOnClickListener(v -> {
