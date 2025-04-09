@@ -391,8 +391,14 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         saveButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "onClickSaveButton: button clicked");
             InputDialog.getInstance().setOnDialogTextInputListener((pos, text) -> {
-                editSurface.storeNewSurface(text);
-                resetBottomLayer();
+               boolean alreadyExist = SurfaceRepository.getSurfaces().stream()
+                       .anyMatch(p -> p.getName().equals(text));
+               if (alreadyExist) {
+                   Toast.makeText(getContext(), "This name already exist!", Toast.LENGTH_LONG).show();
+                } else {
+                   editSurface.storeNewSurface(text);
+                   resetBottomLayer();
+               }
             });
             int itemPosition = SurfaceRepository.getSurfaces().size();
             InputDialog.getInstance().startAlertDialog(itemPosition, "");
