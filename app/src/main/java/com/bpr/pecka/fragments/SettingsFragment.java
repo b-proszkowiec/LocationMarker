@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.preference.ListPreference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreferenceCompat;
 
 import com.bpr.pecka.R;
@@ -34,9 +35,23 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
+
         OptionSettings.getInstance().setShowPrecisionIconStatus(getPrecisionIconVisibleStatus());
         OptionSettings.getInstance().setDistanceUnit(getDistanceUnit());
         OptionSettings.getInstance().setAreaUnit(getAreaUnit());
+
+        ListPreference langPref = findPreference("language");
+        if (langPref != null) {
+            langPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                String langCode = (String) newValue;
+
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+                prefs.edit().putString("language", langCode).apply();
+
+                requireActivity().recreate();
+                return true;
+            });
+        }
     }
 
     @Override

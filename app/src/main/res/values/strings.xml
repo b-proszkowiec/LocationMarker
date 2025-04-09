@@ -5,16 +5,16 @@
     <string name="ic_settings_text">Settings</string>
     <string name="ic_details_text">Details</string>
 
-    <!-- Preference Titles -->
+    <!-- Preference -->
     <string name="units_header">Units</string>
     <string name="theme_header">Theme</string>
     <string name="options_header">Options</string>
-
-    <!-- Settings Preferences -->
     <string name="units_title">Units</string>
     <string name="measurement_system_title">Measurement system</string>
     <string name="area_unit_title">Area unit</string>
     <string name="distance_unit_title">Distance unit</string>
+    <string name="app_language">Application language</string>
+    <string name="choose_language">Choose language</string>
 
     <!-- Sync Preferences -->
     <string name="theme_title">Use dark theme</string>
@@ -26,7 +26,7 @@
     <string name="precision_icon_summary_off">Precision icon on map turned off</string>
 
     <!--  -->
-    <string name="add_point_button_text">Add point</string>
+    <string name="add_point_button_text">Add</string>
     <string name="end_button_text">End</string>
     <string name="reset_button_text">Reset</string>
     <string name="save_button_text">Save</string>

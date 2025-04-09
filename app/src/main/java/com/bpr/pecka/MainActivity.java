@@ -1,5 +1,6 @@
 package com.bpr.pecka;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -11,6 +12,7 @@ import com.bpr.pecka.dialog.InputDialog;
 import com.bpr.pecka.fragments.ItemFragment;
 import com.bpr.pecka.fragments.MapFragment;
 import com.bpr.pecka.fragments.SettingsFragment;
+import com.bpr.pecka.settings.LocaleHelper;
 import com.bpr.pecka.storage.SurfaceRepository;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -67,5 +69,10 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         SurfaceRepository.restoreSavedSurfaces(getApplicationContext());
         InputDialog.getInstance().setContext(this);
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.setLocale(newBase, LocaleHelper.getLanguage(newBase)));
     }
 }

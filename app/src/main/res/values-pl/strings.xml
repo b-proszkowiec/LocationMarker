@@ -1,0 +1,59 @@
+<resources>
+    <string name="app_name">Pecki</string>
+    <string name="ic_map_text">Mapa</string>
+    <string name="ic_location_text">Lokalizacje</string>
+    <string name="ic_settings_text">Ustawienia</string>
+    <string name="ic_details_text">Szczegóły</string>
+
+    <!-- Preference Titles -->
+    <string name="units_header">Jednostki</string>
+    <string name="theme_header">Motyw</string>
+    <string name="options_header">Opcje</string>
+
+    <!-- Settings Preferences -->
+    <string name="units_title">Jednostki</string>
+    <string name="measurement_system_title">System miar</string>
+    <string name="area_unit_title">Jednostka powierzchni</string>
+    <string name="distance_unit_title">Jednostka odległości</string>
+
+    <!-- Sync Preferences -->
+    <string name="choose_language">Wybierz język</string>
+    <string name="theme_title">Użyj ciemnego motywu</string>
+    <string name="theme_summary_on">Włączono ciemny motyw aplikacji</string>
+    <string name="theme_summary_off">Włączono jasny motyw aplikacji</string>
+
+    <string name="precision_icon_title">Pokaż ikonę precyzji</string>
+    <string name="precision_icon_summary_on">Ikona precyzji na mapie jest włączona</string>
+    <string name="precision_icon_summary_off">Ikona precyzji na mapie jest wyłączona</string>
+
+    <!--  -->
+    <string name="add_point_button_text">Dodaj</string>
+    <string name="end_button_text">Zakończ</string>
+    <string name="reset_button_text">Resetuj</string>
+    <string name="save_button_text">Zapisz</string>
+    <string name="import_button_text">Importuj</string>
+    <string name="export_button_text">Eksportuj</string>
+    <string name="no_items_to_show">Brak elementów do wyświetlenia</string>
+    <string name="surface_area">Powierzchnia</string>
+    <string name="surface_edit">Edytuj powierzchnię</string>
+    <string name="surface_delete">Usuń powierzchnię</string>
+    <string name="surface_main_image">Obraz powierzchni</string>
+
+    <!-- Location Details -->
+    <string name="details_surface">Powierzchnia</string>
+    <string name="details_title">Szczegóły lokalizacji</string>
+    <string name="details_id">Identyfikator</string>
+    <string name="details_latitude">Szerokość geograficzna</string>
+    <string name="details_longitude">Długość geograficzna</string>
+    <string name="details_altitude">Wysokość</string>
+    <string name="details_accuracy">Dokładność</string>
+    <string name="details_default">n/d</string>
+
+    <!-- Marker Popups -->
+    <string name="marker_delete_popup">Usuń</string>
+
+    <!-- Surface details activity -->
+    <string name="surface_name">Nazwa powierzchni</string>
+    <string name="go_back_button">Przycisk powrotu</string>
+    <string name="app_language">Język aplikacji</string>
+</resources>

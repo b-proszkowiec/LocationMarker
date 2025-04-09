@@ -9,6 +9,15 @@
             app:title="@string/theme_title" />
 
     </PreferenceCategory>
+
+    <ListPreference
+        android:key="language"
+        android:title="@string/app_language"
+        android:summary="@string/choose_language"
+        android:entries="@array/language_names"
+        android:entryValues="@array/language_values"
+        android:defaultValue="pl" />
+
     <PreferenceCategory app:title="@string/units_header">
 
         <ListPreference

@@ -35,4 +35,14 @@
         <item>m</item>
         <item>km</item>
     </string-array>
+
+    <string-array name="language_names">
+        <item>Polski</item>
+        <item>English</item>
+    </string-array>
+
+    <string-array name="language_values">
+        <item>pl</item>
+        <item>en</item>
+    </string-array>
 </resources>
