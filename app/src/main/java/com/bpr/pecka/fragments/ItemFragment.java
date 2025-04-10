@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bpr.pecka.R;
 import com.bpr.pecka.SurfaceDetailsActivity;
+import com.bpr.pecka.dialog.ConfirmationDialog;
 import com.bpr.pecka.dialog.InputDialog;
 import com.bpr.pecka.storage.SurfaceRepository;
 import com.bpr.pecka.surface.Surface;
@@ -129,10 +130,16 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
     @Override
     public void onDeleteClick(int itemIndex) {
         Log.d(LOG_TAG, "onDeleteClick occurred");
+        String confirmationTitle = requireContext().getString(R.string.surface_delete_confirmation_title);
+        String confirmationMessage= requireContext().getString(R.string.surface_delete_confirmation_message);
         List<Surface> surfaces = SurfaceRepository.getSurfaces();
-        surfaces.remove(itemIndex);
-        SurfaceRepository.updateInAutoStorage();
-        refreshItemsView();
+        Surface surface = surfaces.get(itemIndex);
+
+        ConfirmationDialog.show(requireContext(), () -> {
+            surfaces.remove(itemIndex);
+            SurfaceRepository.updateInAutoStorage();
+            refreshItemsView();
+        }, String.format("%s\n\n%s", surface.getName(), confirmationMessage), confirmationTitle);
     }
 
     @Override
