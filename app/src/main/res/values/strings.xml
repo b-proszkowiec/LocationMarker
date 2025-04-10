@@ -51,10 +51,14 @@
     <!-- Marker Popups -->
     <string name="marker_delete_popup">Delete</string>
 
-    <!-- Surface details activity -->
     <string name="surface_name">Surface name</string>
     <string name="go_back_button">Go back button</string>
-
-
-
+    <string name="positive_button_text">Yes</string>
+    <string name="negative_button_text">No</string>
+    <string name="name_already_exist">This name already exist!</string>
+    <string name="minimum_distance">Distance must be at least</string>
+    <string name="location_delete_confirmation_title">Delete selected localization</string>
+    <string name="location_delete_confirmation_message">Are you sure you want to delete this location?</string>
+    <string name="surface_create_confirmation_title">New surface creating</string>
+    <string name="surface_create_confirmation_message">Did you save all required location points?</string>
 </resources>

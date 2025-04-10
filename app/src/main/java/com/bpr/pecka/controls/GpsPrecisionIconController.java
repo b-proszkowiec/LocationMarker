@@ -19,6 +19,8 @@ import com.bpr.pecka.settings.OptionSettings;
 
 import static com.bpr.pecka.constants.LocationMarkerConstants.GpsPrecisionIconControllerConstants.NO_LOCATION_UPDATE_TIMEOUT;
 
+import java.util.Locale;
+
 public class GpsPrecisionIconController implements IPrecisionIconVisible {
 
     private static final String LOG_TAG = GpsPrecisionIconController.class.getSimpleName();
@@ -72,7 +74,7 @@ public class GpsPrecisionIconController implements IPrecisionIconVisible {
      * @param accuracy value to show inside precision button.
      */
     public void update(float accuracy) {
-        precisionButton.setText(String.format("%.02f m", accuracy));
+        precisionButton.setText(String.format(Locale.getDefault(),"%.02f m", accuracy));
 
         float endScale = getScaleValue(accuracy);
         Animation animation = new ScaleAnimation(

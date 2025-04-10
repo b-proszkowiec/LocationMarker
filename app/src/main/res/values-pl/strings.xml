@@ -52,8 +52,15 @@
     <!-- Marker Popups -->
     <string name="marker_delete_popup">Usuń</string>
 
-    <!-- Surface details activity -->
     <string name="surface_name">Nazwa powierzchni</string>
     <string name="go_back_button">Przycisk powrotu</string>
     <string name="app_language">Język aplikacji</string>
+    <string name="positive_button_text">Tak</string>
+    <string name="negative_button_text">Nie</string>
+    <string name="name_already_exist">Ta nazwa jest już zajęta!</string>
+    <string name="minimum_distance">Odległość musi być przynajmniej</string>
+    <string name="location_delete_confirmation_title">Usunięcie wskazanej lokalizacji</string>
+    <string name="location_delete_confirmation_message">Czy napewno chcesz usunąć tę lokalizację?</string>
+    <string name="surface_create_confirmation_title">Tworzenie nowej powierzchni</string>
+    <string name="surface_create_confirmation_message">Czy zapisałeś już wszystkie punkty?</string>
 </resources>

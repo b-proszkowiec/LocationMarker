@@ -36,7 +36,6 @@ import com.bpr.pecka.R;
 import com.bpr.pecka.controls.GpsPrecisionIconController;
 import com.bpr.pecka.dialog.ConfirmationDialog;
 import com.bpr.pecka.dialog.InputDialog;
-import com.bpr.pecka.event.IMapMarker;
 import com.bpr.pecka.storage.SurfaceRepository;
 import com.bpr.pecka.surface.EditSurface;
 import com.google.android.gms.common.ConnectionResult;
@@ -60,7 +59,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Objects;
 
-public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback, IMapMarker {
+public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
     private static final String LOG_TAG = MapFragment.class.getSimpleName();
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -218,11 +217,15 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
                 PopupMenu popupMenu = new PopupMenu(context, transparentView);
                 popupMenu.setOnMenuItemClickListener(item -> {
+                    String confirmationTitle = context.getString(R.string.location_delete_confirmation_title);
+                    String confirmationMessage = context.getString(R.string.location_delete_confirmation_message);
+
                     if (Objects.equals(item.getTitle(), context.getString(R.string.marker_delete_popup))) {
                         ConfirmationDialog.show(
-                                getContext(),
-                                "Are you sure?",
-                                () -> editSurface.removeMapMarker(marker)
+                                requireContext(),
+                                () -> editSurface.removeMapMarker(marker),
+                                confirmationMessage,
+                                confirmationTitle
                         );
                     }
                     return false;
@@ -375,11 +378,14 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         stopAddingButton.setOnClickListener(v -> {
             Log.d(LOG_TAG, "onClickEndButton: button clicked");
-            ConfirmationDialog.show(getContext(), "Are you sure?", () -> {
+            String confirmationTitle = requireContext().getString(R.string.surface_create_confirmation_title);
+            String confirmationMessage = requireContext().getString(R.string.surface_create_confirmation_message);
+
+            ConfirmationDialog.show(requireContext(), () -> {
                 finish();
                 addPointLayer.setVisibility(View.INVISIBLE);
                 saveLayer.setVisibility(View.VISIBLE);
-            });
+            }, confirmationMessage, confirmationTitle);
         });
 
         resetButton.setOnClickListener(v -> {
@@ -394,7 +400,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                boolean alreadyExist = SurfaceRepository.getSurfaces().stream()
                        .anyMatch(p -> p.getName().equals(text));
                if (alreadyExist) {
-                   Toast.makeText(getContext(), "This name already exist!", Toast.LENGTH_LONG).show();
+                   String message = requireContext().getString(R.string.name_already_exist);
+                   Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
                 } else {
                    editSurface.storeNewSurface(text);
                    resetBottomLayer();
@@ -403,10 +410,5 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             int itemPosition = SurfaceRepository.getSurfaces().size();
             InputDialog.getInstance().startAlertDialog(itemPosition, "");
         });
-    }
-
-    @Override
-    public void onLocationMarkerDelete(int markers) {
-        updateBottomLayer(markers);
     }
 }

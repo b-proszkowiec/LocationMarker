@@ -5,17 +5,20 @@ import android.content.Context;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.bpr.pecka.R;
+
 public class ConfirmationDialog {
 
 
-    public static void show(Context context, String message, ConfirmationDialogListener listener) {
+    public static void show(Context context, ConfirmationDialogListener listener, String message, String title) {
+        String positiveText = context.getString(R.string.positive_button_text);
+        String negativeText = context.getString(R.string.negative_button_text);
+
         new AlertDialog.Builder(context)
-                .setTitle("Confirmation")
+                .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    listener.onConfirmed();
-                })
-                .setNegativeButton("No", null)
+                .setPositiveButton(positiveText, (dialog, which) -> listener.onConfirmed())
+                .setNegativeButton(negativeText, null)
                 .show();
     }
 }

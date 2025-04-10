@@ -17,6 +17,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 public class EditSurface extends MapSurface {
@@ -43,8 +44,9 @@ public class EditSurface extends MapSurface {
             LocationPoint lastLocation = workingSurface.getPoints().get(workingSurface.getPoints().size() - 1);
             double distance = calculateDistanceBetweenLocations(lastLocation.getLocation(), location);
             if (distance < MINIMAL_DISTANCE) {
+                String message = context.getString(R.string.minimum_distance);
                 Toast.makeText(this.context,
-                                String.format("Minimal is %.1f m", MINIMAL_DISTANCE),
+                                String.format(Locale.getDefault(), "%s %.1f m", message, MINIMAL_DISTANCE),
                                 Toast.LENGTH_SHORT)
                         .show();
                 return workingSurface.getPoints().size();
