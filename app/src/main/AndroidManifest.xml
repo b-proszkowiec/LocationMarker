@@ -19,8 +19,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
-        <activity android:name=".DetailsActivity" />
-        <activity android:name=".SurfaceDetailsActivity" />
+        <activity android:name=".DetailsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SurfaceDetailsActivity"
+            android:screenOrientation="portrait"/>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -39,6 +41,7 @@
 
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
