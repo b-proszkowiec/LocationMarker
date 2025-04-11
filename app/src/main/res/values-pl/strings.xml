@@ -31,6 +31,7 @@
     <string name="end_button_text">Zakończ</string>
     <string name="reset_button_text">Resetuj</string>
     <string name="save_button_text">Zapisz</string>
+    <string name="items_amount">Razem:</string>
     <string name="import_button_text">Importuj</string>
     <string name="export_button_text">Eksportuj</string>
     <string name="no_items_to_show">Brak elementów do wyświetlenia</string>

@@ -29,6 +29,17 @@
         android:layout_marginBottom="5dp"
         android:orientation="horizontal">
 
+        <TextView
+            android:id="@+id/itemsCountInfoTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:paddingEnd="10dp"
+            android:layout_centerVertical="true"
+            android:text=""
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/importButton" />
+
         <Button
             android:id="@+id/exportButton"
             android:layout_width="wrap_content"
@@ -37,6 +48,7 @@
             android:layout_marginEnd="5dp"
             android:background="@drawable/custom_button"
             android:text="@string/export_button_text"
+            android:layout_centerVertical="true"
             android:textColor="#ffffff" />
 
         <Button
@@ -46,6 +58,7 @@
             android:layout_marginEnd="5dp"
             android:layout_toStartOf="@id/exportButton"
             android:background="@drawable/custom_button"
+            android:layout_centerVertical="true"
             android:text="@string/import_button_text"
             android:textColor="#ffffff" />
 

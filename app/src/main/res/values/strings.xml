@@ -30,6 +30,7 @@
     <string name="end_button_text">End</string>
     <string name="reset_button_text">Reset</string>
     <string name="save_button_text">Save</string>
+    <string name="items_amount">Items:</string>
     <string name="import_button_text">Import</string>
     <string name="export_button_text">Export</string>
     <string name="no_items_to_show">No items to show</string>

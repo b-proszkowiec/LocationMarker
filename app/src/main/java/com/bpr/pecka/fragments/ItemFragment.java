@@ -27,6 +27,7 @@ import com.bpr.pecka.surface.Surface;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ItemFragment extends Fragment implements FragmentListSingleItemAdapter.OnItemClickListener {
     private static final String LOG_TAG = ItemFragment.class.getSimpleName();
@@ -35,6 +36,7 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
 
     private FragmentListSingleItemAdapter adapter;
     private TextView noItemsTextView;
+    private TextView itemsInfo;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -55,6 +57,7 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_item_list, container, false);
         noItemsTextView = view.findViewById(R.id.noItemsTextView);
+        itemsInfo = view.findViewById(R.id.itemsCountInfoTextView);
         return view;
     }
 
@@ -114,6 +117,8 @@ public class ItemFragment extends Fragment implements FragmentListSingleItemAdap
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
+        String surfaceAmountMessage =  requireContext().getString(R.string.items_amount);
+        itemsInfo.setText(String.format(Locale.getDefault(), "%s %d", surfaceAmountMessage, surfaces.size()));
         if (noItemsTextView != null) {
             noItemsTextView.setVisibility(itemList.isEmpty() ? View.VISIBLE : View.INVISIBLE);
         }
