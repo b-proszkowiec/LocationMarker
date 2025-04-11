@@ -3,14 +3,17 @@ package com.bpr.pecka;
 import static com.bpr.pecka.constants.LocationMarkerConstants.LOCATION_POINT;
 import static com.bpr.pecka.constants.LocationMarkerConstants.SURFACE_NAME;
 
-import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bpr.pecka.settings.LocaleHelper;
 import com.bpr.pecka.surface.LocationPoint;
+
+import java.util.Locale;
 
 public class DetailsActivity extends AppCompatActivity {
     private TextView surfaceNameValue;
@@ -46,13 +49,17 @@ public class DetailsActivity extends AppCompatActivity {
         }
     }
 
-    @SuppressLint("DefaultLocale")
     private void fillDetailsData(LocationPoint locationPoint, String surfaceName) {
         surfaceNameValue.setText(surfaceName);
         idValue.setText(String.format("%s", locationPoint.getOrderNumber()));
-        latitudeValue.setText(String.format("%f", locationPoint.getLatLng().latitude));
-        longitudeValue.setText(String.format("%f", locationPoint.getLatLng().longitude));
-        altitudeValue.setText(String.format("%f", locationPoint.getAltitude()));
-        accuracyValue.setText(String.format("%.2f m", locationPoint.getAccuracy()));
+        latitudeValue.setText(String.format(Locale.getDefault(), "%f", locationPoint.getLatLng().latitude));
+        longitudeValue.setText(String.format(Locale.getDefault(), "%f", locationPoint.getLatLng().longitude));
+        altitudeValue.setText(String.format(Locale.getDefault(), "%f", locationPoint.getAltitude()));
+        accuracyValue.setText(String.format(Locale.getDefault(), "%.2f m", locationPoint.getAccuracy()));
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.setLocale(newBase, LocaleHelper.getLanguage(newBase)));
     }
 }

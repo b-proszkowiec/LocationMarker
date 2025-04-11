@@ -41,14 +41,14 @@
     <string name="surface_main_image">Obraz powierzchni</string>
 
     <!-- Location Details -->
-    <string name="details_surface">Powierzchnia</string>
+    <string name="details_surface">Nazwa powierzchni</string>
     <string name="details_title">Szczegóły lokalizacji</string>
-    <string name="details_id">Identyfikator</string>
+    <string name="details_id">Numer</string>
     <string name="details_latitude">Szerokość geograficzna</string>
     <string name="details_longitude">Długość geograficzna</string>
     <string name="details_altitude">Wysokość</string>
-    <string name="details_accuracy">Dokładność</string>
-    <string name="details_default">n/d</string>
+    <string name="details_accuracy">Dokładność pomiaru</string>
+    <string name="details_default">brak</string>
 
     <!-- Marker Popups -->
     <string name="marker_delete_popup">Usuń</string>

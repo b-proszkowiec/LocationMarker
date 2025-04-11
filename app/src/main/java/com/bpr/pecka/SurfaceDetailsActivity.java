@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bpr.pecka.settings.LocaleHelper;
 import com.bpr.pecka.storage.SurfaceRepository;
 import com.bpr.pecka.surface.LocationPoint;
 import com.bpr.pecka.surface.MapSurface;
@@ -90,5 +91,10 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
         intent.putExtra(SURFACE_NAME, surfaceName);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.setLocale(newBase, LocaleHelper.getLanguage(newBase)));
     }
 }

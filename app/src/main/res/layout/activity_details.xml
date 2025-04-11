@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
+        android:gravity="center"
         android:padding="16dp"
         android:orientation="horizontal">
 
@@ -61,6 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/surface_name_value"
+            android:paddingTop="20dp"
             android:text="@string/details_id"
             android:theme="@style/LocationDetailEntryAppearance" />
 
