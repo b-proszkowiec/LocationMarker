@@ -62,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/surface_name_value"
-            android:paddingTop="20dp"
+            android:layout_marginTop="20dp"
             android:text="@string/details_id"
             android:theme="@style/LocationDetailEntryAppearance" />
 
@@ -80,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/id_value"
-            android:paddingTop="20dp"
+            android:layout_marginTop="20dp"
             android:text="@string/details_latitude"
             android:theme="@style/LocationDetailEntryAppearance" />
 
@@ -98,7 +98,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/latitude_value"
-            android:paddingTop="20dp"
+            android:layout_marginTop="20dp"
             android:text="@string/details_longitude"
             android:theme="@style/LocationDetailEntryAppearance" />
 
@@ -116,7 +116,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/longitude_value"
-            android:paddingTop="20dp"
+            android:layout_marginTop="20dp"
             android:text="@string/details_altitude"
             android:theme="@style/LocationDetailEntryAppearance" />
 
@@ -134,7 +134,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/altitude_value"
-            android:paddingTop="20dp"
+            android:layout_marginTop="20dp"
             android:text="@string/details_accuracy"
             android:theme="@style/LocationDetailEntryAppearance" />
 
@@ -147,24 +147,42 @@
             android:text="@string/details_default"
             android:theme="@style/LocationDetailValueAppearance" />
 
-        <TextView
-            android:id="@+id/reference_entry"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/accuracy_value"
-            android:paddingTop="20dp"
-            android:text="@string/details_reference"
-            android:theme="@style/LocationDetailEntryAppearance" />
+            android:layout_marginTop="20dp"
+            >
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/referenceFieldLayout"
+                >
+                <TextView
+                    android:id="@+id/reference_entry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/details_reference"
+                    android:theme="@style/LocationDetailEntryAppearance" />
 
-        <TextView
-            android:id="@+id/reference_value"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/reference_entry"
-            android:padding="10dp"
-            android:text="@string/details_default"
-            android:theme="@style/LocationDetailValueAppearance" />
-
+                <TextView
+                    android:id="@+id/reference_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/reference_entry"
+                    android:padding="10dp"
+                    android:text="@string/details_default"
+                    android:theme="@style/LocationDetailValueAppearance" />
+            </RelativeLayout>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/switch_reference"
+                android:layout_toEndOf="@+id/referenceFieldLayout"
+                android:layout_centerVertical="true"
+                android:text="@string/change"
+                android:layout_marginStart="20dp"/>
+        </RelativeLayout>
     </RelativeLayout>
 
 </RelativeLayout>

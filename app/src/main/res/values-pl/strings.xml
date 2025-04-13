@@ -9,6 +9,7 @@
     <string name="negative_text">Nie</string>
 
     <!-- Preference Titles -->
+    <string name="change">Zamień</string>
     <string name="units_header">Jednostki</string>
     <string name="theme_header">Motyw</string>
     <string name="options_header">Opcje</string>

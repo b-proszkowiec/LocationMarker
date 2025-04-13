@@ -5,6 +5,7 @@ import static com.bpr.pecka.constants.LocationMarkerConstants.SURFACE_NAME;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -43,10 +44,18 @@ public class LocationDetailsActivity extends AppCompatActivity {
         altitudeValue = findViewById(R.id.altitude_value);
         accuracyValue = findViewById(R.id.accuracy_value);
         referenceValue = findViewById(R.id.reference_value);
+        Button referenceChange = findViewById(R.id.switch_reference);
 
         if (getIntent().hasExtra(LOCATION_POINT) && getIntent().hasExtra(SURFACE_NAME)) {
             LocationPoint locationPoint = (LocationPoint) getIntent()
                     .getSerializableExtra(LOCATION_POINT);
+
+            referenceChange.setOnClickListener(v -> {
+                assert locationPoint != null;
+                boolean isLocationReference = locationPoint.isReference();
+                locationPoint.setReference(!isLocationReference);
+                referenceValue.setText(locationPoint.isReference() ? positiveText : negativeText);
+            });
 
             String surfaceName = getIntent().getStringExtra(SURFACE_NAME);
             assert locationPoint != null;
