@@ -75,6 +75,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private FusedLocationProviderClient fusedLocationClient;
     private GpsPrecisionIconController gpsPrecisionIconController;
     private Marker tempPositionMarker;
+    private EditSurface editSurface;
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -96,7 +97,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             }
         }
     };
-    private EditSurface editSurface;
 
     /**
      * Move bottom layer into adding points mode.

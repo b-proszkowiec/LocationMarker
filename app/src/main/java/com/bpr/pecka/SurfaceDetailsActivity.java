@@ -6,14 +6,17 @@ import static com.bpr.pecka.constants.LocationMarkerConstants.SURFACE_NAME;
 
 import static java.lang.Integer.parseInt;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.bpr.pecka.settings.LocaleHelper;
 import com.bpr.pecka.storage.SurfaceRepository;
@@ -54,7 +57,6 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
-
     }
 
     @Override
@@ -63,7 +65,6 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
         mapSurface = new MapSurface(getApplicationContext(), googleMap);
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.getUiSettings().setZoomControlsEnabled(true);
-
         mapSurface.showSurfaceOnMap(this.surface);
 
         mMap.setOnMarkerClickListener(marker -> {
@@ -83,6 +84,10 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
             }
             return false;
         });
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
     }
 
     private void showDetailsLayout(LocationPoint locationPoint, String surfaceName, Context context) {
