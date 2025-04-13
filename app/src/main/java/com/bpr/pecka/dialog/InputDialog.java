@@ -5,6 +5,8 @@ import android.content.Context;
 import android.text.InputType;
 import android.widget.EditText;
 
+import com.bpr.pecka.R;
+
 public class InputDialog {
     private static InputDialog instance;
     private String alertDialogInputText = "";
@@ -51,7 +53,7 @@ public class InputDialog {
         }
 
         AlertDialog.Builder aBuilder = new AlertDialog.Builder(context);
-        aBuilder.setTitle("Give a name for area:");
+        aBuilder.setTitle(context.getString(R.string.new_surface_create_alert));
 
         final EditText input = new EditText(context);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -65,7 +67,7 @@ public class InputDialog {
             }
         });
 
-        aBuilder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        aBuilder.setNegativeButton(context.getString(R.string.cancel), (dialog, which) -> dialog.cancel());
 
         aBuilder.show();
     }

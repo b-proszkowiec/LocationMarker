@@ -7,6 +7,7 @@
 
     <string name="positive_text">Yes</string>
     <string name="negative_text">No</string>
+    <string name="cancel">Cancel</string>
     <string name="change">Change</string>
 
     <!-- Preference -->
@@ -28,6 +29,8 @@
     <string name="precision_icon_title">Show precision icon</string>
     <string name="precision_icon_summary_on">Precision icon on map turned on</string>
     <string name="precision_icon_summary_off">Precision icon on map turned off</string>
+    <string name="new_surface_create_alert">Give a name for new surface</string>
+
 
     <!--  -->
     <string name="add_point_button_text">Add</string>

@@ -9,6 +9,7 @@
     <string name="negative_text">Nie</string>
 
     <!-- Preference Titles -->
+    <string name="cancel">Anuluj</string>
     <string name="change">Zamień</string>
     <string name="units_header">Jednostki</string>
     <string name="theme_header">Motyw</string>
@@ -31,6 +32,7 @@
     <string name="precision_icon_summary_off">Ikona precyzji na mapie jest wyłączona</string>
 
     <!--  -->
+    <string name="new_surface_create_alert">Podaj nazwę dla kwatery</string>
     <string name="add_point_button_text">Dodaj</string>
     <string name="end_button_text">Zakończ</string>
     <string name="reset_button_text">Resetuj</string>
