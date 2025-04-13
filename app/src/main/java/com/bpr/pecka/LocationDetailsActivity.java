@@ -15,7 +15,7 @@ import com.bpr.pecka.surface.LocationPoint;
 
 import java.util.Locale;
 
-public class DetailsActivity extends AppCompatActivity {
+public class LocationDetailsActivity extends AppCompatActivity {
     private TextView surfaceNameValue;
     private TextView latitudeValue;
     private TextView longitudeValue;
@@ -27,7 +27,7 @@ public class DetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_details);
+        setContentView(R.layout.activity_location_details);
 
         ImageButton button = this.findViewById(R.id.btn_close);
         button.setOnClickListener(v -> finish());

@@ -41,7 +41,7 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_surface);
+        setContentView(R.layout.activity_surface_details);
         ImageButton button = this.findViewById(R.id.btn_close);
         button.setOnClickListener(v -> finish());
 
@@ -91,7 +91,7 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
     }
 
     private void showDetailsLayout(LocationPoint locationPoint, String surfaceName, Context context) {
-        Intent intent = new Intent(context, DetailsActivity.class);
+        Intent intent = new Intent(context, LocationDetailsActivity.class);
         intent.putExtra(LOCATION_POINT, locationPoint);
         intent.putExtra(SURFACE_NAME, surfaceName);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

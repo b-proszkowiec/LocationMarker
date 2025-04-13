@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
-        <activity android:name=".DetailsActivity"
+        <activity android:name=".LocationDetailsActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".SurfaceDetailsActivity"
             android:screenOrientation="portrait"/>
