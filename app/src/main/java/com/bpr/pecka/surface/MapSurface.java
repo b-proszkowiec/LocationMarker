@@ -95,10 +95,14 @@ public class MapSurface {
 
     protected void showLocationMarkerOnMap(List<LocationPoint> locationPoints) {
         for (LocationPoint locationPoint : locationPoints) {
+            BitmapDescriptor bitmap = locationPoint.isReference()
+                    ? BitmapFromVector(R.drawable.edge_dot_reference)
+                    : BitmapFromVector(R.drawable.edge_dot_physical);
+
             googleMap.addMarker(new MarkerOptions()
                     .position(locationPoint.getLatLng())
                     .title("" + locationPoint.getOrderNumber())
-                    .icon(BitmapFromVector(R.drawable.edge_dot))
+                    .icon(bitmap)
                     .anchor(0.5f, 0.5f)
             );
         }
@@ -170,12 +174,6 @@ public class MapSurface {
         polyline = googleMap.addPolyline(polylineOptions.addAll(points));
 
         writeDistancesOnMap(isAddingProcessFinished, surface);
-    }
-
-    private List<LatLng> c(Surface surface) {
-        return surface.getPoints().stream()
-                .map(LocationPoint::getLatLng)
-                .collect(Collectors.toList());
     }
 
     private void writeDistancesOnMap(boolean isAddingProcessFinished, Surface surface) {

@@ -12,9 +12,12 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bpr.pecka.settings.LocaleHelper;
+import com.bpr.pecka.storage.SurfaceRepository;
 import com.bpr.pecka.surface.LocationPoint;
+import com.bpr.pecka.surface.Surface;
 
 import java.util.Locale;
+import java.util.Optional;
 
 public class LocationDetailsActivity extends AppCompatActivity {
     private TextView surfaceNameValue;
@@ -46,19 +49,30 @@ public class LocationDetailsActivity extends AppCompatActivity {
         referenceValue = findViewById(R.id.reference_value);
         Button referenceChange = findViewById(R.id.switch_reference);
 
+        String surfaceName = getIntent().getStringExtra(SURFACE_NAME);
         if (getIntent().hasExtra(LOCATION_POINT) && getIntent().hasExtra(SURFACE_NAME)) {
             LocationPoint locationPoint = (LocationPoint) getIntent()
                     .getSerializableExtra(LOCATION_POINT);
 
+            assert locationPoint != null;
+            boolean isLocationReference = locationPoint.isReference();
             referenceChange.setOnClickListener(v -> {
-                assert locationPoint != null;
-                boolean isLocationReference = locationPoint.isReference();
+                Optional<Surface> surface = SurfaceRepository.getSurfaces().stream()
+                        .filter(s -> s.getName().equals(surfaceName))
+                        .findFirst();
+
+                if(surface.isPresent()) {
+                    Optional<LocationPoint> surfaceLocation =  surface.get().getPoints().stream()
+                                    .filter(l -> l.getOrderNumber() == locationPoint.getOrderNumber())
+                                    .findFirst();
+
+                    surfaceLocation.ifPresent(point -> point.setReference(!isLocationReference));
+                    SurfaceRepository.updateInAutoStorage();
+                }
+
                 locationPoint.setReference(!isLocationReference);
                 referenceValue.setText(locationPoint.isReference() ? positiveText : negativeText);
             });
-
-            String surfaceName = getIntent().getStringExtra(SURFACE_NAME);
-            assert locationPoint != null;
             fillDetailsData(locationPoint, surfaceName);
         }
     }

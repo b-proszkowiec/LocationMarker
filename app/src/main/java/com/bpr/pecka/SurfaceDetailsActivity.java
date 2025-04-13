@@ -60,6 +60,13 @@ public class SurfaceDetailsActivity extends AppCompatActivity  implements OnMapR
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (mapSurface != null)
+            mapSurface.showSurfaceOnMap(this.surface);
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mapSurface = new MapSurface(getApplicationContext(), googleMap);
