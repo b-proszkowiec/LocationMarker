@@ -6,7 +6,8 @@ import android.app.Activity;
 import android.location.Location;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,13 +26,14 @@ public class EditSurface extends MapSurface {
     private static final String LOG_TAG = EditSurface.class.getSimpleName();
     private static final String TEMP_NAME = "Name";
     private static final double MINIMAL_DISTANCE = 0.5;
-    private final Button surfaceNameButton;
+    private final FrameLayout locationCounterFrameLayout;
+    private final TextView locationCounterTextView;
     private Surface workingSurface = new Surface(TEMP_NAME);
 
     public EditSurface(Activity activity, GoogleMap googleMap) {
         super(activity.getApplicationContext(), googleMap);
-        surfaceNameButton = activity.findViewById(R.id.surfaceNameButton);
-    }
+        locationCounterFrameLayout = activity.findViewById(R.id.roundCounterButton);
+        locationCounterTextView = locationCounterFrameLayout.findViewById(R.id.counterText);}
 
     /**
      * Add new location point to a working surface.
@@ -66,13 +68,18 @@ public class EditSurface extends MapSurface {
      */
     public void refreshView(boolean isAddingProcessFinished, Surface surface) {
         googleMap.clear();
-        if (isAddingProcessFinished) {
+        int pointsAdded = surface.getPoints().size();
+        if (pointsAdded == 0) {
+            locationCounterFrameLayout.setVisibility(View.INVISIBLE);
+        } else if (isAddingProcessFinished) {
             showSurfaceOnMap(surface);
-            surfaceNameButton.setVisibility(View.VISIBLE);
-            surfaceNameButton.setText(surface.getName());
+            locationCounterFrameLayout.setVisibility(View.INVISIBLE);
+
         } else {
+            locationCounterFrameLayout.setVisibility(View.VISIBLE);
+            locationCounterTextView.setText(String.format(Locale.getDefault(),"%d", pointsAdded));
             showLocationMarkerOnMap(surface.getPoints());
-            if (surface.getPoints().size() > 1) {
+            if (pointsAdded > 1) {
                 drawPolyline(false, workingSurface);
             }
         }
