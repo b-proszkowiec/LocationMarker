@@ -21,13 +21,18 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private TextView longitudeValue;
     private TextView altitudeValue;
     private TextView accuracyValue;
+    private TextView referenceValue;
     private TextView idValue;
+    private String positiveText;
+    private String negativeText;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_details);
+        positiveText= this.getBaseContext().getString(R.string.positive_text);
+        negativeText= this.getBaseContext().getString(R.string.negative_text);
 
         ImageButton button = this.findViewById(R.id.btn_close);
         button.setOnClickListener(v -> finish());
@@ -37,7 +42,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         longitudeValue = findViewById(R.id.longitude_value);
         altitudeValue = findViewById(R.id.altitude_value);
         accuracyValue = findViewById(R.id.accuracy_value);
-
+        referenceValue = findViewById(R.id.reference_value);
 
         if (getIntent().hasExtra(LOCATION_POINT) && getIntent().hasExtra(SURFACE_NAME)) {
             LocationPoint locationPoint = (LocationPoint) getIntent()
@@ -56,6 +61,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         longitudeValue.setText(String.format(Locale.getDefault(), "%f", locationPoint.getLatLng().longitude));
         altitudeValue.setText(String.format(Locale.getDefault(), "%f", locationPoint.getAltitude()));
         accuracyValue.setText(String.format(Locale.getDefault(), "%.2f m", locationPoint.getAccuracy()));
+        referenceValue.setText(locationPoint.isReference() ? positiveText : negativeText);
     }
 
     @Override

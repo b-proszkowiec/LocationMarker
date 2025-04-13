@@ -9,6 +9,7 @@ import java.io.Serializable;
 
 public class LocationPoint implements Serializable {
     int number;
+    boolean reference;
     double latitude;
     double longitude;
     double altitude;
@@ -19,6 +20,7 @@ public class LocationPoint implements Serializable {
         this.longitude = location.getLongitude();
         this.accuracy = location.getAccuracy();
         this.altitude = location.getAltitude();
+        this.reference = false;
         this.number = number;
     }
 
@@ -44,5 +46,13 @@ public class LocationPoint implements Serializable {
 
     public float getAccuracy() {
         return accuracy;
+    }
+
+    public boolean isReference() {
+        return reference;
+    }
+
+    public void setReference(boolean reference) {
+        this.reference = reference;
     }
 }

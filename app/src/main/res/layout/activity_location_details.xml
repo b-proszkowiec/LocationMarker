@@ -129,7 +129,6 @@
             android:text="@string/details_default"
             android:theme="@style/LocationDetailValueAppearance" />
 
-
         <TextView
             android:id="@+id/accuracy_entry"
             android:layout_width="wrap_content"
@@ -144,6 +143,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/accuracy_entry"
+            android:padding="10dp"
+            android:text="@string/details_default"
+            android:theme="@style/LocationDetailValueAppearance" />
+
+        <TextView
+            android:id="@+id/reference_entry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/accuracy_value"
+            android:paddingTop="20dp"
+            android:text="@string/details_reference"
+            android:theme="@style/LocationDetailEntryAppearance" />
+
+        <TextView
+            android:id="@+id/reference_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/reference_entry"
             android:padding="10dp"
             android:text="@string/details_default"
             android:theme="@style/LocationDetailValueAppearance" />

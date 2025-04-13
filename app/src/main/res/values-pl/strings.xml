@@ -5,6 +5,9 @@
     <string name="ic_settings_text">Ustawienia</string>
     <string name="ic_details_text">Szczegóły</string>
 
+    <string name="positive_text">Tak</string>
+    <string name="negative_text">Nie</string>
+
     <!-- Preference Titles -->
     <string name="units_header">Jednostki</string>
     <string name="theme_header">Motyw</string>
@@ -48,6 +51,7 @@
     <string name="details_longitude">Długość geograficzna</string>
     <string name="details_altitude">Wysokość</string>
     <string name="details_accuracy">Dokładność pomiaru</string>
+    <string name="details_reference">Pecka orientacyjna</string>
     <string name="details_default">brak</string>
 
     <!-- Marker Popups -->
@@ -56,8 +60,6 @@
     <string name="surface_name">Nazwa powierzchni</string>
     <string name="go_back_button">Przycisk powrotu</string>
     <string name="app_language">Język aplikacji</string>
-    <string name="positive_button_text">Tak</string>
-    <string name="negative_button_text">Nie</string>
     <string name="name_already_exist">Ta nazwa jest już zajęta!</string>
     <string name="minimum_distance">Odległość musi być przynajmniej</string>
     <string name="location_delete_confirmation_title">Usunięcie wskazanej lokalizacji</string>

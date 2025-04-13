@@ -11,8 +11,8 @@ public class ConfirmationDialog {
 
 
     public static void show(Context context, ConfirmationDialogListener listener, String message, String title) {
-        String positiveText = context.getString(R.string.positive_button_text);
-        String negativeText = context.getString(R.string.negative_button_text);
+        String positiveText = context.getString(R.string.positive_text);
+        String negativeText = context.getString(R.string.negative_text);
 
         new AlertDialog.Builder(context)
                 .setTitle(title)

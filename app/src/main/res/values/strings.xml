@@ -5,6 +5,9 @@
     <string name="ic_settings_text">Settings</string>
     <string name="ic_details_text">Details</string>
 
+    <string name="positive_text">Yes</string>
+    <string name="negative_text">No</string>
+
     <!-- Preference -->
     <string name="units_header">Units</string>
     <string name="theme_header">Theme</string>
@@ -47,6 +50,7 @@
     <string name="details_longitude">Longitude</string>
     <string name="details_altitude">Altitude</string>
     <string name="details_accuracy">Accuracy</string>
+    <string name="details_reference">Reference location</string>
     <string name="details_default">n/a</string>
 
     <!-- Marker Popups -->
@@ -54,8 +58,6 @@
 
     <string name="surface_name">Surface name</string>
     <string name="go_back_button">Go back button</string>
-    <string name="positive_button_text">Yes</string>
-    <string name="negative_button_text">No</string>
     <string name="name_already_exist">This name already exist!</string>
     <string name="minimum_distance">Distance must be at least</string>
     <string name="location_delete_confirmation_title">Delete selected localization</string>
