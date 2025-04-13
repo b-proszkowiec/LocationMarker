@@ -1,16 +1,22 @@
 # Pecki (Android location marker)
-Go with your phone around the surface and mark its edges on the map. This application allow you to store it in your phone and gets details about new created polygon e.g. distances and surface inside it.
+Use your phone to walk around the perimeter of a selected area and mark its edges directly on the map. The application allows you to save the resulting shape locally on your device. Once the polygon is created, you can access detailed information about it — including the length of its sides, total perimeter, and the surface area it covers. This feature is especially useful for mapping forest compartments, plots of land, or any irregular terrain boundaries with precision and ease.
 
-<img src="https://github.com/b-proszkowiec/LocationMarker/blob/sample-picture/sample_picture.jpg" width="200">
+<br><br>
+<p align="center">
+  <img src="https://github.com/b-proszkowiec/LocationMarker/blob/sample-picture/sample_picture.jpg" width="300">
+</p>
 
 ## Requirements
-- Android SDK version 29
+- Android SDK version 31
 
 ## Build Instructions
 - Clone project to android studio
-- Set your google maps API KEY in `strings.xml`
+- Create **local.properies** file in the root directory with the following content:  
+  `MAPS_API_KEY="<ENTER YOUR GOOGLE API KEY HERE>"`
 - Build the project
+- Send and install apk file on your device.
 
+<br><br>
 License
 -----
 
